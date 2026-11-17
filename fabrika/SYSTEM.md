@@ -1,7 +1,7 @@
 # KOVAN v2 — The System We Are Building
 
 **Date:** October 22, 2026 · **Version:** v2
-**Status:** When this file conflicts with `PRD.md` or `MIMARI.md`, **this file wins**. The v1 concept was tested against research; this is the system that survived the test.
+**Status:** When this file conflicts with `PRD.md` or `ARCHITECTURE.md`, **this file wins**. The v1 concept was tested against research; this is the system that survived the test.
 
 ---
 
@@ -313,7 +313,7 @@ rest of the system tunes itself around it.
 | v1 file | Status in v2 |
 |---|---|
 | `PRD.md` | Requirements valid; §9 metrics to be updated with `review-hours` |
-| `MIMARI.md` | Components valid; 4 rings → 3 lines |
+| `ARCHITECTURE.md` | Components valid; 4 rings → 3 lines |
 | `ORGANIZASYON.md` | 14 roles → 6 roles (v2 §1) |
 | `OGRENME.md` | Night agenda valid; "self-improvement" definition narrowed |
 | `KALITE.md` | Gates valid; seedtest + κ to be added |

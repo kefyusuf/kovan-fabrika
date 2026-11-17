@@ -110,7 +110,7 @@ goal-backward doğrulama.
 spec güncellenmez, kimse okumaz, kod tek gerçek olur. **[C]**
 
 **Tasarıma aktarılan:** F05 (spec = çalıştırılabilir kriter + drift denetimi),
-MIMARI §6 (faz/durum dosyaları), YOL-HARITASI haftalık çıktı disiplini.
+ARCHITECTURE §6 (faz/durum dosyaları), YOL-HARITASI haftalık çıktı disiplini.
 
 **Ders.** "Spec yaz" bir çözüm değil; **spec'in ölçülmesi** çözüm. Bu yüzden
 KOVAN'da spec, komut içermeyen cümleleri kabul etmiyor.
@@ -139,7 +139,7 @@ PR'larının %79.4'ü aynı repoda eşzamanlı açık. **[C]**
 **Bulgu 5: beş yapısal arıza.** Belirsizlik duvarı; inceleme darboğazı;
 koordinasyon çakışması; ölçüm enflasyonu; denetim kaybı. **[C]**
 
-**Tasarıma aktarılan:** İ6 (inceleme bütçesi), MIMARI §8 (tek yazıcı, worktree,
+**Tasarıma aktarılan:** İ6 (inceleme bütçesi), ARCHITECTURE §8 (tek yazıcı, worktree,
 dosya kilidi), KALITE §3.2 (set kimliği, harness sabitleme), ADR-F07 (Airlock).
 
 **Tasarıma aktarılmayan:** "Filo" ölçeği. 20 ajanlı bir kadro, ölçülmemiş bir
@@ -208,7 +208,7 @@ kapıları, SBOM, runbook), anayasa madde 6 ve 8.
 | Deney > kanıt | İ4 | F02, OGRENME §6.4 |
 | Bellek dosyada birikir | İ4 | F11 |
 | Çekirdek değişmez olmalı | İ3 | F03 |
-| Koordinasyon maliyeti gerçek | — | MIMARI §8 |
+| Koordinasyon maliyeti gerçek | — | ARCHITECTURE §8 |
 | Politika araç düzeyinde olmalı | — | F07 |
 | Taşınabilirlik harness'tan bağımsız | — | F12 |
 

@@ -146,7 +146,7 @@ This is not an essay — it is a buildable project set:
 |---|---|
 | [`SYSTEM.md`](SYSTEM.md) | **v2: the system we are building** — 3 lines, components, capacity valve, 90 days |
 | [`PRD.md`](PRD.md) | Product requirements: 19 FR, 8 NFR, acceptance criteria, goals |
-| [`MIMARI.md`](MIMARI.md) | Four rings, components, data flow, technology decisions |
+| [`ARCHITECTURE.md`](ARCHITECTURE.md) | Four rings, components, data flow, technology decisions |
 | [`ORGANIZASYON.md`](ORGANIZASYON.md) | Company structure, agent roles, handoff contracts, SLA |
 | [`OGRENME.md`](OGRENME.md) | Night agenda, knowledge funnel, memory, self-improvement protocol |
 | [`KALITE.md`](KALITE.md) | Gates, eval harness, metric definitions, measurement discipline |

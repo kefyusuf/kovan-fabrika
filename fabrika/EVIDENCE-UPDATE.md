@@ -86,7 +86,7 @@ LLM-yargıçta ham uyum, şansa göre düzeltilmiş κ'yı 33,8–41,3 puan şi�
 |---|---|---|
 | `README.md` | §3 İ4, İ6 | D1 ve D3 cümleleri |
 | `PRD.md` | §7 FR-02, FR-05; §9 | D2; review-hours metriği |
-| `MIMARI.md` | §8 | WIP limiti formülü |
+| `ARCHITECTURE.md` | §8 | WIP limiti formülü |
 | `ORGANIZASYON.md` | §6, §8 | Gece kapasitesi; inceleme-saati karnesi |
 | `OGRENME.md` | §1, §6.4 | D1; "iskelet evrimi" tanımı |
 | `KALITE.md` | §2, §3, §4, §7 | E2, E3, review-hours |

@@ -1,254 +1,266 @@
-# KOVAN — Ürün Gereksinim Belgesi (PRD)
+# KOVAN — Product Requirements Document (PRD)
 
-| Alan | Değer |
+| Field | Value |
 |---|---|
-| Sürüm | 1.0 (konsept) |
-| Tarih | 21 Ekim 2026 |
-| Sahip | kurucu |
-| Durum | **v2 yönlendirmesi geçerli** — sistem tanımı: [`SYSTEM.md`](SYSTEM.md) |
-| İlgili | [`README.md`](README.md) · [`MIMARI.md`](MIMARI.md) · [`ADR.md`](ADR.md) · [`loop/goal.yaml`](loop/goal.yaml) |
+| Version | 1.0 (concept) |
+| Date | October 21, 2026 |
+| Owner | founder |
+| Status | **the v2 redirection is in effect** — system definition: [`SYSTEM.md`](SYSTEM.md) |
+| Related | [`README.md`](README.md) · [`ARCHITECTURE.md`](ARCHITECTURE.md) · [`ADR.md`](ADR.md) · [`loop/goal.yaml`](loop/goal.yaml) |
 
 ---
 
-## 1. Özet
+## 1. Summary
 
-KOVAN, bir yazılım ekibinin biriktirdiği işi (backlog) **gece boyunca işleyip**
-sabaha (a) birleşmeye hazır PR'lar, (b) kaynaklı bir öğrenme raporu ve
-(c) kendi yapısına dair ölçülmüş öneriler bırakan bir üretim hattıdır.
+KOVAN is a production line that processes a software team's accumulated
+backlog **through the night** and leaves, by morning, (a) merge-ready PRs,
+(b) a sourced learning report, and (c) measured proposals about its own
+structure.
 
-Ürün bir model değildir. Ürün üç şeydir:
+The product is not a model. The product is three things:
 
-1. **Kapı seti** — neyin kabul edileceğine karar veren, değişmez, ölçülebilir kurallar.
-2. **Hafıza** — kendi hatalarından damıttığı beceri kütüphanesi ve değerlendirme seti.
-3. **Rapor** — insanın 5 dakikada okuyup karar verebildiği tek sayfalık durum.
+1. **A gate set** — immutable, measurable rules that decide what is accepted.
+2. **Memory** — the skill library and evaluation set it distilled from its own mistakes.
+3. **A report** — a one-page status a human can read and act on in 5 minutes.
 
-Satış cümlesi (henüz doğrulanmadı, bkz. §11):
+Sales sentence (not yet validated; see §11):
 
-> "Modelinizi değiştirmiyoruz. Backlog'unuzu, sabah okunabilir bir rapora
-> ve birleşmeye hazır PR'lara çeviriyoruz — üstelik her karar denetlenebilir."
+> "We do not change your model. We turn your backlog into a readable morning
+> report and merge-ready PRs — and every decision is auditable."
 
 ---
 
 ## 2. Problem
 
-**P1 — Üretim arttı, kabul artmadı.**
-Ajanlar kod üretimini hızlandırdı; ama darboğaz üretimden incelemeye kaydı.
-Yüksek AI benimsemesinde PR sayısı ~%98 artarken inceleme süresi ~%91,
-PR boyutu ~%154 artıyor (ikincil analiz; bkz. `arastirma/05-fabrikalar.md` [K30]). Sonuç:
-"daha çok kod" değil, "daha çok okunmamış kod".
+**P1 — Production rose; acceptance did not.**
+Agents accelerated code production; the bottleneck moved from production to
+review. With high AI adoption, PR counts rise ~98% while review time rises
+~91% and PR size ~154% (secondary analysis; see `arastirma/05-fabrikalar.md`
+[K30]). The result is not "more code" but "more unread code".
 
-**P2 — Öğrenme birikmiyor.**
-Her oturum sıfırdan başlıyor. Ajan aynı hatayı üçüncü kez yapıyor; hata
-kaydedilmiyor, damıtılmıyor, tekrar kullanılabilir hale gelmiyor. Kurumun
-bildiği şey, ajanın bildiği şey değil.
+**P2 — Learning does not accumulate.**
+Every session starts from zero. The agent makes the same mistake a third
+time; the error is not recorded, not distilled, not made reusable. What the
+organization knows is not what the agent knows.
 
-**P3 — Denetim kaybı.**
-Otonomi arttıkça insan kapısı aşağı kayıyor: plandan koda, koddan "ajan
-incelemesine". Bu, en az ölçülmüş alan. Kimin neyi neden onayladığı
-çoğu sistemde kayıtlı değil.
+**P3 — Loss of audit.**
+As autonomy grows, the human gate slides downward: from plan to code, from
+code to "agent review". This is the least measured area. Who approved what,
+and why, is recorded nowhere in most systems.
 
-**P4 — Ölçüm enflasyonu.**
-Aynı model, farklı harness'ta 10+ puan farklı görünüyor. Ekipler benchmark
-sayısına bakarak araç seçiyor; kendi işlerinde ne olduğunu ölçmüyor.
+**P4 — Measurement inflation.**
+The same model looks 10+ points apart across different harnesses. Teams pick
+tools by benchmark counts without measuring what happens in their own work.
 
 ---
 
-## 3. Vizyon ve konumlandırma
+## 3. Vision and positioning
 
-**Vizyon:** Bir yazılım ekibinin "ikinci vardiyası" olmak — ama sabah
-hesap verebilen bir vardiya.
+**Vision:** To be a software team's "second shift" — one that can account for
+itself in the morning.
 
-| KOVAN şudur | KOVAN şu değildir |
+| KOVAN is | KOVAN is not |
 |---|---|
-| Repo-native üretim hattı (dosya + git + CLI) | Barındırılan çok kiracılı SaaS |
-| Kapı ve hafıza ürünü | Model veya IDE ürünü |
-| İnsan kapısını **azaltan** değil, **anlamlı kılan** sistem | "İnsanı kaldıran" otonomi iddiası |
-| Tek repo, tek hat ile başlayan | İlk günden filo yönetimi |
-| Ölçülebilir iddia | Benchmark liderlik tablosu iddiası |
+| A repo-native production line (files + git + CLI) | A hosted multi-tenant SaaS |
+| A gates-and-memory product | A model or IDE product |
+| A system that makes the human gate **meaningful**, not smaller | A "removes the human" autonomy claim |
+| Something that starts with one repo, one line | Fleet management from day one |
+| A measurable claim | A leaderboard claim |
 
 ---
 
-## 4. Kullanıcılar
+## 4. Users
 
-| Persona | Durum | Acı | KOVAN'dan beklediği |
+| Persona | State | Pain | Expects from KOVAN |
 |---|---|---|---|
-| **Yalnız teknik kurucu** | 1 kişi, 3 ürün, sınırsız backlog | Gece çalışamıyor; sabah ne yapacağını hatırlamıyor | Sabah 1 sayfa: ne oldu, ne bekliyor |
-| **Küçük ürün ekibi** | 3–8 kişi, tek repo | İnceleme kuyruğu; ajan çıktısı güvenilmez | Kapılardan geçmiş, küçük PR'lar |
-| **Platform ekibi** | 20+ kişi, çok repo | Standart yok; herkes kendi prompt'uyla | Politika + denetim + ölçüm |
+| **Solo technical founder** | 1 person, 3 products, unbounded backlog | Cannot work at night; forgets by morning what to do | One page in the morning: what happened, what is waiting |
+| **Small product team** | 3–8 people, one repo | Review queue; unreliable agent output | PRs that passed the gates, small PRs |
+| **Platform team** | 20+ people, many repos | No standard; everyone with their own prompt | Policy + audit + measurement |
 
-Birincil persona: **yalnız teknik kurucu**. Sebep: karar verici ile kullanıcı
-aynı kişi; geri bildirim döngüsü en kısa; C3 onayı tek imza.
+Primary persona: **the solo technical founder**. Reason: the decision-maker
+and the user are the same person; the feedback loop is shortest; C3 approval
+is a single signature.
 
 ---
 
-## 5. Hedefler ve hedef-dışı
+## 5. Goals and non-goals
 
-### Hedefler (12 hafta)
+### Goals (12 weeks)
 
-| # | Hedef | Ölçüt |
+| # | Goal | Measure |
 |---|---|---|
-| O1 | Gece vardiyası güvenilir çalışsın | 10 gecenin ≥8'inde sabah raporu 06:00'da hazır |
-| O2 | Kapılar iş görsün | C2 görevlerde ilk turda kapı geçme oranı ≥ %50 (hafta 8), ≥ %65 (hafta 12) |
-| O3 | Öğrenme biriksin | Üretilen beceri adaylarının ≥ %30'u sonraki 2 hafta içinde en az 1 kez kullanılsın |
-| O4 | Denetim kanıtlansın | Her karar hash zinciriyle doğrulanabilir; tahrif testi geçsin |
-| O5 | Maliyet öngörülebilir olsun | Birleşen PR başına maliyet ≤ 6 USD (12 haftalık ortalama) |
+| O1 | The night shift runs reliably | Morning report ready by 06:00 on ≥ 8 of 10 nights |
+| O2 | The gates do their job | First-pass gate rate on C2 tasks ≥ 50% (week 8), ≥ 65% (week 12) |
+| O3 | Learning accumulates | ≥ 30% of the produced skill candidates get used at least once within the following 2 weeks |
+| O4 | Audit is proven | Every decision verifiable through the hash chain; the tamper test passes |
+| O5 | Cost is predictable | Cost per merged PR ≤ 6 USD (12-week average) |
 
-### Hedef-dışı (bilinçli olarak yapılmayacak)
+### Non-goals (deliberately out of scope)
 
-| # | Yapılmayacak | Neden |
+| # | Not doing | Why |
 |---|---|---|
-| X1 | Model eğitimi / fine-tune | Ayrı bütçe, ayrı uzmanlık; önce kapı problemi çözülmeli |
-| X2 | Çok kiracılı barındırma | Güvenlik yüzeyi 10 katına çıkar; tek kullanıcıda doğrulanmadan olmaz |
-| X3 | IDE / editör | Var olan harness'lar yeterli; rekabet değil entegrasyon |
-| X4 | "İnsansız yazılım" iddiası | Ölçümler aksini söylüyor; iddia güven kaybettirir |
-| X5 | Kendi kendini yayınlama (otomatik deploy) | C3 sınıfı; insan kapısı zorunlu |
+| X1 | Model training / fine-tuning | Separate budget, separate expertise; the gate problem comes first |
+| X2 | Multi-tenant hosting | The security surface grows tenfold; not before validation with a single user |
+| X3 | IDE / editor | The existing harnesses suffice; integration, not competition |
+| X4 | A "human-free software" claim | The measurements say otherwise; the claim costs trust |
+| X5 | Self-publishing (automatic deploy) | C3 class; a human gate is mandatory |
 
 ---
 
-## 6. Kullanıcı hikâyeleri
+## 6. User stories
 
-**US-01 — Sabah raporu.** Yalnız kurucu olarak sabah kahve alırken tek sayfada
-şunu görmek istiyorum: gece ne öğrenildi (kaynaklı), ne üretildi, ne reddedildi
-ve bugün ilk üç iş ne. *Kabul:* rapor 5 dakikada okunur; her iddia bir dosya
-veya URL'ye bağlıdır; "doğrulanamadı" bölümü boş bırakılamaz (boşsa "yok" yazar).
+**US-01 — Morning report.** As a solo founder, while getting my coffee in the
+morning, I want to see on a single page: what was learned overnight (with
+sources), what was produced, what was rejected, and today's top three tasks.
+*Acceptance:* the report reads in 5 minutes; every claim is tied to a file or
+URL; the "could not verify" section may not be left empty (if empty, it says
+"none").
 
-**US-02 — Güvenli PR.** Küçük ekip üyesi olarak, sabah gelen PR'ın testlerden
-geçtiğini, inceleyicinin gerekçe yazdığını ve yasak dosyalara dokunmadığını
-görmek istiyorum. *Kabul:* PR açıklaması kapı sonuçlarını tablo olarak içerir;
-inceleme gerekçesi tek cümlelik "LGTM" olamaz.
+**US-02 — A trustworthy PR.** As a small-team member, I want to see that the
+morning PR passed its tests, that the reviewer wrote a rationale, and that no
+forbidden file was touched. *Acceptance:* the PR description includes the gate
+results as a table; the review rationale cannot be a one-word "LGTM".
 
-**US-03 — Tekrarlayan hatanın durması.** Kurucu olarak, aynı hatanın üçüncü
-kez olmasını istemiyorum. *Kabul:* aynı kapı + aynı neden 2 kez görülürse
-`skills.proposed.jsonl`'a aday düşer; aday bir sonraki vardiyada test edilir.
+**US-03 — The recurring error stops.** As a founder, I do not want the same
+mistake a third time. *Acceptance:* the same gate + same cause seen twice
+opens a candidate in `skills.proposed.jsonl`; the candidate is tested in the
+next shift.
 
-**US-04 — Durdurma.** Kurucu olarak, gece 02:00'de bir şeyin ters gittiğini
-görünce tek komutla durdurmak istiyorum. *Kabul:* `STOP` dosyası konduğunda
-yeni iş alınmaz; 60 saniye içinde rapor yazılır; yarım kalan iş "yarım" olarak
-işaretlenir.
+**US-04 — Stopping.** As a founder, when something goes wrong at 02:00 I want
+to stop it with a single command. *Acceptance:* when the `STOP` file is in
+place no new work is taken; a report is written within 60 seconds; unfinished
+work is marked "partial".
 
-**US-05 — Ölçüm dürüstlüğü.** Platform ekibi olarak, "eval %95" cümlesinin
-hangi sette, kaç örnekle, hangi tarihte ölçüldüğünü görmek istiyorum.
-*Kabul:* her metrik kaydı `{set, n, tarih, harness, model}` taşır.
+**US-05 — Measurement honesty.** As a platform team, I want to see in which
+set, with how many samples, and on which date the "eval 95%" sentence was
+measured. *Acceptance:* every metric record carries
+`{set, n, date, harness, model}`.
 
-**US-06 — Yapı önerisi.** Kurucu olarak, sistemin kendi kadrosunu değiştirme
-önerisini gerekçeli ve ölçülmüş görmek istiyorum. *Kabul:* öneri bir ADR
-taslağıdır; "hangi metrik, ne kadar, nasıl ölçülecek" içerir; onaylanmadan
-uygulanmaz.
-
----
-
-## 7. Fonksiyonel gereksinimler
-
-Öncelik: **M**ust / **S**hould / **C**ould. Her gereksinim tek bir halkaya aittir.
-
-### Halka 1 — Görev döngüsü (dakikalar)
-
-| # | Gereksinim | Öncelik | Kabul kriteri |
-|---|---|---|---|
-| FR-01 | Hedef sözleşmesi okunur ve doğrulanır | M | `goal.yaml` yoksa veya `goal.id` boşsa döngü başlamaz |
-| FR-02 | Issue → spec + çalıştırılabilir kabul kriteri | M | Her kriter bir komut içerir; komutsuz kriter reddedilir |
-| FR-03 | Test-önce: kod yazılmadan kırmızı test | M | Testin önce başarısız olduğu kaydı yoksa kod kapıya girmez |
-| FR-04 | Sınırlı kapsamlı patch üretimi | M | Patch yalnızca spec'te listelenen dosyalara dokunur |
-| FR-05 | Bağımsız inceleme | M | İnceleyici farklı bağlamda çalışır; gerekçe zorunlu |
-| FR-06 | Sıralı kapı zinciri + fail-fast | M | İlk bloklayıcı hatada sonraki kapı çalışmaz |
-| FR-07 | Değişiklik sınıfı ve insan kapısı | M | C3 hiçbir koşulda otomatik geçmez |
-| FR-08 | İzolasyon: worktree + konteyner | M | Ajan ana çalışma ağacına yazamaz; ağ allowlist'e tabidir |
-
-### Halka 2 — Vardiya döngüsü (7 saat)
-
-| # | Gereksinim | Öncelik | Kabul kriteri |
-|---|---|---|---|
-| FR-09 | Gece ajandası ve zaman kutusu | M | Her blok için ayrılmış süre ve çıktı tanımlı |
-| FR-10 | Kaynaklı araştırma | M | Her iddia URL/arXiv kimliği taşır; erişilemeyen "doğrulanamadı" |
-| FR-11 | Beceri damıtma | M | Beceri adayı: tetikleyici, prosedür, doğrulama, test |
-| FR-12 | Sabah raporu | M | 5 bölüm dolu; 06:00'da dosyada; tek sayfa |
-| FR-13 | Ders kaydı ve tekrar tespiti | S | Aynı parmak izi 2. kez görülünce aday açılır |
-
-### Halka 3 — Sürüm döngüsü (günler)
-
-| # | Gereksinim | Öncelik | Kabul kriteri |
-|---|---|---|---|
-| FR-14 | Kanarya + otomatik geri alma | M | Eval eşiğin altına düşerse sürüm geri alınır |
-| FR-15 | Model/bütçe yönlendirmesi | S | %80 bütçede kademe düşer; %100'de durur |
-| FR-16 | Beceri aktivasyonu | S | Beceri, uygulandığı görev sınıfında ölçülmeden "aktif" olmaz |
-
-### Halka 4 — Yapı döngüsü (haftalar)
-
-| # | Gereksinim | Öncelik | Kabul kriteri |
-|---|---|---|---|
-| FR-17 | Yapı önerisi (ADR taslağı) | S | Öneri: bağlam, karar, beklenen etki, ölçüm planı |
-| FR-18 | Denetim defteri | M | Append-only; hash zinciri; `verify` tahrifi gösterir |
-| FR-19 | Bellek bakımı | C | Çürüme raporu: kullanılmayan beceri/not listesi; silme yok |
+**US-06 — Structure proposal.** As a founder, I want the system's proposal to
+change its own roster to come with a rationale and a measurement. *Acceptance:*
+the proposal is an ADR draft; it contains "which metric, how much, how it will
+be measured"; it is not applied without approval.
 
 ---
 
-## 8. Fonksiyonel olmayan gereksinimler
+## 7. Functional requirements
 
-| # | Gereksinim | Eşik / kabul |
+Priority: **M**ust / **S**hould / **C**ould. Each requirement belongs to a
+single ring.
+
+### Ring 1 — Task loop (minutes)
+
+| # | Requirement | Priority | Acceptance criterion |
+|---|---|---|---|
+| FR-01 | The goal contract is read and validated | M | If `goal.yaml` is missing or `goal.id` is empty, the loop does not start |
+| FR-02 | Issue → spec + executable acceptance criteria | M | Every criterion contains a command; a commandless criterion is rejected |
+| FR-03 | Test-first: a red test before code | M | Without a record of the test failing first, the code does not enter the gate |
+| FR-04 | Patch generation with bounded scope | M | The patch touches only the files listed in the spec |
+| FR-05 | Independent review | M | The reviewer runs in a separate context; a rationale is mandatory |
+| FR-06 | Ordered gate chain + fail-fast | M | On the first blocking failure, the later gates do not run |
+| FR-07 | Change class and the human gate | M | C3 never passes automatically under any condition |
+| FR-08 | Isolation: worktree + container | M | The agent cannot write to the main working tree; the network is allowlist-bound |
+
+### Ring 2 — Shift loop (7 hours)
+
+| # | Requirement | Priority | Acceptance criterion |
+|---|---|---|---|
+| FR-09 | Night agenda and time box | M | Reserved duration and output defined for each block |
+| FR-10 | Sourced research | M | Every claim carries a URL/arXiv id; unreachable means "could not verify" |
+| FR-11 | Skill distillation | M | Skill candidate: trigger, procedure, verification, test |
+| FR-12 | Morning report | M | 5 sections filled; on file by 06:00; one page |
+| FR-13 | Lesson record and recurrence detection | S | A candidate opens the second time the same fingerprint appears |
+
+### Ring 3 — Release loop (days)
+
+| # | Requirement | Priority | Acceptance criterion |
+|---|---|---|---|
+| FR-14 | Canary + automatic rollback | M | If eval falls below the threshold, the release is rolled back |
+| FR-15 | Model/budget steering | S | At 80% budget the tier drops; at 100% it stops |
+| FR-16 | Skill activation | S | A skill is not "active" until it has been measured on the task class it applies to |
+
+### Ring 4 — Structure loop (weeks)
+
+| # | Requirement | Priority | Acceptance criterion |
+|---|---|---|---|
+| FR-17 | Structure proposal (ADR draft) | S | Proposal: context, decision, expected effect, measurement plan |
+| FR-18 | Audit ledger | M | Append-only; hash chain; `verify` shows tampering |
+| FR-19 | Memory upkeep | C | Decay report: a list of unused skills/notes; no deletion |
+
+---
+
+## 8. Non-functional requirements
+
+| # | Requirement | Threshold / acceptance |
 |---|---|---|
-| NFR-01 | Maliyet | PR başına ≤ 6 USD; vardiya ≤ 40 USD; aşımda durur |
-| NFR-02 | Dayanıklılık | Kesintiden sonra `resume` ile devam; tamamlanan iş tekrar edilmez |
-| NFR-03 | İzolasyon | Ajan başına ayrı worktree + konteyner; secret yok |
-| NFR-04 | Denetlenebilirlik | Her karar: ne, neden, hangi kapı, hangi kanıt |
-| NFR-05 | Taşınabilirlik | Skill/kadro tanımı harness'tan bağımsız (SKILL.md + YAML) |
-| NFR-06 | Gözlemlenebilirlik | Her tur için span: görev, kapı, model, token, süre |
-| NFR-07 | Gizlilik | Kod ve secret dışarı çıkmaz; yalnızca allowlist ağ |
-| NFR-08 | Dil | Rapor Türkçe; kod/commit mesajları İngilizce; terimler sözlükte |
+| NFR-01 | Cost | ≤ 6 USD per PR; ≤ 40 USD per shift; stops on breach |
+| NFR-02 | Durability | Continues after interruption with `resume`; completed work is not repeated |
+| NFR-03 | Isolation | Separate worktree + container per agent; no secrets |
+| NFR-04 | Auditability | Every decision: what, why, which gate, which evidence |
+| NFR-05 | Portability | Skill/roster definitions are harness-independent (SKILL.md + YAML) |
+| NFR-06 | Observability | A span per turn: task, gate, model, tokens, duration |
+| NFR-07 | Privacy | Code and secrets never leave; network by allowlist only |
+| NFR-08 | Language | Reports in Turkish; code/commit messages in English; terms in the glossary |
 
 ---
 
-## 9. Metrikler
+## 9. Metrics
 
-Tanımlar [`KALITE.md`](KALITE.md) §4'te. Burada yalnızca hedef tablosu var.
-**Hiçbiri henüz ölçülmedi**; "başlangıç" kolonu bu yüzden boş.
+Definitions are in [`KALITE.md`](KALITE.md) §4. Only the target table is
+here. **None of these has been measured yet**; that is why the "start" column
+is empty.
 
-| Kısaltma | Metrik | 12 hafta hedefi | Ölçüm |
+| Acronym | Metric | 12-week target | Measurement |
 |---|---|---|---|
-| **BMP** | Birleşen PR / vardiya | ≥ 1.5 | git log + merge kaydı |
-| **GPK** | İlk turda kapı geçme oranı | ≥ %65 | ledger |
-| **DSP** | İnsan düzeltme satırı / PR | ≤ 25 satır | merge sonrası diff |
-| **MBB** | Maliyet / birleşen PR | ≤ 6 USD | model faturası + ledger |
-| **ÖVD** | Kabul edilen beceri / önerilen | ≥ %30 | skills + kullanım kaydı |
-| **TKH** | Tekrarlayan hata oranı | ≤ %15 | lessons fingerprint |
-| **KKA** | Kaçan regresyon / 100 PR | ≤ 1 | sonraki 2 hafta içi hata |
-| **GHS** | Gece hazır rapor oranı | ≥ %80 | reports/ dosya sayımı |
+| **BMP** | Merged PRs / shift | ≥ 1.5 | git log + merge record |
+| **GPK** | First-pass gate rate | ≥ 65% | ledger |
+| **DSP** | Human correction lines / PR | ≤ 25 lines | post-merge diff |
+| **MBB** | Cost / merged PR | ≤ 6 USD | model invoice + ledger |
+| **ÖVD** | Accepted skills / proposed | ≥ 30% | skills + usage record |
+| **TKH** | Recurring error rate | ≤ 15% | lessons fingerprint |
+| **KKA** | Escaped regressions / 100 PRs | ≤ 1 | errors within the following 2 weeks |
+| **GHS** | On-time morning report rate | ≥ 80% | reports/ file count |
 
-**Anti-metrik:** "yazılan satır sayısı". Ölçülmeyecek; çünkü satır sayısı
-kaliteyle ters korelasyon gösterebilir ve en kolay manipüle edilen sayıdır.
+**Anti-metric:** "lines written". Not measured, because the line count can
+show an inverse correlation with quality and is the easiest number to game.
 
 ---
 
-## 10. Sürüm kapsamı
+## 10. Release scope
 
-| Sürüm | Kapsam | Çıkış kriteri |
+| Version | Scope | Exit criteria |
 |---|---|---|
-| **v0.1** (mevcut) | Kuru koşu: sözleşmeler, koşucu, kapılar, defter, demo | 22 test + örnek rapor |
-| **v0.2** | Gerçek adapter (tek model), gerçek eval seti (≥ 50 vaka), maliyet ölçümü | 20 görevde uçtan uca; GPK ölçülmüş |
-| **v0.3** | Gece vardiyası: araştırma + damıtma + sabah raporu | 5 gece üst üste rapor |
-| **v1.0** | Kanarya, geri alma, C3 onay akışı, çoklu hat (3 işçi) | 2 hafta kesintisiz; KKA ölçülmüş |
+| **v0.1** (current) | Dry run: contracts, runner, gates, ledger, demo | 22 tests + a sample report |
+| **v0.2** | Real adapter (one model), real eval set (≥ 50 cases), cost measurement | End-to-end on 20 tasks; GPK measured |
+| **v0.3** | Night shift: research + distillation + morning report | 5 consecutive nightly reports |
+| **v1.0** | Canary, rollback, C3 approval flow, multi-line (3 workers) | 2 weeks uninterrupted; KKA measured |
 
 ---
 
-## 11. Açık sorular ve bağımlılıklar
+## 11. Open questions and dependencies
 
-1. **İsim/marka:** "KOVAN" çalışma adı; tarama yapılmadı. (Airlock'ta da açık.)
-2. **İlk müşteri:** iç fabrika mı, dış hizmet mi? Fiyat modeli buna bağlı.
-3. **Model sağlayıcı:** tek sağlayıcı mı, yönlendirme mi? C3 kararı.
-4. **Eval seti nereden:** kendi geçmiş PR'ları mı, sentetik mi? Dış veri gizlilik riski.
-5. **Türkçe/İngilizce:** ürün dili İngilizce, doküman dili Türkçe mi? Şimdilik öyle.
-6. **Bağımlılık:** Airlock'un araç-düzeyi politikası olgunlaşmadan fabrika
-   güvenlik iddiasını tam kuramaz (bkz. `../STATUS.md`).
+1. **Name/brand:** "KOVAN" is a working name; no screening has been done.
+   (Open in Airlock too.)
+2. **First customer:** the internal factory, or an external service? The
+   pricing model depends on this.
+3. **Model provider:** a single provider, or routing? A C3 decision.
+4. **Where the eval set comes from:** our own past PRs, or synthetic? External
+   data is a privacy risk.
+5. **Turkish/English:** product language English, document language Turkish?
+   For now, that is the state.
+6. **Dependency:** until Airlock's tool-level policy matures, the factory
+   cannot fully establish its security claim (see `../STATUS.md`).
 
 ---
 
-## 12. Ek: kabul testi matrisi (v0.2 için)
+## 12. Appendix: acceptance test matrix (for v0.2)
 
-| Senaryo | Girdi | Beklenen |
+| Scenario | Input | Expected |
 |---|---|---|
-| Mutlu yol | 1 C1 görev | Kapılar geçer, PR açılır, defter 1 kayıt |
-| Test zayıflatma | Aday testi siler | `tests` kapısı reddeder; ders yazılır |
-| Sır okuma | Diff `.secrets/` içerir | `policy` bloklar; insan kapısı; revizyon yok |
-| C3 | Anayasa değişikliği | Anında `blocked`; tek denemede durur |
-| Bütçe | Tavanın %99'u | Yeni görev alınmaz; rapor yazılır |
-| Kesinti | Vardiya ortasında süreç ölür | `resume`; tamamlanan tekrar edilmez |
-| Tahrif | Defter satırı değiştirilir | `verify` ilk kırılma noktasını verir |
+| Happy path | 1 C1 task | Gates pass, a PR opens, the ledger gets 1 record |
+| Test weakening | The candidate deletes a test | The `tests` gate rejects; a lesson is written |
+| Secret reading | The diff contains `.secrets/` | `policy` blocks; human gate; no revision |
+| C3 | Constitutional change | Immediately `blocked`; stops on the first attempt |
+| Budget | 99% of the ceiling | No new task is taken; a report is written |
+| Interruption | The process dies mid-shift | `resume`; completed work is not repeated |
+| Tampering | A ledger line is edited | `verify` gives the first break point |

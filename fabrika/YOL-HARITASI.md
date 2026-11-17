@@ -142,7 +142,7 @@ planı şu:
 | 21:00–22:00 | Hedef sözleşmesi + kapsam | `goal.yaml` | ✅ yapıldı |
 | 22:00–23:30 | Paralel araştırma (7 hat) | `arastirma/*.md` | ✅ 3 dosya + özetler |
 | 23:30–01:00 | Konsept + PRD | `README.md`, `PRD.md` | ✅ |
-| 01:00–02:00 | Mimari + org | `MIMARI.md`, `ORGANIZASYON.md` | ✅ |
+| 01:00–02:00 | Mimari + org | `ARCHITECTURE.md`, `ORGANIZASYON.md` | ✅ |
 | 02:00–03:00 | Çekirdek kod + test | `loop/runner.py`, 22 test | ✅ |
 | 03:00–04:00 | Öğrenme + kalite + yönetişim | 3 belge | ✅ |
 | 04:00–05:00 | ADR + yol haritası | `ADR.md`, bu dosya | ✅ |

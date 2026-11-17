@@ -1,376 +1,393 @@
-# KOVAN — Mimari Karar Kayıtları (ADR)
+# KOVAN — Architecture Decision Records (ADR)
 
-> Her ADR tek bir kararı savunur: **bağlam → karar → sonuç → reddedilen
-> alternatifler**. Kararlar geri alınabilir; ama geri alma da bir ADR ister.
-> Sıra numarası `F` önekli çünkü bu, ayrı bir ürün hattı (Airlock ADR'leri
-> 0001–0010 ile karışmamalı).
+> Each ADR defends a single decision: **context → decision → consequences →
+> rejected alternatives**. Decisions can be reversed; but reversing one also
+> requires an ADR. The ordinals carry the `F` prefix because this is a separate
+> product line (it must not be confused with the Airlock ADRs 0001–0010).
 
-| # | Karar | Durum |
+| # | Decision | Status |
 |---|---|---|
-| [F01](#adr-f01) | Ürünün çıktısı kanıtlı değişikliktir | Kabul |
-| [F02](#adr-f02) | Önce iskelet, sonra model | Kabul |
-| [F03](#adr-f03) | Değişmez çekirdek / değişken kabuk | Kabul |
-| [F04](#adr-f04) | Öğrenme birimi beceridir, kod değil | Kabul |
-| [F05](#adr-f05) | Spec = çalıştırılabilir kabul kriteri | Kabul |
-| [F06](#adr-f06) | Doğrulama hiyerarşisi: D1 > D2 > D3 | Kabul |
-| [F07](#adr-f07) | Araç politikası Airlock'tan geçer | Kabul |
-| [F08](#adr-f08) | Değişiklik sınıfları C0–C3 | Kabul |
-| [F09](#adr-f09) | Model kademelendirme + bütçe tavanı | Kabul |
-| [F10](#adr-f10) | Dosya + git + SQLite; workflow motoru yok | Kabul |
-| [F11](#adr-f11) | Bellek append-only, silme yok | Kabul |
-| [F12](#adr-f12) | Framework değil, desen ödünç alınır | Kabul |
+| [F01](#adr-f01) | The product's output is evidence-backed change | Accepted |
+| [F02](#adr-f02) | Skeleton first, model later | Accepted |
+| [F03](#adr-f03) | Immutable core / mutable shell | Accepted |
+| [F04](#adr-f04) | The unit of learning is the skill, not code | Accepted |
+| [F05](#adr-f05) | Spec = executable acceptance criterion | Accepted |
+| [F06](#adr-f06) | Verification hierarchy: D1 > D2 > D3 | Accepted |
+| [F07](#adr-f07) | Tool policy goes through Airlock | Accepted |
+| [F08](#adr-f08) | Change classes C0–C3 | Accepted |
+| [F09](#adr-f09) | Model tiering + budget ceiling | Accepted |
+| [F10](#adr-f10) | Files + git + SQLite; no workflow engine | Accepted |
+| [F11](#adr-f11) | Memory is append-only; no deletion | Accepted |
+| [F12](#adr-f12) | Borrow patterns, not a framework | Accepted |
+| [F13](#adr-f13) | Project identity: KOVAN brand + kovan-fabrika namespace | Accepted |
 
 ---
 
 ## ADR-F01
-### Ürünün çıktısı kanıtlı değişikliktir
+### The product's output is evidence-backed change
 
-**Durum:** Kabul · **Tarih:** 2026-10-21
+**Status:** Accepted · **Date:** 2026-10-21
 
-**Bağlam.** Piyasadaki ürünler "kod üretimi" ile ölçülüyor: satır, PR sayısı,
-benchmark skoru. Ama üretilen kodun kabul edilmesi ayrı bir iş; ve ölçümler
-PR sayısı artarken inceleme yükünün de arttığını gösteriyor ([C], bkz.
-`arastirma/05-fabrikalar.md` [K30]).
+**Context.** Market products are measured by "code generation": lines, PR
+counts, benchmark scores. But getting generated code accepted is a separate
+job; and measurements show the review load rising as the PR count rises
+([C], see `arastirma/05-fabrikalar.md` [K30]).
 
-**Karar.** KOVAN'ın çıktısı "kod" değil, **kanıtlı değişikliktir**: bir PR +
-onu doğrulayan test + kapı sonuçları + defter kaydı. Bir PR, kanıtı olmadan
-"iş" sayılmaz; bir gün "üretken" sayılmaz.
+**Decision.** KOVAN's output is not "code" but **evidence-backed change**:
+a PR + the tests that verify it + gate results + a ledger record. Without
+its evidence a PR does not count as "work"; a day does not count as
+"productive".
 
-**Sonuçlar.**
-- (+) Başarı metriği üretimle değil kabulle hizalanır.
-- (+) Denetim, üretimin yan ürünü olur; sonradan eklenmez.
-- (−) İlk haftalarda "yavaş" görünür: kanıt üretmek kod yazmaktan pahalı.
-- (−) Kanıt kalitesi düşerse ürün değersizleşir; bu yüzden KALITE.md ayrı belge.
+**Consequences.**
+- (+) The success metric aligns with acceptance, not with production.
+- (+) Audit becomes a by-product of production rather than an add-on.
+- (−) The first weeks look "slow": producing evidence costs more than writing code.
+- (−) If evidence quality drops, the product loses its value; hence
+  KALITE.md is a separate document.
 
-**Reddedilen.** "Yazılan satır sayısı" ve "PR sayısı" metrikleri — ikisi de
-kolay manipüle edilir ve kaliteyle ters korelasyon gösterebilir.
+**Rejected.** "Lines written" and "PR count" metrics — both are easy to
+game and can show an inverse correlation with quality.
 
 ---
 
 ## ADR-F02
-### Önce iskelet, sonra model
+### Skeleton first, model later
 
-**Durum:** Kabul · **Tarih:** 2026-10-21
+**Status:** Accepted · **Date:** 2026-10-21
 
-**Bağlam.** Ajan sistemleri genellikle modelle başlar: prompt yazılır, model
-bağlanır, davranış gözlemlenir. Sonuç: hata modelde mi, akışta mı, kapıda mı
-bilinmez. Ve her model değişiminde tüm sistem yeniden test edilir.
+**Context.** Agent systems usually start from the model: a prompt is written,
+the model is connected, behavior is observed. The result: nobody knows whether
+a failure is in the model, the flow, or a gate. And every model change
+re-tests the whole system.
 
-**Karar.** Döngü önce **deterministik bir durum makinesi** olarak yazılır
-(`runner.py`): kapı sırası, bütçe, devre kesici, defter. Model, `Adapter`
-arayüzünün arkasına en son takılır. Testler `ScriptedAdapter` ile modelsiz koşar.
+**Decision.** The loop is written first as a **deterministic state machine**
+(`runner.py`): gate order, budget, circuit breaker, ledger. The model is
+plugged in last, behind the `Adapter` interface. Tests run model-free with
+`ScriptedAdapter`.
 
-**Sonuçlar.**
-- (+) 22 test, model olmadan geçiyor; regresyonlar modelden bağımsız yakalanır.
-- (+) Model değişimi tek dosyada olur; akış değişmez.
-- (−) Başlangıçta "yapay" görünür: senaryo sinyalleri gerçek değil.
-- (−) Adapter tasarımı yanlışsa, gerçek modelde sürpriz olur (v0.2 riski).
+**Consequences.**
+- (+) 22 tests pass without a model; regressions are caught independently of it.
+- (+) A model swap happens in one file; the flow does not change.
+- (−) It looks "artificial" at first: the scenario signals are not real.
+- (−) If the adapter design is wrong, the real model brings surprises (v0.2 risk).
 
-**Reddedilen.** "Önce prompt'u dene, mimariyi sonra çıkar" yaklaşımı — prototip
-hızı kazandırır, ama ölçüm ve regresyon imkânını kaybettirir.
+**Rejected.** "Try the prompt first, derive the architecture later" — buys
+prototype speed, loses measurement and regression capability.
 
 ---
 
 ## ADR-F03
-### Değişmez çekirdek / değişken kabuk
+### Immutable core / mutable shell
 
-**Durum:** Kabul · **Tarih:** 2026-10-21
+**Status:** Accepted · **Date:** 2026-10-21
 
-**Bağlam.** "Kendi kendini geliştiren sistem" tanımı, sistemin neyi
-değiştirebileceği tanımlanmadan anlamsızdır. Her şeyi değiştirebilen bir
-sistem, hiçbir şeyi güvenilir biçimde değiştiremez.
+**Context.** The definition of a "self-improving system" is meaningless until
+what the system may change is defined. A system that can change everything
+cannot reliably change anything.
 
-**Karar.** İki katman:
-- **Çekirdek (değişmez):** anayasa, kapı sırası, eşikler, model seçimi,
-  yasak yollar, bütçe tavanı. Yalnızca insan (C3).
-- **Kabuk (değişken):** beceri, prompt, kod, test, kadro önerisi. Sistem
-  önerir, kapılar kabul eder.
+**Decision.** Two layers:
+- **Core (immutable):** constitution, gate order, thresholds, model selection,
+  forbidden paths, budget ceiling. Humans only (C3).
+- **Shell (mutable):** skills, prompts, code, tests, roster proposals. The
+  system proposes; the gates accept.
 
-**Sonuçlar.**
-- (+) "Kendini geliştirme" ölçülebilir bir alana hapsolur.
-- (+) Denetim, çekirdeğin küçük olması sayesinde mümkün.
-- (−) Bazı iyileştirmeler (ör. kapı sırası) yavaş ilerler: 14 gün bekleme.
-- (−) Çekirdek yanlış tasarlanırsa, sistem yanlış yönde "güvenli" olur.
+**Consequences.**
+- (+) "Self-improvement" is confined to a measurable area.
+- (+) Audit is possible because the core is small.
+- (−) Some improvements (e.g. gate order) move slowly: a 14-day wait.
+- (−) If the core is misdesigned, the system becomes "safe" in the wrong direction.
 
-**Reddedilen.** Tam otonom kendini değiştirme (DGM tarzı, sınırsız) — literatürde
-test hackleme vakaları belgeli; üretimde kabul edilemez.
+**Rejected.** Unbounded, fully autonomous self-modification (DGM-style) —
+test-hacking cases are documented in the literature; unacceptable in production.
 
 ---
 
 ## ADR-F04
-### Öğrenme birimi beceridir, kod değil
+### The unit of learning is the skill, not code
 
-**Durum:** Kabul · **Tarih:** 2026-10-21
+**Status:** Accepted · **Date:** 2026-10-21
 
-**Bağlam.** "Kendini geliştirme" iki şekilde yapılabilir: (a) sistemin kendi
-kodunu değiştirmesi, (b) sistemin prosedürlerini değiştirmesi. (a) güçlüdür
-ama her değişiklik tüm sistemi etkiler ve geri alması zordur; ayrıca test
-edilmesi, değişikliğin kendisi kadar karmaşıktır.
+**Context.** "Self-improvement" can happen in two ways: (a) the system changes
+its own code, (b) the system changes its procedures. (a) is powerful, but
+every change affects the whole system and is hard to revert; and testing it is
+as complex as the change itself.
 
-**Karar.** Öğrenmenin birimi **beceridir**: `skills/<ad>/SKILL.md` + testi +
-kanıtı. Bir ders, en az 2 kez tekrarlamış bir hatadan doğar; testi yoksa
-beceri sayılmaz. Kod değişikliği (C2) ayrı bir kanal; öğrenme kanalı değil.
+**Decision.** The unit of learning is the **skill**: `skills/<name>/SKILL.md`
++ its test + its evidence. A lesson is born from a failure that has recurred
+at least twice; without a test it does not count as a skill. Code change (C2)
+is a separate channel, not the learning channel.
 
-**Sonuçlar.**
-- (+) Geri alma kolay: dosyayı `status: archived` yap.
-- (+) Beceri, farklı harness'larda taşınabilir (SKILL.md standardı).
-- (−) Bazı iyileştirmeler prosedürle ifade edilemez (ör. performans).
-- (−) Beceri sayısı şişebilir; çürüme mekanizması zorunlu.
+**Consequences.**
+- (+) Reverting is easy: flip the file to `status: archived`.
+- (+) The skill is portable across harnesses (the SKILL.md standard).
+- (−) Some improvements cannot be expressed as a procedure (e.g. performance).
+- (−) The skill count can bloat; a decay mechanism is mandatory.
 
-**Reddedilen.** "Ajan kendi kodunu yazsın" (self-coding) birincil öğrenme yolu
-olarak — ilgi çekici, ama denetimi ve geri almayı zorlaştırıyor.
+**Rejected.** "Let the agent write its own code" (self-coding) as the primary
+learning path — appealing, but it makes audit and revert harder.
 
 ---
 
 ## ADR-F05
-### Spec = çalıştırılabilir kabul kriteri
+### Spec = executable acceptance criterion
 
-**Durum:** Kabul · **Tarih:** 2026-10-21
+**Status:** Accepted · **Date:** 2026-10-21
 
-**Bağlam.** Spec-driven development akımı doğru bir sezgiye dayanıyor: kod
-türev, spec kaynak. Ama pratikte spec dokümanı koda yetişemiyor; "spec drift"
-denen, kimsenin okumadığı bir belge yığını oluşuyor.
+**Context.** Spec-driven development rests on a correct intuition: code is
+the derivative, the spec is the source. In practice the spec document falls
+behind the code; you get "spec drift" — a stack of documents nobody reads.
 
-**Karar.** Spec, **komut içeren** kabul kriterlerinden oluşur. Komutsuz kriter
-reddedilir. Spec ile kod arasındaki fark, haftalık bir "drift denetimi" ile
-ölçülür: spec'te olup kodda olmayan, kodda olup spec'te olmayan davranışlar.
+**Decision.** The spec consists of acceptance criteria that **contain
+commands**. A criterion without a command is rejected. The gap between spec
+and code is measured by a weekly "drift audit": behaviors that are in the spec
+but not the code, and in the code but not the spec.
 
-**Sonuçlar.**
-- (+) Spec, otomatik doğrulanabilir; "yorum" değil.
-- (+) Drift ölçülebilir bir sayı olur.
-- (−) Her kriteri komuta çevirmek yavaş; bazı nitel kriterler (UX) zorlanır.
-- (−) Komut yazmak, test yazmakla neredeyse aynı iş; bazı ekipler bunu
-  "çift iş" olarak görecek.
+**Consequences.**
+- (+) The spec is automatically verifiable; it is not "commentary".
+- (+) Drift becomes a measurable number.
+- (−) Converting every criterion into a command is slow; some qualitative
+  criteria (UX) are forced.
+- (−) Writing commands is nearly the same work as writing tests; some teams
+  will call it "double work".
 
-**Reddedilen.** Uzun prose spec + "plan mode" — okunmuyor, ölçülmüyor.
-(Pocock'un plan mode'u bırakıp doküman + seam sözleşmesine geçmesi bu yönü
-destekliyor [C].)
+**Rejected.** A long prose spec + "plan mode" — unread, unmeasured.
+(Pocock's move away from plan mode toward documents + seam contracts supports
+this direction [C].)
 
 ---
 
 ## ADR-F06
-### Doğrulama hiyerarşisi: D1 > D2 > D3
+### Verification hierarchy: D1 > D2 > D3
 
-**Durum:** Kabul · **Tarih:** 2026-10-21
+**Status:** Accepted · **Date:** 2026-10-21
 
-**Bağlam.** Ajan sistemlerinde "LLM-as-judge" yaygın; çünkü ucuz ve esnek.
-Ama yargı, ölçüm değildir; kalibre edilmedikçe gürültü üretir. Ve tek başına
-kapı olursa, sistem kendi kendini onaylar.
+**Context.** "LLM-as-judge" is widespread in agent systems because it is cheap
+and flexible. But a judgment is not a measurement; uncalibrated, it produces
+noise. And as the sole gate, the system approves itself.
 
-**Karar.** Üç katman: deterministik (D1) > istatistiksel (D2) > yargı (D3).
-**Yetki** bu sıradır; **iş akışı** değildir: kapılar D1 → inceleme (D3) →
-eval (D2) sırasıyla çalışır, çünkü eval yalnızca incelemeden geçmiş adayı
-ölçmelidir. D3 tek başına kapı olamaz; D2 ile desteklenir. İnsan incelemesi de
-D3'tür — bu yüzden rastgele örneklemle denetlenir.
+**Decision.** Three layers: deterministic (D1) > statistical (D2) >
+judgment (D3). **Authority** follows this order; **workflow** does not: the
+gates run in the order D1 → review (D3) → eval (D2), because eval must
+measure only candidates that have already passed review. D3 alone cannot be
+the gate; it is backed by D2. Human review is also D3 — which is why it is
+audited by random sampling.
 
-**Sonuçlar.**
-- (+) Ucuz ve kesin olan önce çalışır; pahalı yargı en sona kalır.
-- (+) "Sinyal yok = geçti" varsayımı kapanır.
-- (−) D1 ile ifade edilemeyen kalite (okunabilirlik, tasarım) ölçülemez kalır.
-- (−) D2 için set bakımı sürekli iş; ihmal edilirse çürür.
+**Consequences.**
+- (+) The cheap and exact runs first; the expensive judgment comes last.
+- (+) The "no signal = pass" assumption is closed off.
+- (−) Quality that cannot be expressed in D1 (readability, design) stays unmeasured.
+- (−) The D2 set is continuous upkeep; neglected, it rots.
 
-**Reddedilen.** "Her şeyi LLM yargıçla değerlendir" — hızlı kurulur, ama
-kalibrasyon ve tahrif direnci yok.
+**Rejected.** "Evaluate everything with an LLM judge" — quick to set up, but
+it has neither calibration nor tamper resistance.
 
 ---
 
 ## ADR-F07
-### Araç politikası Airlock'tan geçer
+### Tool policy goes through Airlock
 
-**Durum:** Kabul · **Tarih:** 2026-10-21
+**Status:** Accepted · **Date:** 2026-10-21
 
-**Bağlam.** Fabrikanın her ajanı dosya, shell ve ağ araçları kullanıyor.
-Bu çağrıları her ajanın içinde ayrı ayrı denetlemek, N farklı politika ve
-N farklı hata demek. Aynı projede çalışan bir araç-düzeyi politika motoru var
-(Airlock): kural tabanı, karar hakemi, hash-zincirli defter.
+**Context.** Every agent in the factory uses file, shell, and network tools.
+Auditing these calls separately inside each agent means N different policies
+and N different failure modes. There is already a tool-level policy engine
+working on the same project (Airlock): a rule base, a decision judge, a
+hash-chained ledger.
 
-**Karar.** Araç çağrıları Airlock'tan geçer; fabrika kendi politika motorunu
-yazmaz. Fabrikanın `policy` kapısı, Airlock'un kararını **değişiklik düzeyinde**
-tamamlar (dosya yolu, kapsam). İki defter ayrı: araç çağrısı defteri (Airlock)
-ve karar defteri (KOVAN).
+**Decision.** Tool calls go through Airlock; the factory does not write its
+own policy engine. The factory's `policy` gate completes Airlock's decision at
+the **change level** (file paths, scope). The two ledgers stay separate: the
+tool-call ledger (Airlock) and the decision ledger (KOVAN).
 
-**Sonuçlar.**
-- (+) Tek politika dili, tek denetim biçimi.
-- (+) Fabrika, Airlock'un olgunlaşmasından doğrudan faydalanır.
-- (−) Airlock'un bilinen boşlukları fabrikaya miras kalır (komut AST'si yok,
-  proxy sıralı, platform kapsaması zayıf).
-- (−) İki defterin korelasyonu ayrı bir iş (aynı `trace_id` şart).
+**Consequences.**
+- (+) One policy language, one audit format.
+- (+) The factory benefits directly from Airlock's maturation.
+- (−) Airlock's known gaps are inherited by the factory (no command AST,
+  serial proxy, weak platform coverage).
+- (−) Correlating the two ledgers is separate work (the same `trace_id` is required).
 
-**Reddedilen.** Fabrika içinde ikinci bir politika motoru — iki doğruluk
-kaynağı, iki kaçış yolu.
+**Rejected.** A second policy engine inside the factory — two sources of
+truth, two escape routes.
 
 ---
 
 ## ADR-F08
-### Değişiklik sınıfları C0–C3
+### Change classes C0–C3
 
-**Durum:** Kabul · **Tarih:** 2026-10-21
+**Status:** Accepted · **Date:** 2026-10-21
 
-**Bağlam.** Her değişiklik aynı riski taşımıyor: bir yazım düzeltmesi ile
-anayasa değişikliği aynı kapıdan geçemez. Ama sınıflandırma ajanın kendisine
-bırakılırsa, ajan kendi işini "küçük" ilan eder.
+**Context.** Not every change carries the same risk: a typo fix and a
+constitutional amendment cannot pass through the same gate. But if
+classification is left to the agent, the agent declares its own work "small".
 
-**Karar.** Dört sınıf: C0 (yazım/biçim), C1 (beceri/prompt/doküman),
-C2 (ürün kodu), C3 (anayasa/kapı/eşik/model/kadro). Sınıf spec'te atanır;
-ajan sınıfı düşüremez. C3 hiçbir koşulda otomatik geçmez. Gece C2 kapalı.
+**Decision.** Four classes: C0 (typos/formatting), C1 (skills/prompts/docs),
+C2 (product code), C3 (constitution/gates/thresholds/model/roster). The class
+is assigned in the spec; the agent cannot lower it. C3 never passes
+automatically under any condition. C2 is closed at night.
 
-**Sonuçlar.**
-- (+) Risk ile süreç eşleşir; C0 hızlı, C3 yavaş.
-- (+) Gece/gündüz ayrımı bu sınıflarla uygulanabilir.
-- (−) Sınıf ataması tartışmalı olabilir (bir "küçük" refactor C2'dir).
-- (−) Yanlış sınıf, ya gereksiz sürtünme ya da denetim boşluğu üretir.
+**Consequences.**
+- (+) Process matches risk; C0 is fast, C3 is slow.
+- (+) The night/day split becomes enforceable with these classes.
+- (−) Class assignment can be contested (a "small" refactor is C2).
+- (−) A wrong class produces either needless friction or an audit gap.
 
-**Reddedilen.** Tek sınıf ("her değişiklik aynı") — ya çok yavaş ya çok riskli.
+**Rejected.** A single class ("every change is the same") — either far too
+slow or far too risky.
 
 ---
 
 ## ADR-F09
-### Model kademelendirme + bütçe tavanı
+### Model tiering + budget ceiling
 
-**Durum:** Kabul · **Tarih:** 2026-10-21
+**Status:** Accepted · **Date:** 2026-10-21
 
-**Bağlam.** En yetenekli model her iş için gereksiz; en ucuz model her iş için
-yetersiz. Ve sınırsız bütçe, öğrenmeyi değil harcamayı optimize eder.
+**Context.** The most capable model is overkill for every task; the cheapest
+model is insufficient for every task. And an unbounded budget optimizes
+spending, not learning.
 
-**Karar.** Dört kademe: T0 (model yok), T1, T2, T3. Rol sözleşmesi kademeyi
-belirler; bütçe %80'e gelince kademe düşer. Her vardiyanın token/USD tavanı
-vardır; aşımda döngü durur, "biraz daha" yok.
+**Decision.** Four tiers: T0 (no model), T1, T2, T3. The role contract sets
+the tier; when the budget reaches 80% the tier drops. Every shift has
+token/USD ceilings; on breach the loop stops — there is no "a little more".
 
-**Sonuçlar.**
-- (+) Maliyet öngörülebilir; fatura sürpriz olmaz.
-- (+) Ucuz işler ucuz modelde kalır.
-- (−) Kademe düşüşü kaliteyi düşürebilir; bu, eval ile izlenmeli.
-- (−) Model fiyatları değişince tablo bayatlar; aylık güncelleme gerekir.
+**Consequences.**
+- (+) Cost is predictable; the invoice holds no surprises.
+- (+) Cheap work stays on cheap models.
+- (−) A tier drop can lower quality; this must be watched via evals.
+- (−) Model prices change and the table goes stale; a monthly update is needed.
 
-**Reddedilen.** "Tek güçlü model, her yerde" — basit, ama maliyet ve gecikme
-açısından sürdürülemez.
+**Rejected.** "One strong model, everywhere" — simple, but unsustainable in
+cost and latency.
 
 ---
 
 ## ADR-F10
-### Dosya + git + SQLite; workflow motoru yok
+### Files + git + SQLite; no workflow engine
 
-**Durum:** Kabul · **Tarih:** 2026-10-21
+**Status:** Accepted · **Date:** 2026-10-21
 
-**Bağlam.** Dayanıklı iş akışı için Temporal, Airflow gibi motorlar var.
-Ama ilk sürümde tek repo, tek kullanıcı ve düşük eşzamanlılık var. Motor
-eklemek, çözülmemiş bir problemi (kapı kalitesi) altyapıyla gizlemek olur.
+**Context.** Temporal, Airflow and the like exist for durable workflows. But
+the first version has one repo, one user, and low concurrency. Adding an
+engine would hide an unsolved problem (gate quality) behind infrastructure.
 
-**Karar.** Durum dosyaları + git + SQLite indeks. Her tur yeniden başlatılabilir;
-`state.json` ile `resume`. Eşzamanlılık en fazla 5 işçi, tek yazıcı kuralı.
+**Decision.** State files + git + a SQLite index. Every turn is restartable;
+`resume` from `state.json`. Concurrency is at most 5 workers, with a
+single-writer rule.
 
-**Sonuçlar.**
-- (+) Anlaşılır, taşınabilir, hata ayıklaması kolay.
-- (+) Git, denetim ve geri alma için hazır.
-- (−) 10k+ görevde dosya tabanlı defter yavaşlar (O(n²) bilinen borç).
-- (−) Çok makineli dağıtım yok; ölçekleme yeniden tasarım ister.
+**Consequences.**
+- (+) Understandable, portable, easy to debug.
+- (+) Git is ready-made for audit and revert.
+- (−) Past 10k+ tasks the file-based ledger slows down (O(n²), a known debt).
+- (−) No multi-machine distribution; scaling requires a redesign.
 
-**Reddedilen.** Temporal/Kubernetes ile başlamak — erken optimizasyon; asıl
-darboğaz orkestrasyon değil, kapı.
+**Rejected.** Starting with Temporal/Kubernetes — premature optimization; the
+real bottleneck is not orchestration but the gate.
 
 ---
 
 ## ADR-F11
-### Bellek append-only, silme yok
+### Memory is append-only; no deletion
 
-**Durum:** Kabul · **Tarih:** 2026-10-21
+**Status:** Accepted · **Date:** 2026-10-21
 
-**Bağlam.** Kendini geliştiren bir sistemin en tehlikeli hareketi, kendi
-geçmişini yeniden yazması. O anda "öğrendi mi, öğrendiğini mi sandı"
-sorusu cevaplanamaz hale gelir.
+**Context.** The most dangerous move of a self-improving system is rewriting
+its own past. The question "did it learn, or did it only think it learned"
+becomes unanswerable.
 
-**Karar.** `ledger.jsonl`, `lessons.jsonl`, `skills.proposed.jsonl` yalnızca
-eklenir. Yanlış kayıt silinmez; `supersedes` veya `[geçersiz]` notu eklenir.
-Beceri `archived` olabilir; dosyası kalır. Hash zinciri bunu teknik olarak
-zorlar.
+**Decision.** `ledger.jsonl`, `lessons.jsonl`, `skills.proposed.jsonl` are
+append-only. A wrong record is not deleted; a `supersedes` entry or an
+`[invalid]` note is added. A skill may become `archived`; its file remains.
+The hash chain enforces this technically.
 
-**Sonuçlar.**
-- (+) Denetim izi bütün; geriye dönük analiz mümkün.
-- (+) Yanlış öğrenme, sonradan işaretlenebilir.
-- (−) Depo büyür; indeks ve arşivleme gerekir.
-- (−) Kişisel veri içeren kayıt silinemez → baştan maskelenmeli (v0.2 kuralı).
+**Consequences.**
+- (+) The audit trail is whole; retrospective analysis is possible.
+- (+) Wrong learning can be flagged later.
+- (−) The store grows; indexing and archiving become necessary.
+- (−) A record containing personal data cannot be deleted → it must be masked
+  from the start (v0.2 rule).
 
-**Reddedilen.** "Yanlış kaydı sil, temiz tut" — denetimi bozar.
+**Rejected.** "Delete the wrong record, keep it clean" — breaks the audit.
 
 ---
 
 ## ADR-F12
-### Framework değil, desen ödünç alınır
+### Borrow patterns, not a framework
 
-**Durum:** Kabul · **Tarih:** 2026-10-21
+**Status:** Accepted · **Date:** 2026-10-21
 
-**Bağlam.** Superpowers, GSD, Spec Kit, BMAD gibi olgun iskeletler var.
-Bunları kurmak hızlı yol; ama hiçbiri fabrikanın üç ihtiyacını birlikte
-karşılamıyor: (1) gece/gündüz ayrımı, (2) kendi kendini geliştirme sınıfları,
-(3) kanıt defteri + bütçe muhasebesi.
+**Context.** Mature skeletons exist: Superpowers, GSD, Spec Kit, BMAD.
+Installing them is the fast road; but none of them meets the factory's three
+needs together: (1) the night/day split, (2) self-improvement classes,
+(3) an evidence ledger + budget accounting.
 
-**Karar.** Desenler alınır, motor yazılır. Özellikle alınanlar:
+**Decision.** Patterns are borrowed; the engine is written. Specifically
+borrowed:
 
-| Kaynak | Alınan desen | Neden |
+| Source | Pattern borrowed | Why |
 |---|---|---|
-| Superpowers | "test yoksa üretim kodu yok", taze doğrulama kanıtı, 5 tur breaker, SKILL.md | Kural sertliği, taşınabilirlik |
-| Superpowers | Skill = prosedür, subagent = bağlam izolasyonu, hook = yaptırım | Üç ayrı mekanizma, üç ayrı iş |
-| GSD | Faz/faz geçişleri, `STATE.md`/`ROADMAP.md` durum dosyaları, goal-backward doğrulama | Uzun görevlerde bağlam yönetimi |
-| Spec Kit / Kiro | spec → plan → tasks ayrımı | Spec'in türevlenebilir olması |
-| Pocock | Spec = karar kaydı + seam sözleşmesi; deterministik doğrulama (tsc/vitest) | "Plan mode" yerine ölçülebilir artefakt |
-| Karpathy | Doğrulanabilirlik ekseni, autonomy slider, tek metrikli deney döngüsü | Görev sınıflandırması ve ölçüm |
+| Superpowers | "no production code without a test", fresh verification evidence, a 5-round breaker, SKILL.md | Rule hardness, portability |
+| Superpowers | Skill = procedure, subagent = context isolation, hook = enforcement | Three mechanisms, three jobs |
+| GSD | Phase/phase transitions, `STATE.md`/`ROADMAP.md` state files, goal-backward validation | Context management on long tasks |
+| Spec Kit / Kiro | the spec → plan → tasks separation | Keeping the spec derivable |
+| Pocock | Spec = decision record + seam contracts; deterministic verification (tsc/vitest) | A measurable artifact instead of "plan mode" |
+| Karpathy | The verifiability axis, the autonomy slider, the single-metric experiment loop | Task classification and measurement |
 
-**Alınmayanlar:** ağır çok-ajan seminerleri (MetaGPT/ChatDev tarzı rol
-tiyatrosu), "plan mode" (ölçülemez), sınırsız otonomi, framework'e kilitlenme.
+**Not borrowed:** heavy multi-agent ceremonies (MetaGPT/ChatDev-style role
+theater), "plan mode" (unmeasurable), unbounded autonomy, framework lock-in.
 
-**Sonuçlar.**
-- (+) Motor küçük (300 satır) ve kendi ihtiyacına göre.
-- (+) Desenler test edilmiş; tekerleği yeniden icat etmiyoruz.
-- (−) Framework'lerin hazır entegrasyonlarından (IDE, CI) yararlanamıyoruz.
-- (−) Desenlerin bakımı bize ait; upstream düzeltmeleri gelmiyor.
+**Consequences.**
+- (+) The engine is small (300 lines) and fits its own need.
+- (+) The patterns are tested; we are not reinventing the wheel.
+- (−) We cannot use the frameworks' ready-made integrations (IDE, CI).
+- (−) Pattern upkeep is ours; upstream fixes do not arrive.
 
-**Reddedilen.** Superpowers/GSD'yi doğrudan kurmak — 3 ihtiyaçtan 2'si
-karşılanmıyor ve kendi kendini geliştirme sınıfları dışarıda kalıyor.
+**Rejected.** Installing Superpowers/GSD directly — 2 of the 3 needs go
+unmet and the self-improvement classes are left out.
 
 ---
 
 ## ADR-F13
-### Proje kimliği: KOVAN markası + kovan-fabrika ad alanı
+### Project identity: KOVAN brand + kovan-fabrika namespace
 
-**Durum:** Kabul · **Tarih:** 2026-11-17
+**Status:** Accepted · **Date:** 2026-11-17
 
-**Bağlam.** Public yayın öncesi repo/PyPI adı seçilmeli. Adaylar: bare
-"kovan", "kovan-fabric", "kovan-fabrika". Arama doğrulaması (17 Kasım):
-bare "kovan" GitHub'da alınmış — vertexclique/kovan (Rust wait-free
-kütüphanesi) ve boratanrikulu/kovan ("engineering methodology →
-infrastructure; agent + gates" — kavramsal çakışma yüksek); Ethereum
-Kovan testnet sonuçları "kovan" aramalarını gömüyor. "fabric" baş
-kelimesi AI/framework alanında kirli (danielmiessler/Fabric, Microsoft
-Fabric, Hyperledger Fabric, Python Fabric); sistem ise fiilen
-kapasite-bounded bir üretim hattı — kod ve doküman metaforu zaten
-fabrika (vardiya, hat, kapı, üretim).
+**Context.** Before the public release, a repo/PyPI name had to be chosen.
+Candidates: bare "kovan", "kovan-fabric", "kovan-fabrika". Search validation
+(November 17): bare "kovan" is taken on GitHub — vertexclique/kovan (a Rust
+wait-free library) and boratanrikulu/kovan ("engineering methodology →
+infrastructure; agent + gates" — high conceptual collision); Ethereum Kovan
+testnet results bury "kovan" searches. "fabric" as a head word is polluted in
+the AI/framework space (danielmiessler/Fabric, Microsoft Fabric, Hyperledger
+Fabric, Python Fabric); the system is in fact a capacity-bounded production
+line — the code and docs metaphor is already the factory (shift, line, gate,
+production).
 
-**Karar.** Marka: **KOVAN**; repo ve PyPI paketi: **`kovan-fabrika`**;
-CLI komutu: `kovan`; İngilizce çerçeve README.en.md'de: "a
-capacity-bounded, evidence-first software factory". pyproject zaten
-uyumlu — geçiş maliyeti sıfır. `project.urls` gerçek repo adresi
-yaratılınca tek satırla eklenir.
+**Decision.** Brand: **KOVAN**; repo and PyPI package: **`kovan-fabrika`**;
+CLI command: `kovan`; the English framing, in README.en.md: "a
+capacity-bounded, evidence-first software factory". pyproject is already
+compliant — migration cost is zero. `project.urls` is added in a single line
+once the real repo address exists.
 
-**Sonuçlar.**
-- (+) Keşfedilebilirlik: "kovan-fabrika" tam-string araması yalnızca bizi verir.
-- (+) Metafor bütünlüğü: doküman setiyle çelişki yok; geçiş maliyeti sıfır.
-- (−) "kovan" ön ekli aramalar testnet ile yarışır; tam-string arama normu.
-- (−) Türkçe ad alanı uluslararası hissi azaltır; README.en ve cognate
-  ("fabrika" ~ factory) bunu telafi eder.
+**Consequences.**
+- (+) Discoverability: a full-string search for "kovan-fabrika" returns only us.
+- (+) Metaphor integrity: no conflict with the document set; migration cost is zero.
+- (−) "kovan"-prefixed searches compete with the testnet; the full-string
+  search is the norm.
+- (−) The Turkish namespace weakens the international feel; README.en and the
+  cognate ("fabrika" ≈ factory) compensate for it.
 
-**Reddedilen.** bare "kovan" (alınmış + kavramsal çakışma);
-"kovan-fabric" (kirli baş kelime + metafor uyumsuzluğu + geçiş
-maliyeti); "kovan-os" (aşırı iddialı); İngilizcelendirme ("hivecraft"
-benzeri — çökmüş alan: TheHive vb.).
+**Rejected.** bare "kovan" (taken + conceptual collision);
+"kovan-fabric" (polluted head word + metaphor mismatch + migration
+cost); "kovan-os" (overclaiming); Anglicization ("hivecraft"-like —
+a collapsed space: TheHive etc.).
 
 ---
 
-## Karar günlüğü
+## Decision log
 
-| Tarih | Olay |
+| Date | Event |
 |---|---|
-| 2026-10-21 | F01–F12 kabul edildi (konsept sürümü) |
-| 2026-11-17 | F13 kabul edildi — proje kimliği: KOVAN / kovan-fabrika |
-| — | F07, Airlock'un T1 modeli ölçülene kadar "kısmi" sayılır |
-| — | F09'un fiyat tablosu aylık güncellenecek |
-| — | F12, ilk gerçek görevde (v0.2) yeniden gözden geçirilecek |
+| 2026-10-21 | F01–F12 accepted (concept version) |
+| 2026-11-17 | F13 accepted — project identity: KOVAN / kovan-fabrika |
+| — | F07 is counted "partial" until Airlock's T1 model is measured |
+| — | F09's price table will be updated monthly |
+| — | F12 will be revisited on the first real task (v0.2) |
