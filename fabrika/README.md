@@ -144,7 +144,7 @@ This is not an essay — it is a buildable project set:
 
 | File | Content |
 |---|---|
-| [`SISTEM.md`](SISTEM.md) | **v2: the system we are building** — 3 lines, components, capacity valve, 90 days |
+| [`SYSTEM.md`](SYSTEM.md) | **v2: the system we are building** — 3 lines, components, capacity valve, 90 days |
 | [`PRD.md`](PRD.md) | Product requirements: 19 FR, 8 NFR, acceptance criteria, goals |
 | [`MIMARI.md`](MIMARI.md) | Four rings, components, data flow, technology decisions |
 | [`ORGANIZASYON.md`](ORGANIZASYON.md) | Company structure, agent roles, handoff contracts, SLA |

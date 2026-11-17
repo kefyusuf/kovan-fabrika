@@ -1,6 +1,6 @@
 # KOVAN — Yönetişim, Güvenlik ve Maliyet
 
-> **v2 notu (4 Kasım 2026):** Güncel sistem tanımı [`SISTEM.md`](SISTEM.md).
+> **v2 notu (4 Kasım 2026):** Güncel sistem tanımı [`SYSTEM.md`](SYSTEM.md).
 > Uyum katmanı `uyum.py` devrede (import izin listesi + bağımlılık dosyası
 > tespiti + kopya şüphesi + yinelenen fonksiyon = provenance sinyali);
 > SBOM tohumu (`sbom.py`, SPDX 2.3, lock sürümleri) ve **egress kaydı**

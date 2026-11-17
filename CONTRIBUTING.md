@@ -28,7 +28,7 @@ git -C fabrika/loop/ornek-repo commit -m "ornek-repo initial state"
 ## Testing norms
 
 - **19 test files, full suite green before opening a PR.** If the count
-  changes, update the total line in `SISTEM.md`.
+  changes, update the total line in `SYSTEM.md`.
 - New behavior → test first. Changes touching gate logic must keep the
   gate-sequence tests in `tests/test_runner.py` intact.
 - Determinism: `kuru_senaryo(isler, seed)` — same seed → same decisions.

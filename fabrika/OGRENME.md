@@ -1,6 +1,6 @@
 # KOVAN — Öğrenme ve Kendini Geliştirme
 
-> **v2 notu (4 Kasım 2026):** Güncel sistem tanımı [`SISTEM.md`](SISTEM.md).
+> **v2 notu (4 Kasım 2026):** Güncel sistem tanımı [`SYSTEM.md`](SYSTEM.md).
 > "Kendi kendine öğrenme" = donmuş model altında **iskelet + beceri + kapı
 > seti evrimi** (ağırlık öğrenmesi kapsam dışı). Gece hattı `vardiya.py`
 > olarak çalışıyor.

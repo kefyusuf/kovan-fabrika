@@ -26,7 +26,7 @@ Full setup and the fresh-clone note: [CONTRIBUTING.md](CONTRIBUTING.md).
 
 | Document | Content |
 |---|---|
-| [fabrika/SISTEM.md](fabrika/SISTEM.md) | v2 system definition: 3 lines, component table, 167 tests |
+| [fabrika/SYSTEM.md](fabrika/SYSTEM.md) | v2 system definition: 3 lines, component table, 167 tests |
 | [fabrika/README.md](fabrika/README.md) | The 6 principles (İ1–İ6), file map, setup |
 | [fabrika/ADR.md](fabrika/ADR.md) | Architecture decision records (F01–F13) |
 | [fabrika/EVIDENCE-UPDATE.md](fabrika/EVIDENCE-UPDATE.md) | Evidence log (§1–§21) |

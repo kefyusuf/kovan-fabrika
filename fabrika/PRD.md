@@ -5,7 +5,7 @@
 | Sürüm | 1.0 (konsept) |
 | Tarih | 21 Ekim 2026 |
 | Sahip | kurucu |
-| Durum | **v2 yönlendirmesi geçerli** — sistem tanımı: [`SISTEM.md`](SISTEM.md) |
+| Durum | **v2 yönlendirmesi geçerli** — sistem tanımı: [`SYSTEM.md`](SYSTEM.md) |
 | İlgili | [`README.md`](README.md) · [`MIMARI.md`](MIMARI.md) · [`ADR.md`](ADR.md) · [`loop/goal.yaml`](loop/goal.yaml) |
 
 ---

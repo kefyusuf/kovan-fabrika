@@ -1,6 +1,6 @@
 # KOVAN — Kalite, Kapılar ve Ölçüm
 
-> **v2 notu (4 Kasım 2026):** Güncel sistem tanımı [`SISTEM.md`](SISTEM.md).
+> **v2 notu (4 Kasım 2026):** Güncel sistem tanımı [`SYSTEM.md`](SYSTEM.md).
 > Eval v1 devrede (90 vakalık dondurulmuş set, bloklayıcı); tohumlanmış hata
 > ölçümü `seedtest.py`; LLM-yargıçta ham uyum değil κ raporlanacak.
 

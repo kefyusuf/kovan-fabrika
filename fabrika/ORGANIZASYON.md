@@ -1,6 +1,6 @@
 # KOVAN — Organizasyon
 
-> **v2 notu (4 Kasım 2026):** Güncel sistem tanımı [`SISTEM.md`](SISTEM.md);
+> **v2 notu (4 Kasım 2026):** Güncel sistem tanımı [`SYSTEM.md`](SYSTEM.md);
 > çelişki halinde o geçerli. Bu belgedeki 14 rol → **6 rol** (İ6 inceleme
 > bütçesi); devir/SLA/eskalasyon sözleşmeleri geçerlidir.
 
