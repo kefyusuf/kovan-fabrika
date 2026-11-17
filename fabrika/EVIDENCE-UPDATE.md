@@ -428,4 +428,28 @@ kavramsal çakışma) ve Kovan testnet aramaları gömüyor; "fabric" AI
 alanında kirli (danielmiessler/Fabric vb.); "kovan-fabrika" tam-string
 araması boş. pyproject zaten uyumlu; tek bekleyen `project.urls`
 (gitHub repo adresi yaratılınca). Karar workspace hafızasına da yazıldı.
+\n\n
+---
+
+## 19. Yayın: kovan-fabrika reposu GitHub'da (17 Kasım 2026)
+
+**ADR-F13 kararı uygulamaya geçti.** Makinedeki kayıtlı git kimliğiyle
+(kefyusuf; token ekrana basılmadan in-memory kullanıldı) repo oluşturuldu
+ve pushlandı:
+
+- **Repo:** https://github.com/kefyusuf/kovan-fabrika (public, main)
+- **Yapı:** repo kökü = kök README + LICENSE + CHANGELOG/SECURITY/
+  CONTRIBUTING/CoC + .github (CI, PR/issue şablonları); paket `fabrika/`
+  altında — mevcut tüm yollar (CI working-directory, pip install -e
+  fabrika, .gitignore) değişmeden kaldı.
+- **Hariç:** çalışma zamanı kanıtları (runs/, state/, reports/,
+  vardiya-runs/, loglar, .anahtar*, egress, kullanim.jsonl) ve
+  ornek-repo'nun git geçmişi.
+- **Güvenlik taraması:** 157 dosyada anahtar/token kalibi skanı temiz.
+- **Taze klon çözümü:** testler ornek-repo'nun git deposu olmasını
+  bekliyor; CI'ye "Örnek repo hazırlığı" adımı (init+commit),
+  CONTRIBUTING'e taze klon notu eklendi.
+- **§17'nin son boşluğu kapandı:** `project.urls` (Homepage/Repository/
+  Changelog) pyproject'e girildi; kök README'ye CI rozeti.
+- **CI:** push sonrası tests workflow'u başladı (run 44078529278).
 \n
