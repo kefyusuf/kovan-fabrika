@@ -1,5 +1,7 @@
 # KOVAN — kovan-fabrika
 
+![tests](https://github.com/kefyusuf/kovan-fabrika/actions/workflows/tests.yml/badge.svg)
+
 **Kapasite-bounded, evidence-first yazılım üretim hattı** — *a capacity-bounded, evidence-first software factory.*
 
 KOVAN, yazılım işlerini kapasite hesabıyla kabul eden, her değişikliği
