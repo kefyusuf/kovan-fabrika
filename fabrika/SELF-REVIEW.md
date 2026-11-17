@@ -175,7 +175,7 @@ Bir başkası bu teslimatı denetlerken şu 8 soruyu sorabilir:
 4. `runner.py` gerçekten fail-fast mi? (`evaluate` erken çıkıyor mu)
 5. Defter tahrifi gerçekten yakalanıyor mu? (testi çalıştır, sonra elle boz)
 6. `LEARNING.md`'deki "2 tekrar" eşiği `runner.py` ile aynı mı? (`>= 2`)
-7. `KALITE.md` metrikleri `PRD.md` ile aynı tanımı mı kullanıyor?
+7. `QUALITY.md` metrikleri `PRD.md` ile aynı tanımı mı kullanıyor?
 8. `SELF-REVIEW.md` §3 listesi, `ARASTIRMA.md` §9 ile tutarlı mı?
 
 Bu soruların altısı komutla, ikisi okumayla cevaplanır. Cevabı "hayır" olan

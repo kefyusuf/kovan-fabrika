@@ -316,8 +316,8 @@ rest of the system tunes itself around it.
 | `ARCHITECTURE.md` | Components valid; 4 rings → 3 lines |
 | `ORGANIZATION.md` | 14 roles → 6 roles (v2 §1) |
 | `LEARNING.md` | Night agenda valid; "self-improvement" definition narrowed |
-| `KALITE.md` | Gates valid; seedtest + κ to be added |
-| `YONETISIM.md` | Valid; identity/isolation/rollback prioritized |
+| `QUALITY.md` | Gates valid; seedtest + κ to be added |
+| `GOVERNANCE.md` | Valid; identity/isolation/rollback prioritized |
 | `ADR.md` | F01–F12 valid; F04/F06/F08 will get revision notes |
 | `EVIDENCE-UPDATE.md` | The short version of this file |
 

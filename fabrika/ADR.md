@@ -43,7 +43,7 @@ its evidence a PR does not count as "work"; a day does not count as
 - (+) Audit becomes a by-product of production rather than an add-on.
 - (−) The first weeks look "slow": producing evidence costs more than writing code.
 - (−) If evidence quality drops, the product loses its value; hence
-  KALITE.md is a separate document.
+  QUALITY.md is a separate document.
 
 **Rejected.** "Lines written" and "PR count" metrics — both are easy to
 game and can show an inverse correlation with quality.

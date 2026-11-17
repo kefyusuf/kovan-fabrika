@@ -24,5 +24,5 @@ contribution nor the tone norms.
 
 Report violations to the maintainers privately via GitHub. Maintainers apply
 the Covenant's v2.1 scaled sanctions, from warning to permanent ban. If this
-document conflicts with the project constitution (YONETISIM.md), the
+document conflicts with the project constitution (GOVERNANCE.md), the
 constitution prevails.

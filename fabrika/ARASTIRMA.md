@@ -38,7 +38,7 @@ denetlenebilir sistemdir. **[C]**
 **Tasarıma aktarılan (→ ADR):**
 - Görevleri **doğrulanabilirlik ekseninde** sınıflandır (F05, F08).
 - Otonomiyi kademelendir; "slider" bir ürün yüzeyi olsun (F08).
-- Tek metrikli, sabit bütçeli deney döngüsü (F09, KALITE §4).
+- Tek metrikli, sabit bütçeli deney döngüsü (F09, QUALITY §4).
 - Tek depo, küçük artefakt, az bağımlılık (F10).
 
 **Aktarılmayan:** "vibe coding" pratikleri üretim hattına girmez; prototip
@@ -64,7 +64,7 @@ sitasyon ister (dosya + satır). Alt-ajan çıktısı **hipotez** sayılır, kan
 (tek seviye); script/CI = deterministik, insansız yaptırım. **[C]**
 
 **Tasarıma aktarılan:** F05 (komutlu kabul kriteri), F06 (deterministik >
-yargı), KALITE §2.2 (gerekçeli inceleme), ORGANIZATION §5 (devirde artefakt).
+yargı), QUALITY §2.2 (gerekçeli inceleme), ORGANIZATION §5 (devirde artefakt).
 
 ---
 
@@ -87,7 +87,7 @@ subagent = ayrı bağlam + kendi araç seti; hook = izin sisteminden önce çal�
 deterministik kapı. Üçü birlikte "süreç" ile "yaptırım"ı ayırır. **[C]**
 
 **Tasarıma aktarılan:** F02 (test edilebilir iskelet), F04 (SKILL.md birimi),
-F06 (kanıt > iddia), KALITE §2.1 (test zayıflatma yasağı), `loop/agents.yaml`
+F06 (kanıt > iddia), QUALITY §2.1 (test zayıflatma yasağı), `loop/agents.yaml`
 devir kuralları.
 
 **Aktarılmayan:** 15 becerinin tamamını taşımak. KOVAN 14 rol + 5–8 beceri ile
@@ -140,7 +140,7 @@ PR'larının %79.4'ü aynı repoda eşzamanlı açık. **[C]**
 koordinasyon çakışması; ölçüm enflasyonu; denetim kaybı. **[C]**
 
 **Tasarıma aktarılan:** İ6 (inceleme bütçesi), ARCHITECTURE §8 (tek yazıcı, worktree,
-dosya kilidi), KALITE §3.2 (set kimliği, harness sabitleme), ADR-F07 (Airlock).
+dosya kilidi), QUALITY §3.2 (set kimliği, harness sabitleme), ADR-F07 (Airlock).
 
 **Tasarıma aktarılmayan:** "Filo" ölçeği. 20 ajanlı bir kadro, ölçülmemiş bir
 inceleme kuyruğudur; KOVAN 3–5 eşzamanlı işçiyle başlar.
@@ -163,7 +163,7 @@ vakada **F1 1.000**, gerçekçi holdout'ta **0.394** aldı; sonra holdout
 "yanmış" ilan edildi (bkz. `../STATUS.md` §4). Bu, tüm konseptin en somut
 gerekçesi: **dairesel ölçüm, ölçüm değildir.**
 
-**Tasarıma aktarılan:** F06 (D1 > D2 > D3), KALITE §3.2 (holdout disiplini),
+**Tasarıma aktarılan:** F06 (D1 > D2 > D3), QUALITY §3.2 (holdout disiplini),
 LEARNING §6.3 (eval değiştiren aday otomatik ret), F03 (değişmez çekirdek).
 
 **Kritik ayrım.** "Kanıtla" (Gödel machine) yerine "ölç" (deney + kapı).
@@ -192,7 +192,7 @@ imzalı artefakt. **[C]**
 eğitim verisi iddialarını daralttığı raporlandı; telif riski sürüyor. **[C]**
 — hukuki tavsiye değil.
 
-**Tasarıma aktarılan:** YONETISIM §1–§9 (tehdit modeli, izolasyon, insan
+**Tasarıma aktarılan:** GOVERNANCE §1–§9 (tehdit modeli, izolasyon, insan
 kapıları, SBOM, runbook), anayasa madde 6 ve 8.
 
 ---
@@ -204,7 +204,7 @@ kapıları, SBOM, runbook), anayasa madde 6 ve 8.
 | Doğrulanabilirlik otomasyonu belirler | İ1, İ5 | F05, F06 |
 | Otonomi kademelidir | İ3 | F08 |
 | Üretim ucuz, kabul pahalı | İ6 | inceleme bütçesi |
-| Değerlendirici tavandır | İ5 | F06, KALITE §3 |
+| Değerlendirici tavandır | İ5 | F06, QUALITY §3 |
 | Deney > kanıt | İ4 | F02, LEARNING §6.4 |
 | Bellek dosyada birikir | İ4 | F11 |
 | Çekirdek değişmez olmalı | İ3 | F03 |

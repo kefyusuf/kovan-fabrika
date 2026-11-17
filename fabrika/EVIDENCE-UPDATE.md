@@ -20,7 +20,7 @@
 **Eski cümle:** "Spec-driven araçlar spec zorunluluğunu azaltıyor; spec bakım yüküne dönüşüyor."
 **Sorun:** Birincil dokümanlar artefaktın korunduğunu gösteriyor: Kiro "all three artifacts without approval gates"; Spec Kit "independent entry points, not mandatory phases"; GSD quick "skips research, discussion, plan-checker, verifier" ama `PLAN.md`+`SUMMARY.md` üretiyor. "Bakım yükü" gerekçesi resmî dokümanlarda yok. Tek istisna BMAD: "small changes go straight to build".
 **Yeni cümle:** "2026'da araçlar **onay kapılarını** koşullu hale getirdi; spec artefaktı çoğunlukla korunuyor. Kaldırılan şey kapıysa, kaldırılan şey kanıttır."
-**Etki:** PRD FR-02/FR-05, ADR-F05, LEARNING §3 (huni), KALITE §2.
+**Etki:** PRD FR-02/FR-05, ADR-F05, LEARNING §3 (huni), QUALITY §2.
 
 ### D3 — "Gece vardiyası" takvim kazancı değil, WIP artışı
 
@@ -42,12 +42,12 @@ WIP limiti (Little)            = hedef cycle time × günlük PR sayısı
 ```
 
 Kalibrasyon: 400 LOC ≈ 0,8–1,0 saat (Cisco/SmartBear); μ=10 PR/gün tabanında ρ=0,625 → ~4 saat (Google <4 saat), ρ=0,80 → 9,6 saat, ρ=0,89 → ~19 saat (Faros %441), ρ=0,95 → 45,6 saat. Kuyruk *uzunluğu* ile kuyruk *süresi* karıştırılmamalı.
-**Nereye:** PRD §9 (BMP yerine "review-hours/PR"), KALITE §4, ORGANIZATION §8.
+**Nereye:** PRD §9 (BMP yerine "review-hours/PR"), QUALITY §4, ORGANIZATION §8.
 
 ### E2 — Tohumlanmış hata seti
 
 Kapıların gerçekten yakaladığını ölçen tek yöntem: PR'a bilinen hatalar enjekte et, kapının yakalama oranını ölç. Ajan-ajan incelemesinin kusur yakalama oranı bugün **ölçülmemiş**; en yakın veri gözlemsel (yorumların %73,8'i kod değiştiriyor, ama "hata yakaladı" değil).
-**Nereye:** KALITE §3.1 (yeni set türü: `seeded`), YOL-HARITASI H3.
+**Nereye:** QUALITY §3.1 (yeni set türü: `seeded`), YOL-HARITASI H3.
 
 ### E3 — Yargıç kalibrasyonu
 
@@ -55,7 +55,7 @@ LLM-yargıçta ham uyum, şansa göre düzeltilmiş κ'yı 33,8–41,3 puan şi�
 - Kapı raporu **κ** verir, ham uyum vermez.
 - Pozisyon/uzunluk yanlılığı test edilir.
 - Yargıç asla tek kapı değildir.
-**Nereye:** KALITE §2.2 ve §7.
+**Nereye:** QUALITY §2.2 ve §7.
 
 ### E4 — Kimlik, izolasyon, geri alma
 
@@ -63,7 +63,7 @@ LLM-yargıçta ham uyum, şansa göre düzeltilmiş κ'yı 33,8–41,3 puan şi�
 - Dosya ve ağ izolasyonu **birlikte**; biri eksikse diğeri işlevsiz.
 - `soft-delete` + yedek izolasyonu + geri alma tatbikatı.
 - Referans olay: 9 saniyede silinen veritabanı; kök neden aynı token'la erişilen yedekler.
-**Nereye:** YONETISIM §2, §4, §8; `loop/goal.yaml sandbox`.
+**Nereye:** GOVERNANCE §2, §4, §8; `loop/goal.yaml sandbox`.
 
 ---
 
@@ -89,8 +89,8 @@ LLM-yargıçta ham uyum, şansa göre düzeltilmiş κ'yı 33,8–41,3 puan şi�
 | `ARCHITECTURE.md` | §8 | WIP limiti formülü |
 | `ORGANIZATION.md` | §6, §8 | Gece kapasitesi; inceleme-saati karnesi |
 | `LEARNING.md` | §1, §6.4 | D1; "iskelet evrimi" tanımı |
-| `KALITE.md` | §2, §3, §4, §7 | E2, E3, review-hours |
-| `YONETISIM.md` | §2, §4, §8 | E4 |
+| `QUALITY.md` | §2, §3, §4, §7 | E2, E3, review-hours |
+| `GOVERNANCE.md` | §2, §4, §8 | E4 |
 | `YOL-HARITASI.md` | H3, H5–H6 | Seeded set; gece kapasitesi |
 
 Bu düzeltmeler **henüz uygulanmadı**; bu dosya, uygulanacak değişikliklerin denetlenebilir listesidir. Uygulama ayrı bir iş kalemi (v0.2).
@@ -197,7 +197,7 @@ ağacı temiz; önceki iki defter değişmedi.
    depodakilerle kesişirse `uyum_not`'a düşer — bloklayıcı değil, review
    sinyali. Fail-closed değil: bilgi katmanı.
 7. **Egress kaydı (adapter_http):** her dış çağrı `--egress-log` verilirse
-   JSONL'e yazılır (ts, host, model, sonuç) — YONETISIM §4 denetim
+   JSONL'e yazılır (ts, host, model, sonuç) — GOVERNANCE §4 denetim
    maddesinin ilk somut parçası.
 
 ---
@@ -235,7 +235,7 @@ Regresyon testi: iki koşumda dosya sayısı artmaz, rapor "Zaten adaydı" yazar
 5. **.gitignore:** koşu kanıtları, loglar ve anahtar dosyaları hariç.
 
 **Public kullanım hedefi:** self-hosted, bring-your-own-key geliştirici.
-Barındırılan servis (SaaS) X2 hedef-dışıdır (YONETISIM).
+Barındırılan servis (SaaS) X2 hedef-dışıdır (GOVERNANCE).
 
 ---
 
@@ -463,7 +463,7 @@ testler ve gece kuyruğu, yayın dışı workspace dosyalarına
 
 **Düzeltme (niyet korunarak, mekanik bağımlılık kaldırılarak):**
 1. `kaynak-kuyrugu.yaml`: 6 dosya kaynağı artık repo içinden —
-   fabrika/README, SISTEM, ADR, PRD, KALITE, EVIDENCE-UPDATE (+ aynı
+   fabrika/README, SISTEM, ADR, PRD, QUALITY, EVIDENCE-UPDATE (+ aynı
    2 URL). Taze klon + CI + yerel aynı davranır.
 2. `test_vardiya` rotasyon testleri hermetikleştirildi: geçici KOK +
    geçici markdown (URL satırlı); `kaynak_tara`'nın "yalnız URL

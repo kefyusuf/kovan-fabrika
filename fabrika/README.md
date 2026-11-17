@@ -149,8 +149,8 @@ This is not an essay — it is a buildable project set:
 | [`ARCHITECTURE.md`](ARCHITECTURE.md) | Four rings, components, data flow, technology decisions |
 | [`ORGANIZATION.md`](ORGANIZATION.md) | Company structure, agent roles, handoff contracts, SLA |
 | [`LEARNING.md`](LEARNING.md) | Night agenda, knowledge funnel, memory, self-improvement protocol |
-| [`KALITE.md`](KALITE.md) | Gates, eval harness, metric definitions, measurement discipline |
-| [`YONETISIM.md`](YONETISIM.md) | Security, compliance, cost, licensing, incident response |
+| [`QUALITY.md`](QUALITY.md) | Gates, eval harness, metric definitions, measurement discipline |
+| [`GOVERNANCE.md`](GOVERNANCE.md) | Security, compliance, cost, licensing, incident response |
 | [`YOL-HARITASI.md`](YOL-HARITASI.md) | 12-week plan, risk register, kill criteria |
 | [`ADR.md`](ADR.md) | Architecture decision records (F01–F13) |
 | [`ARASTIRMA.md`](ARASTIRMA.md) | Karpathy, Pocock, Superpowers, GSD, factories, self-improvement — sourced |

@@ -1,4 +1,4 @@
-"""KOVAN — S1 runbook tatbikatı (YONETISIM §8 koşulabilir hali).
+"""KOVAN — S1 runbook tatbikatı (GOVERNANCE §8 koşulabilir hali).
 
 Dört adım:
   A1 Normal koşu: kuyruk → kapasite → kapılar → defter.

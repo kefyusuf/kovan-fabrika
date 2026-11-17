@@ -206,7 +206,7 @@ single ring.
 
 ## 9. Metrics
 
-Definitions are in [`KALITE.md`](KALITE.md) §4. Only the target table is
+Definitions are in [`QUALITY.md`](QUALITY.md) §4. Only the target table is
 here. **None of these has been measured yet**; that is why the "start" column
 is empty.
 

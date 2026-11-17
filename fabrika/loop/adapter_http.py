@@ -107,7 +107,7 @@ class HttpAdapter:
         raise AdapterError(son_hata)
 
     def _egress(self, sonuc: str) -> None:
-        """Her dış çağrıyı denetim dosyasına yazar (YONETISIM §4)."""
+        """Her dış çağrıyı denetim dosyasına yazar (GOVERNANCE §4)."""
         if not self.egress_log:
             return
         kayit = {
