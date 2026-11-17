@@ -14,7 +14,7 @@ kaynaklar:
     yol: fabrika/README.md
     konu: İ1–İ6 ilkeler ve dosya haritası
   - tur: dosya
-    yol: fabrika/SISTEM.md
+    yol: fabrika/SYSTEM.md
     konu: v2 sistem tanımı (3 hat, bileşenler)
   - tur: dosya
     yol: fabrika/ADR.md

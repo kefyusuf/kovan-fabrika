@@ -362,7 +362,7 @@ line — the code and docs metaphor is already the factory (shift, line, gate,
 production).
 
 **Decision.** Brand: **KOVAN**; repo and PyPI package: **`kovan-fabrika`**;
-CLI command: `kovan`; the English framing, in README.en.md: "a
+CLI command: `kovan`; the English framing lives in README.md: "a
 capacity-bounded, evidence-first software factory". pyproject is already
 compliant — migration cost is zero. `project.urls` is added in a single line
 once the real repo address exists.
@@ -388,6 +388,7 @@ a collapsed space: TheHive etc.).
 |---|---|
 | 2026-10-21 | F01–F12 accepted (concept version) |
 | 2026-11-17 | F13 accepted — project identity: KOVAN / kovan-fabrika |
+| 2026-11-18 | F13 revision note — README.en.md was folded into README.md; the English framing lives in README.md |
 | — | F07 is counted "partial" until Airlock's T1 model is measured |
 | — | F09's price table will be updated monthly |
 | — | F12 will be revisited on the first real task (v0.2) |

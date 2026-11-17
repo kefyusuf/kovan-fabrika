@@ -9,12 +9,12 @@
 # Test evidence
 
 - Files run:
-- Total test count: <!-- must match the SISTEM.md total -->
+- Total test count: <!-- must match the SYSTEM.md total -->
 - Determinism check: <!-- same seed → same decisions, when relevant -->
 
 # Doc sync (mandatory)
 
-- [ ] `SISTEM.md` test count / component table up to date
+- [ ] `SYSTEM.md` test count / component table up to date
 - [ ] `CHANGELOG.md` updated (if behavior changed)
 - [ ] Evidence section added to `EVIDENCE-UPDATE.md`
 - [ ] Gate order untouched, or recorded in `ADR.md`

@@ -1,518 +1,592 @@
-# Kanıt Güncellemesi — Derin Araştırma Sonrası Konsept Düzeltmeleri
+# Evidence Update — Concept Corrections After Deep Research
 
-**Tarih:** 22 Ekim 2026
-**Kaynak:** [`../arastirma/KOVAN-DERIN-ARASTIRMA-2026-10-22.md`](../arastirma/KOVAN-DERIN-ARASTIRMA-2026-10-22.md)
-**Amaç:** Araştırma, konseptin bazı cümlelerini doğruladı, bazılarını düzeltilmesi gereken hale getirdi. Bu dosya, hangi dokümanda neyin değişeceğini tek yerde tutar.
-
----
-
-## 1. Üç düzeltme (iddia → kanıt)
-
-### D1 — "Kendi kendine öğrenen fabrika" ifadesi daraltılmalı
-
-**Eski cümle:** "KOVAN, gece öğrenen, kendi yapısını geliştiren bir fabrikadır."
-**Sorun:** Literatürdeki sistemler (DGM, SICA) model ağırlıklarını değiştirmiyor; **iskeleti** (ajan kodu, araç, kontrol akışı, prompt) değiştiriyor. DGM kendi metninde "frozen pretrained FMs" diyor; `DGM_outer.py` sabit, yani arama prosedürü evrilmiyor.
-**Yeni cümle:** "KOVAN, donmuş model altında **iskeletini, becerisini ve kapı setini** evrimleştiren bir fabrikadır. Ağırlık öğrenmesi kapsam dışıdır."
-**Etki:** README §3 (İ4), LEARNING §1 ve §6.4, ADR-F03.
-
-### D2 — "Spec zorunluluğu azalıyor" değil, "onay kapıları kalkıyor"
-
-**Eski cümle:** "Spec-driven araçlar spec zorunluluğunu azaltıyor; spec bakım yüküne dönüşüyor."
-**Sorun:** Birincil dokümanlar artefaktın korunduğunu gösteriyor: Kiro "all three artifacts without approval gates"; Spec Kit "independent entry points, not mandatory phases"; GSD quick "skips research, discussion, plan-checker, verifier" ama `PLAN.md`+`SUMMARY.md` üretiyor. "Bakım yükü" gerekçesi resmî dokümanlarda yok. Tek istisna BMAD: "small changes go straight to build".
-**Yeni cümle:** "2026'da araçlar **onay kapılarını** koşullu hale getirdi; spec artefaktı çoğunlukla korunuyor. Kaldırılan şey kapıysa, kaldırılan şey kanıttır."
-**Etki:** PRD FR-02/FR-05, ADR-F05, LEARNING §3 (huni), QUALITY §2.
-
-### D3 — "Gece vardiyası" takvim kazancı değil, WIP artışı
-
-**Eski cümle:** "Gece 7 saat üretim, sabah raporu."
-**Sorun:** Üretim kapasitesi artarken kabul kapasitesi sabit: PR hacmi ×2, incelemede medyan süre +%441,5. Gece üretimi sabah kuyruğunu büyütür; akış hızlanmaz.
-**Yeni cümle:** "Gece vardiyası, **sabah inceleme kapasitesi kadar** iş alır. Kapasitenin üstünde üretim, kaliteyi değil borcu büyütür."
-**Etki:** README §3 (İ6), ORGANIZATION §6, ROADMAP H5–H6, `loop/goal.yaml` (max_parallel_workers).
+**Date:** October 22, 2026
+**Source:** [`../arastirma/KOVAN-DERIN-ARASTIRMA-2026-10-22.md`](../arastirma/KOVAN-DERIN-ARASTIRMA-2026-10-22.md)
+**Purpose:** The research validated some of the concept's sentences and turned
+others into ones that need fixing. This file keeps, in one place, what changes
+in which document.
 
 ---
 
-## 2. Dört ekleme (konseptte yoktu)
+## 1. Three corrections (claim → evidence)
 
-### E1 — İnceleme bütçesi formülü
+### D1 — "The self-learning factory" phrase must be narrowed
+
+**Old sentence:** "KOVAN is a factory that learns overnight and improves its
+own structure."
+**Problem:** Systems in the literature (DGM, SICA) do not change model
+weights; they change the **skeleton** (agent code, tools, control flow,
+prompts). DGM says "frozen pretrained FMs" in its own text; `DGM_outer.py` is
+fixed, i.e. the search procedure does not evolve.
+**New sentence:** "KOVAN is a factory that evolves **its skeleton, its
+skills, and its gate set** under a frozen model. Weight learning is out of
+scope."
+**Impact:** README §3 (İ4), LEARNING §1 and §6.4, ADR-F03.
+
+### D2 — Not "the spec requirement is fading" but "the approval gates are being lifted"
+
+**Old sentence:** "Spec-driven tools reduce the spec requirement; it turns
+into a spec-maintenance burden."
+**Problem:** Primary documents show the artifact is preserved: Kiro "all
+three artifacts without approval gates"; Spec Kit "independent entry points,
+not mandatory phases"; GSD quick "skips research, discussion, plan-checker,
+verifier" but produces `PLAN.md`+`SUMMARY.md`. The "maintenance burden"
+rationale does not exist in the official documents. The single exception is
+BMAD: "small changes go straight to build".
+**New sentence:** "In 2026, tools made the **approval gates** conditional;
+the spec artifact is mostly preserved. What was removed, if it was a gate,
+was evidence."
+**Impact:** PRD FR-02/FR-05, ADR-F05, LEARNING §3 (the funnel), QUALITY §2.
+
+### D3 — The "night shift" is not a calendar gain, it is a WIP increase
+
+**Old sentence:** "7 hours of night production, a morning report."
+**Problem:** As production capacity grows, acceptance capacity stays fixed:
+PR volume ×2, median review time +441.5%. Night production grows the morning
+queue; the flow does not speed up.
+**New sentence:** "The night shift takes on **as much work as the morning
+review capacity**. Production above capacity grows debt, not quality."
+**Impact:** README §3 (İ6), ORGANIZATION §6, ROADMAP H5–H6, `loop/goal.yaml`
+(max_parallel_workers).
+
+---
+
+## 2. Four additions (not in the concept)
+
+### E1 — The review budget formula
 
 ```
-Haftalık inceleme yükü (saat) = Σ_PR ( LOC_PR / 500 ) + 0,25 × PR_sayısı
-Kuyruk gecikmesi (M/M/1)      = (ρ / (1-ρ)) × (1/μ)
-WIP limiti (Little)            = hedef cycle time × günlük PR sayısı
+Weekly review load (hours)  = Σ_PR ( LOC_PR / 500 ) + 0.25 × PR_count
+Queue delay (M/M/1)         = (ρ / (1-ρ)) × (1/μ)
+WIP limit (Little)          = target cycle time × daily PR count
 ```
 
-Kalibrasyon: 400 LOC ≈ 0,8–1,0 saat (Cisco/SmartBear); μ=10 PR/gün tabanında ρ=0,625 → ~4 saat (Google <4 saat), ρ=0,80 → 9,6 saat, ρ=0,89 → ~19 saat (Faros %441), ρ=0,95 → 45,6 saat. Kuyruk *uzunluğu* ile kuyruk *süresi* karıştırılmamalı.
-**Nereye:** PRD §9 (BMP yerine "review-hours/PR"), QUALITY §4, ORGANIZATION §8.
+Calibration: 400 LOC ≈ 0.8–1.0 h (Cisco/SmartBear); with μ=10 PR/day,
+ρ=0.625 → ~4 h (Google <4 h), ρ=0.80 → 9.6 h, ρ=0.89 → ~19 h (Faros 441%),
+ρ=0.95 → 45.6 h. Queue *length* and queue *time* must not be confused.
+**Where:** PRD §9 ("review-hours/PR" instead of BMP), QUALITY §4,
+ORGANIZATION §8.
 
-### E2 — Tohumlanmış hata seti
+### E2 — The seeded error set
 
-Kapıların gerçekten yakaladığını ölçen tek yöntem: PR'a bilinen hatalar enjekte et, kapının yakalama oranını ölç. Ajan-ajan incelemesinin kusur yakalama oranı bugün **ölçülmemiş**; en yakın veri gözlemsel (yorumların %73,8'i kod değiştiriyor, ama "hata yakaladı" değil).
-**Nereye:** QUALITY §3.1 (yeni set türü: `seeded`), ROADMAP H3.
+The only method that measures whether the gates really catch: inject known
+errors into a PR and measure the gate's catch rate. The defect-catch rate of
+agent-to-agent review is **unmeasured** today; the nearest data is
+observational (73.8% of comments change code, but that is not "caught an
+error").
+**Where:** QUALITY §3.1 (a new set type: `seeded`), ROADMAP H3.
 
-### E3 — Yargıç kalibrasyonu
+### E3 — Judge calibration
 
-LLM-yargıçta ham uyum, şansa göre düzeltilmiş κ'yı 33,8–41,3 puan şişiriyor; "%85 uyum" ≈ κ 0,48. Bu yüzden:
-- Kapı raporu **κ** verir, ham uyum vermez.
-- Pozisyon/uzunluk yanlılığı test edilir.
-- Yargıç asla tek kapı değildir.
-**Nereye:** QUALITY §2.2 ve §7.
+In LLM-as-judge, raw agreement inflates chance-corrected κ by 33.8–41.3
+points; "85% agreement" ≈ κ 0.48. Therefore:
+- The gate report gives **κ**, not raw agreement.
+- Position/length bias is tested.
+- The judge is never a single gate.
+**Where:** QUALITY §2.2 and §7.
 
-### E4 — Kimlik, izolasyon, geri alma
+### E4 — Identity, isolation, rollback
 
-- Ajan ortamına secret konmaz; OIDC ile kısa ömürlü kimlik, repo/branch kapsamı.
-- Dosya ve ağ izolasyonu **birlikte**; biri eksikse diğeri işlevsiz.
-- `soft-delete` + yedek izolasyonu + geri alma tatbikatı.
-- Referans olay: 9 saniyede silinen veritabanı; kök neden aynı token'la erişilen yedekler.
-**Nereye:** GOVERNANCE §2, §4, §8; `loop/goal.yaml sandbox`.
+- No secret goes into the agent environment; short-lived identity via OIDC,
+  scoped to the repo/branch.
+- File and network isolation go **together**; if one is missing, the other
+  is useless.
+- `soft-delete` + backup isolation + a rollback drill.
+- The reference incident: a database deleted in 9 seconds; the root cause
+  was backups reachable with the same token.
+**Where:** GOVERNANCE §2, §4, §8; `loop/goal.yaml sandbox`.
 
 ---
 
-## 3. Doğrulanan altı ilke
+## 3. The six principles validated
 
-| İlke | Kanıt durumu |
+| Principle | Evidence status |
 |---|---|
-| İ1 Kanıt yoksa iş yok | **Doğrulandı** — benchmark emekliliği, κ şişmesi, test hacking |
-| İ2 İki vites | **Doğrulandı** — üretim/kabul ayrımı |
-| İ3 Değişmez çekirdek | **Doğrulandı** — DGM arama prosedürünü sabit tutuyor |
-| İ4 Öğrenme = dosya | **Doğrulandı** — bellek fiilen dosya; alternatif sevk edilmiyor |
-| İ5 Değerlendirici tavandır | **Doğrulandı** — üç bağımsız kanıt hattı |
-| İ6 Üretim = inceleme kapasitesi | **Doğrulandı ve sayısallaştı** — formül eklendi |
+| İ1 No evidence, no work | **Validated** — benchmark retirement, κ inflation, test hacking |
+| İ2 Two gears | **Validated** — the production/acceptance separation |
+| İ3 The immutable core | **Validated** — DGM keeps the search procedure fixed |
+| İ4 Learning = file | **Validated** — memory is literally files; the alternative is not pursued |
+| İ5 The evaluator can game it | **Validated** — three independent evidence lines |
+| İ6 Production = review capacity | **Validated and quantified** — the formula was added |
 
 ---
 
-## 4. Doküman eşlemesi (uygulanacak düzeltmeler)
+## 4. Document mapping (the corrections to be applied)
 
-| Doküman | Bölüm | Değişiklik |
+| Document | Section | Change |
 |---|---|---|
-| `README.md` | §3 İ4, İ6 | D1 ve D3 cümleleri |
-| `PRD.md` | §7 FR-02, FR-05; §9 | D2; review-hours metriği |
-| `ARCHITECTURE.md` | §8 | WIP limiti formülü |
-| `ORGANIZATION.md` | §6, §8 | Gece kapasitesi; inceleme-saati karnesi |
-| `LEARNING.md` | §1, §6.4 | D1; "iskelet evrimi" tanımı |
+| `README.md` | §3 İ4, İ6 | The D1 and D3 sentences |
+| `PRD.md` | §7 FR-02, FR-05; §9 | D2; the review-hours metric |
+| `ARCHITECTURE.md` | §8 | The WIP limit formula |
+| `ORGANIZATION.md` | §6, §8 | Night capacity; the review-hour scorecard |
+| `LEARNING.md` | §1, §6.4 | D1; the "skeleton evolution" definition |
 | `QUALITY.md` | §2, §3, §4, §7 | E2, E3, review-hours |
 | `GOVERNANCE.md` | §2, §4, §8 | E4 |
-| `ROADMAP.md` | H3, H5–H6 | Seeded set; gece kapasitesi |
+| `ROADMAP.md` | H3, H5–H6 | The seeded set; night capacity |
 
-Bu düzeltmeler **henüz uygulanmadı**; bu dosya, uygulanacak değişikliklerin denetlenebilir listesidir. Uygulama ayrı bir iş kalemi (v0.2).
-
----
-
-## 5. Yeni açık sorular
-
-1. **Tohumlanmış hata seti nasıl kurulur?** Geçmiş 100 PR'dan hata enjeksiyonu ile mi, sentetik mi?
-2. **İnceleme-saati nasıl ölçülür?** GitHub olay loglarından oturum süresi çıkarılabilir mi?
-3. **κ kalibrasyonu için insan etiketi kimden?** Tek kişilik kurulumda etiketleyici kim?
-4. **Gece kapasitesi nasıl tavanlanır?** Sabah kaç PR inceleyebiliyorsun; bu sayı ölçüldü mü?
-5. **"İskelet evrimi" hangi dosyalarda izinli?** `skills/`, `kadro/`, `loop/` — hangisi C1, hangisi C3?
+These corrections have **not yet been applied**; this file is the auditable
+list of the changes to be applied. Application is a separate work item
+(v0.2).
 
 ---
 
-## 6. Tek karar önerisi
+## 5. New open questions
 
-v0.2 kapsamına iki iş eklenmeli:
-1. **Review budget + review-hours metriği** (gece kapasitesini tavanlar).
-2. **Tohumlanmış hata seti** (kapıların gerçekten yakaladığını ölçer).
-
-İkisi de mevcut mimariye eklenebilir; yeni bileşen gerektirmez. Ve ikisi de, "fabrika" iddiasının ölçülebilir tek zeminini kurar.
-
----
-
-## 7. Canlı profil sapması (S2 · 4 Kasım 2026)
-
-Gerçek model bağlantısı (adapter_http.py) ve gerçek doğrulama katmanı
-(dogrula.py) devreye alındı. İki kayıt:
-
-1. **Runner boolean sinyal hatası düzeltildi.** `signal` alanlı bir kapıda
-   boolean `False`, sayısal `0.0` sayılıp kapıyı geçiriyordu. Artık boolean
-   sinyal her koşulda boolean sayılır; regresyon testi eklendi
-   (test_runner: `test_bool_signal_with_signal_field_is_boolean`).
-2. **Canlı profil (gates-canli.yaml):** review ve eval kapıları geçici
-   olarak *uyarıcı*. Gerekçe: S2'de bu kapılar sinyal üretmiyor. Bu bir
-   gevşetme değil ertelemedir: her satırda tarihli gerekçe var ve S3'te
-   (eval v1 ≥50 vaka + bağımsız incelemeci) bloklayıcıya dönecek. Kapı
-   *kaldırılmadı*; sinyal üretilmeyen kapı zaten fail-closed düşüyor.
+1. **How is the seeded error set built?** From error injection over the past
+   100 PRs, or synthetic?
+2. **How is review time measured?** Can session time be extracted from
+   GitHub event logs?
+3. **Where does the human label for κ calibration come from?** Who is the
+   labeler in a one-person setup?
+4. **How is night capacity capped?** How many PRs can you review in the
+   morning; has that number been measured?
+5. **In which files is "skeleton evolution" allowed?** `skills/`, `kadro/`,
+   `loop/` — which is C1, which C3?
 
 ---
 
-## 8. S3 güncellemesi (4 Kasım 2026)
+## 6. The single decision proposal
 
-1. **Eval v1 devrede ve bloklayıcı.** `eval_set/sicaklik-v1.jsonl` — 90
-   vakalık dondurulmuş set (golden değerler mevcut referans davranıştan;
-   set davranış değişimini yakalar, matematiksel doğruluğu kanıtlamaz).
-   `eval_kos.py` diff'i depoya uygulayıp seti koşar, skor 0,90 eşiğiyle
-   bloklayıcı. Kırık formül diff'i skoru 0,90'ın altına düşürdü (testte
-   doğrulandı). Canlı profilde eval artık `blocking: true`.
-2. **Set yazarı hatası da yakalandı:** ilk sette `ortalama` vakaları
-   argüman açılımı yüzünden 7 tutarsızlık üretti; skor 0,922'ye düştü.
-   Set düzeltildi → 90/90. Ders: eval seti de kapıdan geçmeli.
-3. **Bağımsız incelemeci sözleşmesi:** `incelemeci.py` — ikinci model uç
-   noktası, yapılandırılmış karar JSON'u, gerekçesiz onay otomatik ret.
-   `--inceleme-url` verildiğinde review kapısı programatik olarak
-   bloklayıcıya yükselir ve kararlar rapora düşer; verilmezse uyarıcı kalır.
-4. **Gece hattı çalışıyor (kuru mod).** `vardiya.py`: yerel kaynaklardan
-   kaynaklı not (15 iddia), tekrar eden dersten beceri adayı (seen ≥ 2),
-   seedtest tabanlı kırılma raporu (canlı profilin kaçırdığı tür:
-   tasarım hatası), defter istatistiğinden ölçüm planlı ADR taslağı ve
-   5 bölümlü sabah raporu. C2 gece kapalı; model bağlandığında aynı hat
-   adapter'a geçer, dosya sözleşmesi değişmez.
-5. **Döngü hedefi devreye alındı (4 Kasım 2026).** `kovan.py durum` —
-   tüm koşuların çapraz metrikleri (kabul/blok/ret, revizyon, ortalama
-   doluluk, en çok düşen kapılar, tekrar eden dersler, vardiya sayısı).
-   Windows Görev Zamanlayıcı'ya **KOVAN-Gece** görevi kuruldu: her gece
-   23:00 yerel python, kuru mod (sıfır token); çıktılar `runs/` ve
-   `vardiya-runs/` altına + log yan dosyasına. Kaldırma: `gorev-sil.ps1`.
-   Model anahtarı geldiğinde `gece-kos.ps1` içine `--adapter http` satırı
-   eklenir; hat aynı kalır. Görev, elle bir kez koşturularak doğrulandı
-   (gece-20261104-2026 / vardiya-20261104-2026; iki defter de sağlam).
-7. **Provenance sinyali gerçek ölçüme bağlandı.** `uyum.py`: diff'ten
-   yeni import köklerini çıkarır; stdlib serbest, üçüncü taraf yalnızca
-   `uyum-izinli.yaml` listesindeyse serbest, bağımlılık dosyası değişimi
-   ise REDDET (C3). Böylece canlı profilde dört bloklayıcı kapının
-   hepsi (policy, tests, provenance, eval) gerçek ölçümle çalışır;
-   review koşullu (incelemeci), cost uyarı. SBOM (SPDX) ve kopya kod
-   tespiti S4'te.
+Two items should be added to the v0.2 scope:
+1. **The review budget + the review-hours metric** (caps the night capacity).
+2. **The seeded error set** (measures whether the gates really catch).
+
+Both can be added to the existing architecture; they need no new component.
+And both establish the only measurable ground of the "factory" claim.
 
 ---
 
-## 9. S4 ilk adım — "dikkatli tur" (4 Kasım 2026)
+## 7. The live-profile deviation (S2 · November 4, 2026)
 
-Hiçbir mevcut test bozulmadı (93 → 103, hepsi yeşil); ornek-repo çalışma
-ağacı temiz; önceki iki defter değişmedi.
+The real model connection (adapter_http.py) and the real verification layer
+(dogrula.py) went live. Two records:
 
-1. **SBOM tohumu (`sbom.py`):** depo .py'ları `ast` ile taranır (exec yok);
-   stdlib ve yerel modüller SBOM'a girmez, üçüncü taraf SPDX 2.3 Package
-   olur (kuruluysa sürüm, yoksa NOASSERTION). ornek-repo: packages = 0
-   (yalnızca stdlib + yerel).
-2. **Kopya şüphesi (uyum.py):** eklenen satırlarda Copyright/SPDX başlığı
-   → provenance False, gerekçe "insan kararı". seedtest'in `kopya_kod`
-   hata türü artık ölçülebilir sinyale bağlandı.
-3. **`dogrula.py --geri-al`:** depoyu HEAD'e döndürüp temizliği raporlar.
-4. **`kovan.py --kanarya N`:** kabul edilenlerin yalnızca ilk N'i koşulur;
-   kalanlar kapasiteyi harcamış sayılır (dürüst muhasebe) ve rapor
-   başlığına KANARYA damgası düşer.
-5. **Lock dosyasından sürüm okuma:** `sbom.py` requirements/pyproject'teki
-   sabitlenmiş sürümleri öncelikler; modül→dağıtım eşlemesi
-   `packages_distributions()` ile çözülür (yaml → PyYAML).
-6. **Yinelenen fonksiyon tespiti (uyum):** diff'in eklediği fonksiyon adları
-   depodakilerle kesişirse `uyum_not`'a düşer — bloklayıcı değil, review
-   sinyali. Fail-closed değil: bilgi katmanı.
-7. **Egress kaydı (adapter_http):** her dış çağrı `--egress-log` verilirse
-   JSONL'e yazılır (ts, host, model, sonuç) — GOVERNANCE §4 denetim
-   maddesinin ilk somut parçası.
+1. **The runner boolean-signal bug was fixed.** On a gate carrying a
+   `signal` field, a boolean `False` was counted as the numeric `0.0` and
+   passed the gate. Now a boolean signal is treated as boolean under all
+   conditions; a regression test was added (test_runner:
+   `test_bool_signal_with_signal_field_is_boolean`).
+2. **The live profile (gates-canli.yaml):** the review and eval gates are
+   temporarily *advisory*. Rationale: in S2 these gates produce no signal.
+   This is not a loosening but a deferral: every line carries a dated
+   rationale and, in S3 (eval v1 ≥50 cases + an independent reviewer), they
+   return to blocking. The gate was **not removed**; a gate producing no
+   signal already fails closed.
 
 ---
 
-## 10. İlk otonom gece + ilk sistem-düzeltmesi (5 Kasım 2026)
+## 8. The S3 update (November 4, 2026)
 
-**KOVAN-Gece 04.11.2026 23:00'te kendiliğinden çalıştı** (LastTaskResult 0):
-- kovan: 4 kabul / 1 blok (K-107, politika) / 1 revizyon; defter 6 kayıt sağlam;
-- vardiya: 15 kaynaklı iddia, beceri adayı, kırılma raporu, ADR taslağı, sabah raporu;
-- C2 yazılmadı (anayasa m.3 uyumlu).
-
-**Sistemin kendi yakaladığı kusur:** beceri adayı her gece yeniden
-üretiliyordu (3 kopya birikmişti). Tekrar eden ders, tekrar eden "yeni
-öğrenme" değildir — damıtma idempotent yapıldı: adaylar paylaşılan
-dizine yazılır, varsa yazılmaz, deftere `beceri_adayi_zaten_var` düşer.
-Regresyon testi: iki koşumda dosya sayısı artmaz, rapor "Zaten adaydı" yazar.
-
----
-
-## 13. Yayın paketi (10 Kasım 2026)
-
-1. **Güvenlik: kirli ağaç koruması.** `dogrula.uygula` artık `git status
-   --porcelain` kirli ise uygulamayı REDDEDER — canlı modda kullanıcının
-   commitlenmemiş işini `reset --hard` silemez (fail-closed, testli).
-2. **Kurulum:** `fabrika/pyproject.toml` + entry point'ler
-   (`kovan/vardiya/tatbikat/beceri`). Kanıt: `pip install -e fabrika
-   --no-build-isolation` sonrası `kovan plan` repo kökünden çalıştı;
-   kapasite valfi saat=2'de K-103'ü doğru erteledi. Not: py-modules
-   `loop/` altında olduğundan `package-dir` eşlemesi gerekti.
-3. **Yapılandırma:** `loop/kullanici.yaml` — kullanıcı varsayılanları tüm
-   alt komutlara uygulanır, CLI ezer. Argparse tuzağı (alt ayrıştırıcı
-   varsayılanı ana varsayılanı ezer) testle belgelendi.
-4. **README.en.md** (İngilizce hızlı başlangıç + güvenlik uyarıları) ve
-   **CI** (`.github/workflows/tests.yml`: 15 test dosyası + tatbikat).
-5. **.gitignore:** koşu kanıtları, loglar ve anahtar dosyaları hariç.
-
-**Public kullanım hedefi:** self-hosted, bring-your-own-key geliştirici.
-Barındırılan servis (SaaS) X2 hedef-dışıdır (GOVERNANCE).
-
----
-
-## 12. S4 kapanış parçaları (10 Kasım 2026)
-
-1. **Kopya kod blok tespiti (seviye 2):** `uyum.kopya_blok_tara` — diff,
-   geçici klon'a uygulanır; yeni fonksiyon gövdeleri, **yapı imzası** ile
-   (tanımlayıcı/sayı/metin maskelenmiş token dizisi) depodaki fonksiyonlarla
-   karşılaştırılır. Eşik: ≥12 satır, benzerlik ≥0,90; kendi eski hali hariç.
-   Kanıt demo: `istatistik` fonksiyonunun değişkenleri yeniden adlandırılmış
-   kopyası skor 1,0 → provenance False. Canlı profil: kopya şüphesi
-   provenance'ı False yapar (fail-closed, insan kararı gerekir).
-2. **S1 runbook tatbikatı (`tatbikat.py`):** normal koşu, defter doğrulama,
-   STOP ile durdurma, kirli klon üzerinde geri alma — 4/4 PASS. A4'ün ilk
-   sürümündeki CRLF karşılaştırma hatası `git status --porcelain` ölçütüyle
-   düzeltildi.
-3. **Kanarya muhasebesi:** `--kanarya N` koşulan işleri N'e indirir; kalan
-   işler kapasiteyi harcamış sayılır (ertelenen olarak deftere geçer).
-4. **Haftalık retro otomasyonu (`retro.py`):** defterden GPK vekili hesaplar
-   (ilk karar kabul ise ilk tur sayılır), kapı trendini çıkarır ve **koşulabilir
-   mekanik checkler** üretir (ORGANIZATION §6 kuralı). Bilinen sınır: GPK
-   vekili tüm koşuları karıştırır — run-bazlı ayrım S3b.
-5. **Tatbikata A5 kaos adımı:** kesinti → resume; koşucu kabul edilmiş işi
-   tekrar etmez, düşen işi sonraki vardiyada yeniden dener (fail-closed davranış
-   tatbikatla kanıtlandı — 5/5 PASS).
-
-**Kalan:** yalnızca girdi — API anahtarı (canlı ölçüm) ve gerçek backlog
-(GPK/MBB). Ayrıca mutasyon testi devrede: ilk 6 mutantın **tamamı eval ve
-gerçek test koşumu tarafından öldürüldü** — "kapılar yakalıyor" iddiası
-artık yaptırım kanıtlı (§12'nin devamı, 10 Kasım 2026).
+1. **Eval v1 is live and blocking.** `eval_set/sicaklik-v1.jsonl` — a frozen
+   90-case set (the golden values come from the existing reference behavior;
+   the set catches behavior change, it does not prove mathematical
+   correctness). `eval_kos.py` applies the diff to the repo and runs the
+   set, blocking at a 0.90 threshold. The broken-formula diff dropped the
+   score below 0.90 (verified in a test). In the live profile, eval is now
+   `blocking: true`.
+2. **The set-writer error was also caught:** in the first set the `ortalama`
+   cases produced 7 inconsistencies because of argument unpacking; the score
+   dropped to 0.922. The set was fixed → 90/90. Lesson: the eval set must
+   also pass the gate.
+3. **The independent reviewer contract:** `incelemeci.py` — a second model
+   endpoint, a structured decision JSON, approval without a rationale
+   auto-rejected. When `--inceleme-url` is given, the review gate escalates
+   to programmatic blocking and the decisions land in the report; without
+   it, it stays advisory.
+4. **The night line runs (dry mode).** `vardiya.py`: sourced notes from
+   local sources (15 claims), skill candidates from recurring lessons
+   (seen ≥ 2), a seedtest-based break report (the type the live profile
+   missed: a design error), a measurement-planned ADR draft from ledger
+   statistics, and a 5-section morning report. C2 is closed at night; when
+   a model connects, the same line switches to the adapter, the file
+   contract does not change.
+5. **The loop goal went live (November 4, 2026).** `kovan.py durum` — the
+   cross-metrics of all runs (accept/block/reject, revisions, average
+   occupancy, the most-falling gates, recurring lessons, the shift count).
+   A **KOVAN-Gece** task was installed into Windows Task Scheduler: every
+   night at 23:00 local python, dry mode (zero tokens); outputs go under
+   `runs/` and `vardiya-runs/` + a log side file. Removal: `gorev-sil.ps1`.
+   When the model key arrives, an `--adapter http` line is added inside
+   `gece-kos.ps1`; the line stays the same. The task was verified by running
+   it once by hand (gece-20261104-2026 / vardiya-20261104-2026; both ledgers
+   sound).
+7. **The provenance signal was tied to a real measurement.** `uyum.py`:
+   extracts the new import roots from the diff; stdlib is free, third-party
+   is free only if it is on the `uyum-izinli.yaml` list, and a
+   dependency-file change is REJECT (C3). This way all four blocking gates
+   in the live profile (policy, tests, provenance, eval) run on real
+   measurement; review is conditional (the reviewer), cost warns. SBOM
+   (SPDX) and copy-code detection are in S4.
 
 ---
 
-## 11. İlk beceri aktive edildi (5 Kasım 2026)
+## 9. S4 first step — the "careful turn" (November 4, 2026)
 
-**Önce sistem iki kez kendini onaylamayı REDDETTİ** (m.2 çalışıyor):
-`AKTİFLEŞTİRME RED: insan onay notu yok`. Sonra kurucu kararı soruldu
-(ask_user) ve onay kayda geçirildi.
+No existing test broke (93 → 103, all green); the ornek-repo working tree is
+clean; the previous two ledgers unchanged.
 
-- **Beceri:** `tests-kapisi-tekrar-dusmesi` v0.2.0 — prosedürü gerçek koda
-  çevrildi: `beceri.test_zayiflatma_tespiti(diff)` (5 vaka testli: silme,
-  `assert True` zayıflatma, meşru takas, tests/ dışı, dosya silme).
-- **Yürütme koşullu:** koşucu beceriyi yalnızca `status: active` iken
-  uygular; proposed beceri pipeline'ı etkileyemez (m.6 kod karşılığı).
-- **Canlı simülasyon kanıtı:** `assert True` ile geçen yama →
-  `tests=False`, not: "beceri taraması: assertion zayıflatıldı",
-  `kullanim.jsonl`'a kullanım kaydı düştü (ÖVD artık ölçülebilir).
-- **Yaşam döngüsü:** proposed → active → stale (90 gün) → archived;
-  aktifleşme ölçütleri: beceri testi geçiyor + kanıt ≥ 2 görev + insan
-  onayı. Çürüme raporu: `beceri.py rapor`.
-
-**Öğrenme döngüsü ilk kez uçtan uca kapandı:** hata → ders → beceri
-adayı → insan onayı → aktif beceri → pipeline'da yaptırım → kullanım
-sayacı. Ağırlık öğrenmesi yok; **dosya öğrenmesi var** (İ4).
-
----
-
-## 14. Kuyruk ilerlemesi devrede (10-16 Kasım 2026)
-
-**Gerçek otonom operasyon verisi:** 04-15 Kasım arası **10 gece koşusu**
-(Zamanlayıcı, LastTaskResult hep 0) + **ilk haftalık retro (W46)** + ilk
-tatbikat koşumu. Toplam: 34 kabul / 8 blok, tüm defterler sağlam.
-
-Bu haftanın üç düzeltmesi:
-1. **Tatbikat logu kodlama hatası:** Windows redirection Türkçe karakterde
-   UnicodeEncodeError üretiyordu; görev "başarılı" görünüyordu ama log
-   yarım kalıyordu. `PYTHONIOENCODING=utf-8` + `Out-File -Encoding utf8`
-   ile düzeltildi; elle koşumla doğrulandı (5/5 PASS, log okunur).
-2. **Gece hattına kaynak rotasyonu:** her gece aynı 15 kaynak yerine,
-   okunanlar geçmişe yazılır (kaynak-gecmisi.jsonl) ve okunmamışlar
-   taranır; hepsi tükenirse açık "TEKRAR TARAMA" işaretiyle yeniden
-   okunur. İlk turda rotasyon kodunun çözümlü-yol hatası sessizce 0 kaynak
-   okunmasına yol açmıştı — panodan yakalandı, düzeltildi, testlendi.
-3. **Completion-aware kuyruk:** `--tamamlanan` ile kabul edilen işler
-   kayda geçer ve sonraki gece atlanır — kuyruk ilerler. Düzeltme:
-   bloklanan işler de kayda yazılıyordu (tekrar eden ihlal trendi
-   kaybolacaktı); yalnızca kabul edilenler kayda geçer, bloklananlar
-   sonraki gece yeniden denenir (testle sabitlendi).
-
-**ÖVD ilk gerçek veri:** tek aktif beceri (tests-kapisi-tekrar-dusmesi),
-kullanım sayacı kullanim.jsonl'de. Sayı henüz tekil; 30 günlük pencere
-sonunda ÖVD = kullanım / 30 ölçülebilir olacak.
+1. **The SBOM seed (`sbom.py`):** the repo's .py files are scanned with
+   `ast` (no exec); stdlib and local modules do not enter the SBOM,
+   third parties become SPDX 2.3 Packages (version if installed, otherwise
+   NOASSERTION). ornek-repo: packages = 0 (only stdlib + local).
+2. **Copy suspicion (uyum.py):** a Copyright/SPDX header in the added lines
+   → provenance False, rationale "human decision". seedtest's `kopya_kod`
+   error type is now tied to a measurable signal.
+3. **`dogrula.py --geri-al`:** turns the repo back to HEAD and reports
+   cleanliness.
+4. **`kovan.py --kanarya N`:** only the first N of the accepted tasks run;
+   the rest are counted as having spent capacity (honest accounting) and the
+   report heading gets a CANARY stamp.
+5. **Reading versions from the lock file:** `sbom.py` prioritizes the pinned
+   versions in requirements/pyproject; the module→distribution mapping is
+   resolved with `packages_distributions()` (yaml → PyYAML).
+6. **Duplicate function detection (uyum):** if the function names added by
+   the diff intersect with those in the repo, it lands in `uyum_not` — not
+   blocking, a review signal. Not fail-closed: the information layer.
+7. **The egress record (adapter_http):** if `--egress-log` is given, every
+   external call is written to JSONL (ts, host, model, result) — the first
+   concrete piece of the GOVERNANCE §4 audit item.
 
 ---
 
-## 15. Gece koşularının print çökmesi — kök neden ve kapanış (16 Kasım 2026)
+## 10. The first autonomous night + the first system-caught defect (November 5, 2026)
 
-**Belirti:** 10 gece defteri sağlam, ozet ve raporlar yazılmış; ama her gece
-logunda `UnicodeEncodeError: 'charmap' codec can't encode 'ş'` ve
-`state/tamamlanan.jsonl` hiç oluşmamış (kuyruk ilerlemiyor).
+**KOVAN-Gece ran by itself at 04.11.2026 23:00** (LastTaskResult 0):
+- kovan: 4 accepted / 1 block (K-107, policy) / 1 revision; ledger 6 records
+  sound;
+- vardiya: 15 sourced claims, a skill candidate, a break report, an ADR
+  draft, a morning report;
+- No C2 was written (compliant with constitution art. 3).
 
-**Kök neden:** Python, stdout bir PIPE'a bağlıyken yerel kodlamayı (cp1252)
-kullanır; Türkçe karakterli `print` süreci son satırda öldürür. Tüm
-artefaktlar print'ten ÖNCE yazıldığı için koşu "başarılı" görünüyordu —
-ama çıkış kodu bozuluyor ve sonraki adım/log yarım kalıyordu. Ayrıca
-`--tamamlanan` eski gece-kos sürümünde hiç geçilmiyordu; bu yüzden kayıt
-dosyası yoktu.
+**The defect the system caught itself:** the skill candidate was being
+regenerated every night (3 copies had accumulated). A recurring lesson is
+not recurring "new learning" — distillation was made idempotent: candidates
+are written to a shared directory, not written if present, and
+`beceri_adayi_zaten_var` lands in the ledger. Regression test: over two runs
+the file count does not grow, and the report writes "Zaten adaydı".
 
-**Düzeltme:**
-1. `konsol.py` + 11 CLI girişinde `konsol.hazirla()`: stdout/stderr
-   `encoding="utf-8", errors="replace"`. Çıktı kaybolmaz, süreç ölmez.
+---
+
+## 13. The release package (November 10, 2026)
+
+1. **Security: dirty-tree protection.** `dogrula.uygula` now REFUSES to
+   apply if `git status --porcelain` is dirty — in live mode it cannot wipe
+   the user's uncommitted work with `reset --hard` (fail-closed, tested).
+2. **Installation:** `fabrika/pyproject.toml` + entry points
+   (`kovan/vardiya/tatbikat/beceri`). Evidence: after
+   `pip install -e fabrika --no-build-isolation`, `kovan plan` ran from the
+   repo root; the capacity valve correctly deferred K-103 at hour=2. Note:
+   since py-modules live under `loop/`, the `package-dir` mapping was
+   needed.
+3. **Configuration:** `loop/kullanici.yaml` — user defaults apply to all
+   subcommands, CLI overrides. The argparse trap (the subparser default
+   overriding the main default) was documented with a test.
+4. **README.en.md** (an English quick start + security warnings) and **CI**
+   (`.github/workflows/tests.yml`: 15 test files + the drill).
+5. **.gitignore:** run evidence, logs, and key files excluded.
+
+**The public-use target:** a self-hosted, bring-your-own-key developer.
+A hosted service (SaaS) is the X2 non-goal (GOVERNANCE).
+
+---
+
+## 12. The S4 closing pieces (November 10, 2026)
+
+1. **Copy-code block detection (level 2):** `uyum.kopya_blok_tara` — the
+   diff is applied to a temporary clone; the new function bodies are
+   compared against the repo's functions using a **structure signature**
+   (an identifier/number/text-masked token sequence). Threshold: ≥12 lines,
+   similarity ≥0.90; excluding its own former self. Evidence demo: a copy of
+   the `istatistik` function with renamed variables scored 1.0 → provenance
+   False. Live profile: copy suspicion makes provenance False (fail-closed,
+   a human decision is required).
+2. **The S1 runbook drill (`tatbikat.py`):** a normal run, ledger
+   verification, stopping with STOP, rollback on a dirty clone — 4/4 PASS.
+   The CRLF comparison bug in A4's first version was fixed with the
+   `git status --porcelain` criterion.
+3. **Canary accounting:** `--kanarya N` reduces the running tasks to N; the
+   remaining tasks are counted as having spent capacity (they enter the
+   ledger as deferred).
+4. **The weekly retro automation (`retro.py`):** computes the GPK proxy from
+   the ledger (the first decision counts as the first pass if it is
+   accepted), extracts the gate trend, and produces **runnable mechanical
+   checks** (the ORGANIZATION §6 rule). Known limit: the GPK proxy mixes all
+   runs — run-based separation is S3b.
+5. **An A5 chaos step for the drill:** interruption → resume; the runner
+   does not repeat an accepted task and retries the dropped one in the next
+   shift (the fail-closed behavior was proven with the drill — 5/5 PASS).
+
+**Remaining:** input only — the API key (live measurement) and a real
+backlog (GPK/MBB). Also, mutation testing is live: **all** of the first
+6 mutants were killed by eval and the real test run — the "gates catch"
+claim is now enforcement-proven (a continuation of §12, November 10, 2026).
+
+---
+
+## 11. The first skill was activated (November 5, 2026)
+
+**First the system twice REFUSED to approve itself** (art. 2 working):
+`AKTİFLEŞTİRME RED: insan onay notu yok`. Then the founder was asked for the
+decision (ask_user) and the approval was recorded.
+
+- **The skill:** `tests-kapisi-tekrar-dusmesi` v0.2.0 — the procedure was
+  turned into real code: `beceri.test_zayiflatma_tespiti(diff)` (5 test
+  cases: deletion, `assert True` weakening, a legitimate swap, outside
+  tests/, file deletion).
+- **Conditional execution:** the runner applies the skill only while
+  `status: active`; a proposed skill cannot affect the pipeline (the code
+  counterpart of art. 6).
+- **Live simulation evidence:** the patch passing with `assert True` →
+  `tests=False`, note: "beceri taraması: assertion zayıflatıldı", a usage
+  record landed in `kullanim.jsonl` (ÖVD is now measurable).
+- **The life cycle:** proposed → active → stale (90 days) → archived;
+  activation criteria: the skill's test passes + evidence ≥ 2 tasks + human
+  approval. The decay report: `beceri.py rapor`.
+
+**The learning loop closed end-to-end for the first time:** error → lesson →
+skill candidate → human approval → active skill → enforcement in the
+pipeline → the usage counter. No weight learning; **file learning** (İ4).
+
+---
+
+## 14. Queue progress live (November 10–16, 2026)
+
+**Real autonomous-operation data:** between November 4–15, **10 night runs**
+(Scheduler, LastTaskResult always 0) + **the first weekly retro (W46)** +
+the first drill run. Total: 34 accepted / 8 blocked, all ledgers sound.
+
+This week's three fixes:
+1. **The drill log encoding bug:** Windows redirection produced a
+   UnicodeEncodeError on a Turkish character; the task looked "successful"
+   but the log was cut short. Fixed with `PYTHONIOENCODING=utf-8` +
+   `Out-File -Encoding utf8`; verified with a manual run (5/5 PASS, the log
+   is readable).
+2. **Source rotation for the night line:** instead of the same 15 sources
+   every night, the read ones are written to history
+   (kaynak-gecmisi.jsonl) and the unread ones are scanned; when all are
+   exhausted, they are re-read with an explicit "TEKRAR TARAMA" (rescan)
+   mark. In the first turn, a resolved-path bug in the rotation code
+   silently led to 0 sources being read — caught from the board, fixed,
+   tested.
+3. **The completion-aware queue:** with `--tamamlanan`, accepted tasks are
+   recorded and skipped the next night — the queue advances. The fix:
+   blocked tasks were also being recorded (the recurring-violation trend
+   would have been lost); only accepted tasks are recorded, blocked ones
+   are retried the next night (fixed with a test).
+
+**ÖVD's first real data:** a single active skill (tests-kapisi-tekrar-
+dusmesi), the usage counter in kullanim.jsonl. The number is still singular;
+at the end of the 30-day window, ÖVD = usage / 30 will be measurable.
+
+---
+
+## 15. The print crash of the night runs — root cause and closure (November 16, 2026)
+
+**Symptom:** 10 nights with sound ledgers, the summaries and reports
+written; but every night's log had
+`UnicodeEncodeError: 'charmap' codec can't encode 'ş'` and
+`state/tamamlanan.jsonl` had never been created (the queue was not
+advancing).
+
+**Root cause:** when stdout is attached to a PIPE, Python uses the legacy
+encoding (cp1252); a Turkish-character `print` kills the process on the last
+line. Since all artifacts were written BEFORE the print, the run looked
+"successful" — but the exit code was broken and the next step/log was cut
+short. Also, `--tamamlanan` was never passed in the old gece-kos version;
+that is why the record file did not exist.
+
+**The fix:**
+1. `konsol.py` + 11 CLI entries get `konsol.hazirla()`: stdout/stderr
+   `encoding="utf-8", errors="replace"`. Output is not lost, the process
+   does not die.
 2. `gece-kos.ps1` / `hafta-kos.ps1`: `PYTHONIOENCODING=utf-8` +
-   `Out-File -Encoding utf8` (Türkçe log artık okunur).
-3. `--tamamlanan` yolu önce değişkene alınıp açıkça geçirildi.
-4. `pyproject.toml` py-modules'a `konsol` eklendi (kurulumda eksik kalmasın).
+   `Out-File -Encoding utf8` (the Turkish log is now readable).
+3. The `--tamamlanan` path is first taken into a variable and passed
+   explicitly.
+4. `konsol` was added to pyproject.toml py-modules (so it is not missing
+   from the install).
 
-**Kanıt (uçtan uca, Zamanlayıcı'nın kullandığı girişle):** `gece-kos.ps1`
-elle koşuldu → `runs/gece-20261116-0941`: 5 kabul / 8, 4 kabul + 1 blok,
-defter OK; `state/tamamlanan.jsonl` oluştu (236 bayt, yalnız kabul
-edilenler); log **temiz** (Traceback yok, Türkçe okunur). Bu gece 23:00'ten
-itibaren kuyruk ilerleyecek.
+**Evidence (end-to-end, with the entry the Scheduler uses):**
+`gece-kos.ps1` was run by hand → `runs/gece-20261116-0941`: 5 accepted / 8,
+4 accepted + 1 block, ledger OK; `state/tamamlanan.jsonl` was created
+(236 bytes, only the accepted ones); the log is **clean** (no Traceback,
+Turkish readable). From 23:00 tonight, the queue will advance.
 
-**Ders:** "Artefaktlar var" ≠ "koşu başarılı". Exit code ve log bütünlüğü
-panoya girmeli — bu düzeltmeyle gece raporu bunu da kontrol eder hale geldi.\n
+**Lesson:** "artifacts exist" ≠ "the run succeeded". Exit code and log
+integrity must enter the board — with this fix, the night report now checks
+those too.
+
 ---
 
-## 16. Kuyruk ilerlemesi kanıtı + log bütünlüğü ağı + publish hazırlığı (16 Kasım 2026)
+## 16. Queue progress evidence + the log-integrity net + publish prep (November 16, 2026)
 
-**Kuyruk ilerlemesi (§15'in vaadi, artık gerçek):** `gece-kos.ps1` elle
-koşuldu → `state/tamamlanan.jsonl` 5→6 kayda büyüdü (K-106 kabul edilip
-kayda geçti); blok/ertelenenler yine kayda girmedi (m.4 kuralı korunuyor).
-Sistem artık aynı geceyi iki kez yaşamıyor: tamamlanan işler tekrar
-seçilmiyor.
+**Queue progress (§15's promise, now real):** `gece-kos.ps1` was run by hand
+→ `state/tamamlanan.jsonl` grew from 5 to 6 records (K-106 accepted and
+recorded); blocks/deferrals still do not enter the record (the art. 4 rule
+is preserved). The system no longer lives the same night twice: completed
+tasks are not selected again.
 
-**Gece durum defteri (yeni güvenlik ağı):** `gece-kos.ps1` artık her iki
-koşumun **çıkış kodunu** ve loglarının **çöküm imzası** içerip içermediğini
-kontrol edip `state/gece-durum.log`'a yazıyor. İlk kayıt:
+**The night status ledger (a new safety net):** `gece-kos.ps1` now checks
+both runs' **exit codes** and whether their logs contain a **crash
+signature**, writing to `state/gece-durum.log`. The first record:
 `20261116-1353 | kovan-cikis: 0 temiz: EVET | vardiya-cikis: 0 temiz: EVET`.
 
-**Retro mekanik checki — `python retro.py --log-saglik`:** runs\*.log'u
-tarar; Traceback/UnicodeEncodeError içerenleri raporlar, bozuk varsa çıkış
-1. Kritik bulgu: eski PowerShell logları **UTF-16 (BOM'lu)** yazılmıştı —
-UTF-8 okuma "Traceback"i göremiyordu (NUL'lar karakter aralarına giriyor).
-BOM algılama eklendi ve test edildi (UTF-16 testi dahil, retro 6→11 test).
-Canlı tarama 9 bozuk log yakaladı; bunlar kanıt olarak `runs/arsiv/`e
-taşındı (tarama kapsamı dışı, diskte duruyor).
+**The retro mechanical check — `python retro.py --log-saglik`:** scans
+runs\*.log; reports those containing Traceback/UnicodeEncodeError, exits 1
+if anything is broken. Critical finding: the old PowerShell logs had been
+written **UTF-16 (with BOM)** — UTF-8 reading could not see "Traceback"
+(NULs land between the characters). BOM detection was added and tested
+(including a UTF-16 test; retro 6→11 tests). The live scan caught 9 broken
+logs; they were moved to `runs/arsiv/` as evidence (outside the scan scope,
+kept on disk).
 
-**Publish hazırlığı:**
+**Publish prep:**
 1. `pip install -e fabrika --no-build-isolation` → kovan-fabrika 0.2.1
-   kuruldu (editable, loop/); `kovan --help` ve `vardiya --help` çıkış 0.
-   Not: CLI dosyaları (backlog vb.) cwd'e göre çözülür — entry point'in
-   boş dizinde `plan` vermesi beklenen davranış.
-2. CI: test listesine `test_kuyruk_uret.py` + `test_konsol.py` eklendi
-   (19 dosya); "Log bütünlüğü taraması" adımı girildi (`--log-saglik`).
-3. `.gitignore`: `fabrika/loop/state/` ve `fabrika/loop/reports/` eklendi
-   (çalışma zamanı durumu repoya girmez; defter/kanıt yerelde kalır).
-4. Sürüm 0.2.0 → 0.2.1.
+   installed (editable, loop/); `kovan --help` and `vardiya --help` exit 0.
+   Note: the CLI files (backlog etc.) resolve relative to cwd — the entry
+   point giving `plan` in an empty directory is expected behavior.
+2. CI: `test_kuyruk_uret.py` + `test_konsol.py` added to the test list
+   (19 files); the "Log integrity scan" step entered (`--log-saglik`).
+3. `.gitignore`: `fabrika/loop/state/` and `fabrika/loop/reports/` added
+   (runtime state does not enter the repo; the ledger/evidence stays
+   local).
+4. Version 0.2.0 → 0.2.1.
 
-**Ders:** İzleme zinciri tamamlanmalı — artefakt (ozet/rapor) yazılsa bile
-çıkış kodu + log bütünlüğü + kuyruk ilerlemesi ayrı sinyallerdir; artık
-üçü de kayda geçiyor (gece-durum.log → retro --log-saglik → tamamlanan.jsonl).
-\n\n
+**Lesson:** the monitoring chain must be completed — even if artifacts
+(summary/report) are written, the exit code + log integrity + queue progress
+are separate signals; now all three are recorded (gece-durum.log →
+retro --log-saglik → tamamlanan.jsonl).
+
 ---
 
-## 17. Sektörel norm kapanışı (16 Kasım 2026)
+## 17. The industry-norm closure (November 16, 2026)
 
-Norm denetimi beş boşluk buldu; hepsi bu turda kapatıldı:
+The norm audit found five gaps; all were closed this turn:
 
-1. **Norm dosyaları** (hepsi fabrika/ altında, Türkçe): CHANGELOG.md
-   (Keep a Changelog + SemVer; 0.1.0→0.2.1), SECURITY.md (açıklık
-   bildirimi + BYOK/egress tasarım kararları), CONTRIBUTING.md
-   (tur normu, kapı sırası dokunulmazlığı, m.2 PR kuralı),
-   CODE_OF_CONDUCT.md (Contributor Covenant 2.1 modeli). Depo kökünde
+1. **Norm files** (all under fabrika/, Turkish at the time): CHANGELOG.md
+   (Keep a Changelog + SemVer; 0.1.0→0.2.1), SECURITY.md (disclosure +
+   the BYOK/egress design decisions), CONTRIBUTING.md (the turn norm,
+   gate-order immutability, the art. 2 PR rule), CODE_OF_CONDUCT.md (the
+   Contributor Covenant 2.1 model). At the repo root,
    `.github/PULL_REQUEST_TEMPLATE.md` + `ISSUE_TEMPLATE/` (bug + feature,
-   norm checklist'li). LICENSE Apache-2.0 paket dizinine kopyalandı.
+   with norm checklists). LICENSE copied into the package directory as
+   Apache-2.0.
 2. **pyproject PEP 639:** `license = "Apache-2.0"` (SPDX expression) +
-   `license-files = ["LICENSE"]`; classifiers 9; `pyyaml>=6,<7` aralık
-   kilidi; build-system setuptools>=77. **Öğrenilen:** license
-   expression kullanılınca License classifier setuptools 77+ tarafından
-   *hata* olarak reddediliyor — classifier kaldırıldı. Kanıt:
-   `pip install -e fabrika` çıkış 0; metadata: License-Expression
+   `license-files = ["LICENSE"]`; 9 classifiers; the `pyyaml>=6,<7` range
+   pin; build-system setuptools>=77. **Learned:** once the license
+   expression is used, the License classifier is rejected as an *error* by
+   setuptools 77+ — the classifier was removed. Evidence:
+   `pip install -e fabrika` exit 0; metadata: License-Expression
    Apache-2.0, Requires-Dist pyyaml<7,>=6.
-3. **SBOM NTIA güçlendirme:** kök paket (hedef proje adı/sürümü
-   pyproject'ten, yoksa NOASSERTION), her pakete `supplier`, DOC→kök
-   DESCRIBES + kök→paket DEPENDS_ON ilişkileri. sbom 6→8 test.
-4. **Sürümleme:** 0.2.1 changelog'a işlendi; SemVer normu yazılı.
+3. **SBOM NTIA hardening:** the root package (the target project's
+   name/version from pyproject, else NOASSERTION), a `supplier` for every
+   package, DOC→root DESCRIBES + root→package DEPENDS_ON relationships.
+   sbom 6→8 tests.
+4. **Versioning:** 0.2.1 entered into the changelog; the SemVer norm
+   written down.
 
-**Sonuç:** Norm denetim tablosundaki beş boşluk kapatıldı; 162/162 test.
-Kalan tek tek satırlık iş: `project.urls` — gerçek GitHub repo adresi
-yaratılınca eklenir (uydurma URL yazılmadı).
-\n\n
+**Result:** the five gaps in the norm-audit table closed; 162/162 tests.
+The only remaining one-line job: `project.urls` — added when the real
+GitHub repo address is created (no invented URL was written).
+
 ---
 
-## 18. Proje kimliği kararı — ADR-F13 (17 Kasım 2026)
+## 18. The project-identity decision — ADR-F13 (November 17, 2026)
 
-İsim araştırması yapıldı ve karar ADR-F13 olarak kayda geçti: marka
-**KOVAN**, repo/PyPI **`kovan-fabrika`**, CLI `kovan`. Kanıt: bare
-"kovan" GitHub'da alınmış (vertexclique/kovan; boratanrikulu/kovan —
-kavramsal çakışma) ve Kovan testnet aramaları gömüyor; "fabric" AI
-alanında kirli (danielmiessler/Fabric vb.); "kovan-fabrika" tam-string
-araması boş. pyproject zaten uyumlu; tek bekleyen `project.urls`
-(gitHub repo adresi yaratılınca). Karar workspace hafızasına da yazıldı.
-\n\n
+Name research was done and the decision was recorded as ADR-F13: the brand
+**KOVAN**, repo/PyPI **`kovan-fabrika`**, CLI `kovan`. Evidence: bare
+"kovan" is taken on GitHub (vertexclique/kovan; boratanrikulu/kovan —
+conceptual collision) and the Kovan testnet buries the searches; "fabric"
+is polluted in the AI space (danielmiessler/Fabric etc.); a full-string
+search for "kovan-fabrika" is empty. pyproject was already compliant; the
+only pending item was `project.urls` (once the GitHub repo address is
+created). The decision was also written into workspace memory.
+
 ---
 
-## 19. Yayın: kovan-fabrika reposu GitHub'da (17 Kasım 2026)
+## 19. Release: the kovan-fabrika repo is on GitHub (November 17, 2026)
 
-**ADR-F13 kararı uygulamaya geçti.** Makinedeki kayıtlı git kimliğiyle
-(kefyusuf; token ekrana basılmadan in-memory kullanıldı) repo oluşturuldu
-ve pushlandı:
+**The ADR-F13 decision went into effect.** With the git identity registered
+on the machine (kefyusuf; the token used in memory, never printed), the
+repo was created and pushed:
 
 - **Repo:** https://github.com/kefyusuf/kovan-fabrika (public, main)
-- **Yapı:** repo kökü = kök README + LICENSE + CHANGELOG/SECURITY/
-  CONTRIBUTING/CoC + .github (CI, PR/issue şablonları); paket `fabrika/`
-  altında — mevcut tüm yollar (CI working-directory, pip install -e
-  fabrika, .gitignore) değişmeden kaldı.
-- **Hariç:** çalışma zamanı kanıtları (runs/, state/, reports/,
-  vardiya-runs/, loglar, .anahtar*, egress, kullanim.jsonl) ve
-  ornek-repo'nun git geçmişi.
-- **Güvenlik taraması:** 157 dosyada anahtar/token kalibi skanı temiz.
-- **Taze klon çözümü:** testler ornek-repo'nun git deposu olmasını
-  bekliyor; CI'ye "Örnek repo hazırlığı" adımı (init+commit),
-  CONTRIBUTING'e taze klon notu eklendi.
-- **§17'nin son boşluğu kapandı:** `project.urls` (Homepage/Repository/
-  Changelog) pyproject'e girildi; kök README'ye CI rozeti.
-- **CI:** push sonrası tests workflow'u başladı (run 44078529278).
-\n\n
----
-
-## 20. Yayın CI'si: taşınabilirlik düzeltmesi (17 Kasım 2026)
-
-İlk CI koşumu (run 44078596115) **3 testle düştü** — hepsi vardiya:
-testler ve gece kuyruğu, yayın dışı workspace dosyalarına
-(`arastirma/…`) bağımlıydı; taze klon içinde o dosyalar yok.
-
-**Düzeltme (niyet korunarak, mekanik bağımlılık kaldırılarak):**
-1. `kaynak-kuyrugu.yaml`: 6 dosya kaynağı artık repo içinden —
-   fabrika/README, SISTEM, ADR, PRD, QUALITY, EVIDENCE-UPDATE (+ aynı
-   2 URL). Taze klon + CI + yerel aynı davranır.
-2. `test_vardiya` rotasyon testleri hermetikleştirildi: geçici KOK +
-   geçici markdown (URL satırlı); `kaynak_tara`'nın "yalnız URL
-   taşıyan satırlardan kayıt üretir" gerçeğine doküman içeriği
-   üzerinden bağımlılık kalmadı (KOK monkeypatch, finally restore).
-3. `test_dogrula`/`test_eval_kos` gercek git deposu bekliyor:
-   CI'ye "Örnek repo hazırlığı" adımı (init+commit), CONTRIBUTING'e
-   taze klon notu.
-
-**Bilinen sınırlama (kabul edildi):** yeni kuyruktaki fabrika
-dokümanları URL-fakirdir (2 URL satırı) — gece taramasının "kaynaklı
-iddia" çıktısı EVIDENCE/SISTEM'deki bağlantılarla sınırlı. Gerçek
-backlog + canlı mod gelince kuyruk gerçek hedeflerle doldurulacak;
-URL uydurarak tarayıcıyı beslemek evidence-first normuna aykırı.
-
-**Sonuç:** 162/162 yerel. CI yeniden koşumu izleniyor.
-
-**Kapanış (aynı gün):** 3. koşumda iki ek düzeltme — `test_konsol.py`'a
-`sys.path.insert` (lokalde pip kurulumu maskeliyordu; CI'da
-ModuleNotFoundError) ve CI listesine eksik `test_simulasyon.py`. CI
-sonucu: **success** (run 44081160418) — 20 test dosyası (167 test) +
-retro dumanı + log bütünlüğü + S1 tatbikatı, taze Linux klonunda yeşil.
-SISTEM toplam satırı 167'ye güncellendi.
+- **Structure:** the repo root = the root README + LICENSE +
+  CHANGELOG/SECURITY/CONTRIBUTING/CoC + .github (CI, PR/issue templates);
+  the package lives under `fabrika/` — all existing paths (the CI
+  working-directory, pip install -e fabrika, .gitignore) stayed unchanged.
+- **Excluded:** runtime evidence (runs/, state/, reports/, vardiya-runs/,
+  logs, .anahtar*, egress, kullanim.jsonl) and the ornek-repo's git
+  history.
+- **The security scan:** a credential/token pattern scan across 157 files
+  came back clean.
+- **The fresh-clone solution:** the tests expect ornek-repo to be a git
+  repo; a "Sample repo preparation" step (init+commit) entered CI, and a
+  fresh-clone note was added to CONTRIBUTING.
+- **§17's last gap closed:** `project.urls` (Homepage/Repository/Changelog)
+  entered pyproject; the CI badge on the root README.
+- **CI:** the tests workflow started after the push (run 44078529278).
 
 ---
 
-## 21. Yayın sonrası dikkatli denetim + yayın akışı (17 Kasım 2026)
+## 20. The release CI: the portability fix (November 17, 2026)
 
-**CI çift-yeşil:** doküman push'u (a2b95f7) da success — run
-44081360845. Rozet aktif.
+The first CI run (run 44078596115) **failed with 3 tests** — all vardiya:
+the tests and the night queue depended on non-published workspace files
+(`arastirma/…`); inside a fresh clone those files do not exist.
 
-**Dependabot güvenlik uyarıları:** repo API'siyle açıldı (vulnerability
-alerts). Branch protection bilinçli olarak AÇILMADI: saklı kimlik
-belirtecinin admin kapsamı bilinmiyor; tek geliştiricili ilk dönemde
-main'e doğrudan push normu (m.2 incelemeci kuralı PR akışına geçince
-değerlendirilir).
+**The fix (the intent preserved, the mechanical dependency removed):**
+1. `kaynak-kuyrugu.yaml`: the 6 file sources are now inside the repo —
+   fabrika/README, SYSTEM, ADR, PRD, QUALITY, EVIDENCE-UPDATE (+ the same
+   2 URLs). A fresh clone + CI + local behave the same.
+2. The `test_vardiya` rotation tests were made hermetic: a temporary root +
+   temporary markdown (with a URL line); the dependency on document
+   content — beyond `kaynak_tara`'s "produces records only from URL-carrying
+   lines" fact — was removed (the root monkeypatched, finally-restored).
+3. `test_dogrula`/`test_eval_kos` expect a real git repo: a "Sample repo
+   preparation" step in CI (init+commit), a fresh-clone note in
+   CONTRIBUTING.
 
-**Gece hattı — kuyruk ilerlemesinin ilk gerçek kanıtı:** 16/17 Kasım
-koşumları `kabul 0 | blok 1 | dur is_kalmadi` — tamamlananlar (K-101…
-K-106) yeniden SEÇİLMİYOR; kalan tek iş insan kapısında (C1/C3)
-bekliyor. `state/gece-durum.log` iki temiz kayıt (çıkış 0, loglar
-EVET). Sistem boş işle dolandırıcılık yapmıyor — dürüst duruş.
+**Known limitation (accepted):** the new queue's factory documents are
+URL-poor (2 URL lines) — the night scan's "sourced claim" output is limited
+to the links in EVIDENCE/SYSTEM. When a real backlog + live mode arrive,
+the queue will be filled with real targets; feeding the scanner with
+invented URLs would violate the evidence-first norm.
 
-**Yayın akışı kurallılaştırıldı:** kaynak düzenleme `Default\fabrika`
-de; `sync-yayin.ps1` (proje kökü) yalnız izlenen dosya kümesini
-kovan-fabrika\'ya aynalar (kanıt dizinleri hariç; norm dosyaları köke,
-fabrika/ içindeki kopyalar silinir). İlk koşum kanıtı: değişiklik
-yokken git TEMİZ çıktı. Akış: düzenle → sync → commit → push.
+**Result:** 162/162 local. The CI re-run was being watched.
 
-**Kalan eşikler:** API anahtarı (canlı hat), gerçek backlog,
-opsiyonel branch protection.
-\n
+**Closure (same day):** a third run with two more fixes — `sys.path.insert`
+in `test_konsol.py` (locally the pip install masked it; on CI
+ModuleNotFoundError) and the missing `test_simulasyon.py` added to the CI
+list. The CI result: **success** (run 44081160418) — 20 test files (167
+tests) + the retro smoke + log integrity + the S1 drill, green on a fresh
+Linux clone. The SYSTEM.md totals row was updated to 167.
+
+---
+
+## 21. The post-release careful audit + the release flow (November 17, 2026)
+
+**CI double-green:** the docs push (a2b95f7) also succeeded — run
+44081360845. The badge is active.
+
+**Dependabot security alerts:** opened via the repo API (vulnerability
+alerts). Branch protection was deliberately NOT enabled: the stored
+credential token's admin scope is unknown; in the single-developer initial
+period, a direct push to main is the norm (the art. 2 reviewer rule will be
+evaluated once the PR flow starts).
+
+**The night line — the first real evidence of queue progress:** the
+November 16/17 runs gave `kabul 0 | blok 1 | dur is_kalmadi` — the
+completed ones (K-101…K-106) are NOT SELECTED AGAIN; the only remaining
+task waits at the human gate (C1/C3). `state/gece-durum.log` has two clean
+records (exit 0, logs YES). The system does not fake work with empty tasks —
+an honest standstill.
+
+**The release flow was formalized:** source editing in `Default\fabrika`;
+`sync-yayin.ps1` (the project root) mirrors only the tracked file set into
+`kovan-fabrika\` (except the evidence directories; the norm files go to the
+root, the copies inside fabrika/ are deleted). First-run evidence: with no
+changes, git came back CLEAN. The flow: edit → sync → commit → push.
+
+**Remaining thresholds:** the API key (the live line), a real backlog,
+optional branch protection.
