@@ -1,30 +1,33 @@
 # KOVAN — gece tarama kuyruğu
 #
-# tur: dosya → yerel markdown (workspace kökü içinde, izolasyon sınırı)
+# tur: dosya → yerel markdown (repo kökü içinde, izolasyon sınırı)
 # tur: url   → dış kaynak; KURU modda atlanır, canlı model gerekir
 #
 # Not: URL'ler yalnızca goal.yaml'daki izinli hostlardan olabilir
 # (kısıt: allowed_hosts). Kuru mod bunlara dokunmaz, rapor işaretler.
+#
+# Kaynaklar repo içinden seçilir ki taze klon üzerinde de koşsun;
+# araştırma sentezleri ARASTIRMA.md özetinde taşınır.
 
 kaynaklar:
   - tur: dosya
-    yol: arastirma/01-karpathy.md
-    konu: Karpathy söylemi ve doğrulanabilirlik
+    yol: fabrika/README.md
+    konu: İ1–İ6 ilkeler ve dosya haritası
   - tur: dosya
-    yol: arastirma/03-superpowers.md
-    konu: Beceri/subagent ekosistemi
+    yol: fabrika/SISTEM.md
+    konu: v2 sistem tanımı (3 hat, bileşenler)
   - tur: dosya
-    yol: arastirma/05-fabrikalar.md
-    konu: Otonom yazılım fabrikaları
+    yol: fabrika/ADR.md
+    konu: Mimari kararlar (F01–F13)
   - tur: dosya
-    yol: arastirma/derin-20261021-0134/insight.md
-    konu: Çapraz boyut içgörüleri
+    yol: fabrika/PRD.md
+    konu: Kabul kriterleri
   - tur: dosya
-    yol: arastirma/derin-20261021-0134/verify.md
-    konu: Güvenilirlik sınıflandırması
+    yol: fabrika/KALITE.md
+    konu: Kalite normları ve ölçümler
   - tur: dosya
-    yol: arastirma/KOVAN-DERIN-ARASTIRMA-2026-10-22.md
-    konu: Derin araştırma sentezi
+    yol: fabrika/EVIDENCE-UPDATE.md
+    konu: Kanıt dersleri (§1–§18)
   - tur: url
     url: https://metr.org/blog/2026-02-24-uplift-update
     konu: METR ölçüm güncellemesi

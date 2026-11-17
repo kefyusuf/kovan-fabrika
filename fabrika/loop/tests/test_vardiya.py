@@ -107,26 +107,39 @@ class VardiyaTest(unittest.TestCase):
 
     def test_rotasyon_harcanan_atlanir(self):
         """Kısmi tüketim: okunmuş kaynak atlanır, okunmamış taranır."""
+        kok = Path(tempfile.mkdtemp())
+        (kok / "eski.md").write_text("bak: https://ornek.one/a\n", encoding="utf-8")
+        (kok / "yeni.md").write_text("bak: https://ornek.two/b\n", encoding="utf-8")
         kaynaklar = [
-            {"tur": "dosya", "yol": "arastirma/01-karpathy.md", "konu": "eski"},
-            {"tur": "dosya", "yol": "arastirma/03-superpowers.md", "konu": "yeni"},
+            {"tur": "dosya", "yol": "eski.md", "konu": "eski"},
+            {"tur": "dosya", "yol": "yeni.md", "konu": "yeni"},
         ]
-        harcanan = frozenset(
-            {str((vardiya.KOK / "arastirma/01-karpathy.md").resolve())}
-        )
-        okunan, atlanan = vardiya.kaynak_tara(kaynaklar, harcanan)
+        eski_kok = vardiya.KOK
+        vardiya.KOK = kok
+        try:
+            harcanan = frozenset({str((kok / "eski.md").resolve())})
+            okunan, atlanan = vardiya.kaynak_tara(kaynaklar, harcanan)
+        finally:
+            vardiya.KOK = eski_kok
 
         atlanan_yollar = {
             a.get("yol") for a in atlanan if a.get("neden") == "önceden okundu (rotasyon)"
         }
-        self.assertIn("arastirma/01-karpathy.md", atlanan_yollar)
+        self.assertIn("eski.md", atlanan_yollar)
         okunan_kaynaklar = {n["kaynak_dosya"] for n in okunan}
-        self.assertTrue(all("03-superpowers" in k for k in okunan_kaynaklar))
+        self.assertTrue(all("yeni.md" in k for k in okunan_kaynaklar))
 
     def test_tumu_tukendiyse_tekrar_isaretli(self):
-        yol = str((vardiya.KOK / "arastirma/01-karpathy.md").resolve())
-        kaynaklar = [{"tur": "dosya", "yol": "arastirma/01-karpathy.md", "konu": "k"}]
-        okunan, atlanan = vardiya.kaynak_tara(kaynaklar, frozenset({yol}))
+        kok = Path(tempfile.mkdtemp())
+        (kok / "eski.md").write_text("bak: https://ornek.three/c\n", encoding="utf-8")
+        kaynaklar = [{"tur": "dosya", "yol": "eski.md", "konu": "k"}]
+        eski_kok = vardiya.KOK
+        vardiya.KOK = kok
+        try:
+            harcanan = frozenset({str((kok / "eski.md").resolve())})
+            okunan, atlanan = vardiya.kaynak_tara(kaynaklar, harcanan)
+        finally:
+            vardiya.KOK = eski_kok
         self.assertGreater(len(okunan), 0)
         self.assertTrue(okunan[0]["tekrar_tarama"])
         self.assertEqual(atlanan, [])

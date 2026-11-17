@@ -452,4 +452,32 @@ ve pushlandı:
 - **§17'nin son boşluğu kapandı:** `project.urls` (Homepage/Repository/
   Changelog) pyproject'e girildi; kök README'ye CI rozeti.
 - **CI:** push sonrası tests workflow'u başladı (run 44078529278).
+\n\n
+---
+
+## 20. Yayın CI'si: taşınabilirlik düzeltmesi (17 Kasım 2026)
+
+İlk CI koşumu (run 44078596115) **3 testle düştü** — hepsi vardiya:
+testler ve gece kuyruğu, yayın dışı workspace dosyalarına
+(`arastirma/…`) bağımlıydı; taze klon içinde o dosyalar yok.
+
+**Düzeltme (niyet korunarak, mekanik bağımlılık kaldırılarak):**
+1. `kaynak-kuyrugu.yaml`: 6 dosya kaynağı artık repo içinden —
+   fabrika/README, SISTEM, ADR, PRD, KALITE, EVIDENCE-UPDATE (+ aynı
+   2 URL). Taze klon + CI + yerel aynı davranır.
+2. `test_vardiya` rotasyon testleri hermetikleştirildi: geçici KOK +
+   geçici markdown (URL satırlı); `kaynak_tara`'nın "yalnız URL
+   taşıyan satırlardan kayıt üretir" gerçeğine doküman içeriği
+   üzerinden bağımlılık kalmadı (KOK monkeypatch, finally restore).
+3. `test_dogrula`/`test_eval_kos` gercek git deposu bekliyor:
+   CI'ye "Örnek repo hazırlığı" adımı (init+commit), CONTRIBUTING'e
+   taze klon notu.
+
+**Bilinen sınırlama (kabul edildi):** yeni kuyruktaki fabrika
+dokümanları URL-fakirdir (2 URL satırı) — gece taramasının "kaynaklı
+iddia" çıktısı EVIDENCE/SISTEM'deki bağlantılarla sınırlı. Gerçek
+backlog + canlı mod gelince kuyruk gerçek hedeflerle doldurulacak;
+URL uydurarak tarayıcıyı beslemek evidence-first normuna aykırı.
+
+**Sonuç:** 162/162 yerel. CI yeniden koşumu izleniyor.
 \n
