@@ -92,7 +92,7 @@ would, the line stops and writes a report.
 | 9 | **Status board** | `kovan.py durum` | Cross-run metrics for all runs; data source for the weekly retro | **Running**, 3 tests |
 | 11 | **Configuration** | `loop/kullanici.yaml` | User defaults (hours, repo, model…); CLI overrides | **Running**, 3 tests |
 | 12 | **Packaging** | `fabrika/pyproject.toml` | `pip install -e fabrika` → `kovan/vardiya/tatbikat/beceri` commands | **Proven** (entry points from repo root) |
-| 13 | **Eval set template** | `loop/eval_set/SABLON.md` | Rules for public users to build their own frozen set | Published |
+| 13 | **Eval set template** | `loop/eval_set/TEMPLATE.md` | Rules for public users to build their own frozen set | Published |
 | 15 | **Queue producer** | `loop/kuyruk_uret.py` | Evidence-based task proposals: repeated lesson, breakage scenario, saturation → backlog-proposals (awaits human approval) | **Running**, 5 tests |
 
 **Total:** 167 tests passing (23 + 18 + 9 + 13 + 5 + 8 + 4 + 4 + 11 + 3 + 18 + 8 + 7 + 5 + 3 + 11 + 4 + 5 + 3 + 5).
