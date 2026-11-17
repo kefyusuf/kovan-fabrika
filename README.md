@@ -1,4 +1,4 @@
-# KOVAN — kovan-fabrika
+﻿# KOVAN — kovan-fabrika
 
 ![tests](https://github.com/kefyusuf/kovan-fabrika/actions/workflows/tests.yml/badge.svg)
 
@@ -26,7 +26,7 @@ Detaylı kurulum ve taze klon notu: [fabrika/CONTRIBUTING.md](CONTRIBUTING.md).
 
 | Belge | İçerik |
 |---|---|
-| [fabrika/SISTEM.md](fabrika/SISTEM.md) | v2 sistem tanımı: 3 hat, bileşen tablosu, 162 test |
+| [fabrika/SISTEM.md](fabrika/SISTEM.md) | v2 sistem tanımı: 3 hat, bileşen tablosu, 167 test |
 | [fabrika/README.md](fabrika/README.md) | 6 ilke (İ1–İ6), dosya haritası, kurulum |
 | [fabrika/ADR.md](fabrika/ADR.md) | Mimari karar kayıtları (F01–F13) |
 | [fabrika/EVIDENCE-UPDATE.md](fabrika/EVIDENCE-UPDATE.md) | Kanıt güncellemeleri (§1–§18) |

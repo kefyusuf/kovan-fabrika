@@ -480,4 +480,11 @@ backlog + canlı mod gelince kuyruk gerçek hedeflerle doldurulacak;
 URL uydurarak tarayıcıyı beslemek evidence-first normuna aykırı.
 
 **Sonuç:** 162/162 yerel. CI yeniden koşumu izleniyor.
+
+**Kapanış (aynı gün):** 3. koşumda iki ek düzeltme — `test_konsol.py`'a
+`sys.path.insert` (lokalde pip kurulumu maskeliyordu; CI'da
+ModuleNotFoundError) ve CI listesine eksik `test_simulasyon.py`. CI
+sonucu: **success** (run 44081160418) — 20 test dosyası (167 test) +
+retro dumanı + log bütünlüğü + S1 tatbikatı, taze Linux klonunda yeşil.
+SISTEM toplam satırı 167'ye güncellendi.
 \n

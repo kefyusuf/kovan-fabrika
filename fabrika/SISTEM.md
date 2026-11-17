@@ -93,7 +93,7 @@ flowchart LR
 | 13 | **Eval seti şablonu** | `loop/eval_set/SABLON.md` | Public kullanıcı için kendi dondurulmuş setini kurma kuralları | Yayında |
 | 12 | **Kurulum** | `fabrika/pyproject.toml` | `pip install -e fabrika` → `kovan/vardiya/tatbikat/beceri` komutları | **Kanıtlandı** (entry point repo kökünden) |
 
-**Toplam:** 162 test geçiyor (23 + 18 + 9 + 13 + 5 + 8 + 4 + 4 + 11 + 3 + 18 + 8 + 7 + 5 + 3 + 11 + 4 + 5 + 3).
+**Toplam:** 167 test geçiyor (23 + 18 + 9 + 13 + 5 + 8 + 4 + 4 + 11 + 3 + 18 + 8 + 7 + 5 + 3 + 11 + 4 + 5 + 3 + 5).
 
 ---
 
