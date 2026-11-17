@@ -13,21 +13,21 @@
 **Eski cümle:** "KOVAN, gece öğrenen, kendi yapısını geliştiren bir fabrikadır."
 **Sorun:** Literatürdeki sistemler (DGM, SICA) model ağırlıklarını değiştirmiyor; **iskeleti** (ajan kodu, araç, kontrol akışı, prompt) değiştiriyor. DGM kendi metninde "frozen pretrained FMs" diyor; `DGM_outer.py` sabit, yani arama prosedürü evrilmiyor.
 **Yeni cümle:** "KOVAN, donmuş model altında **iskeletini, becerisini ve kapı setini** evrimleştiren bir fabrikadır. Ağırlık öğrenmesi kapsam dışıdır."
-**Etki:** README §3 (İ4), OGRENME §1 ve §6.4, ADR-F03.
+**Etki:** README §3 (İ4), LEARNING §1 ve §6.4, ADR-F03.
 
 ### D2 — "Spec zorunluluğu azalıyor" değil, "onay kapıları kalkıyor"
 
 **Eski cümle:** "Spec-driven araçlar spec zorunluluğunu azaltıyor; spec bakım yüküne dönüşüyor."
 **Sorun:** Birincil dokümanlar artefaktın korunduğunu gösteriyor: Kiro "all three artifacts without approval gates"; Spec Kit "independent entry points, not mandatory phases"; GSD quick "skips research, discussion, plan-checker, verifier" ama `PLAN.md`+`SUMMARY.md` üretiyor. "Bakım yükü" gerekçesi resmî dokümanlarda yok. Tek istisna BMAD: "small changes go straight to build".
 **Yeni cümle:** "2026'da araçlar **onay kapılarını** koşullu hale getirdi; spec artefaktı çoğunlukla korunuyor. Kaldırılan şey kapıysa, kaldırılan şey kanıttır."
-**Etki:** PRD FR-02/FR-05, ADR-F05, OGRENME §3 (huni), KALITE §2.
+**Etki:** PRD FR-02/FR-05, ADR-F05, LEARNING §3 (huni), KALITE §2.
 
 ### D3 — "Gece vardiyası" takvim kazancı değil, WIP artışı
 
 **Eski cümle:** "Gece 7 saat üretim, sabah raporu."
 **Sorun:** Üretim kapasitesi artarken kabul kapasitesi sabit: PR hacmi ×2, incelemede medyan süre +%441,5. Gece üretimi sabah kuyruğunu büyütür; akış hızlanmaz.
 **Yeni cümle:** "Gece vardiyası, **sabah inceleme kapasitesi kadar** iş alır. Kapasitenin üstünde üretim, kaliteyi değil borcu büyütür."
-**Etki:** README §3 (İ6), ORGANIZASYON §6, YOL-HARITASI H5–H6, `loop/goal.yaml` (max_parallel_workers).
+**Etki:** README §3 (İ6), ORGANIZATION §6, YOL-HARITASI H5–H6, `loop/goal.yaml` (max_parallel_workers).
 
 ---
 
@@ -42,7 +42,7 @@ WIP limiti (Little)            = hedef cycle time × günlük PR sayısı
 ```
 
 Kalibrasyon: 400 LOC ≈ 0,8–1,0 saat (Cisco/SmartBear); μ=10 PR/gün tabanında ρ=0,625 → ~4 saat (Google <4 saat), ρ=0,80 → 9,6 saat, ρ=0,89 → ~19 saat (Faros %441), ρ=0,95 → 45,6 saat. Kuyruk *uzunluğu* ile kuyruk *süresi* karıştırılmamalı.
-**Nereye:** PRD §9 (BMP yerine "review-hours/PR"), KALITE §4, ORGANIZASYON §8.
+**Nereye:** PRD §9 (BMP yerine "review-hours/PR"), KALITE §4, ORGANIZATION §8.
 
 ### E2 — Tohumlanmış hata seti
 
@@ -87,8 +87,8 @@ LLM-yargıçta ham uyum, şansa göre düzeltilmiş κ'yı 33,8–41,3 puan şi�
 | `README.md` | §3 İ4, İ6 | D1 ve D3 cümleleri |
 | `PRD.md` | §7 FR-02, FR-05; §9 | D2; review-hours metriği |
 | `ARCHITECTURE.md` | §8 | WIP limiti formülü |
-| `ORGANIZASYON.md` | §6, §8 | Gece kapasitesi; inceleme-saati karnesi |
-| `OGRENME.md` | §1, §6.4 | D1; "iskelet evrimi" tanımı |
+| `ORGANIZATION.md` | §6, §8 | Gece kapasitesi; inceleme-saati karnesi |
+| `LEARNING.md` | §1, §6.4 | D1; "iskelet evrimi" tanımı |
 | `KALITE.md` | §2, §3, §4, §7 | E2, E3, review-hours |
 | `YONETISIM.md` | §2, §4, §8 | E4 |
 | `YOL-HARITASI.md` | H3, H5–H6 | Seeded set; gece kapasitesi |
@@ -256,7 +256,7 @@ Barındırılan servis (SaaS) X2 hedef-dışıdır (YONETISIM).
    işler kapasiteyi harcamış sayılır (ertelenen olarak deftere geçer).
 4. **Haftalık retro otomasyonu (`retro.py`):** defterden GPK vekili hesaplar
    (ilk karar kabul ise ilk tur sayılır), kapı trendini çıkarır ve **koşulabilir
-   mekanik checkler** üretir (ORGANIZASYON §6 kuralı). Bilinen sınır: GPK
+   mekanik checkler** üretir (ORGANIZATION §6 kuralı). Bilinen sınır: GPK
    vekili tüm koşuları karıştırır — run-bazlı ayrım S3b.
 5. **Tatbikata A5 kaos adımı:** kesinti → resume; koşucu kabul edilmiş işi
    tekrar etmez, düşen işi sonraki vardiyada yeniden dener (fail-closed davranış

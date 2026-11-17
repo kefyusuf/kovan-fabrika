@@ -6,7 +6,7 @@
    KODDA yaşar; diff'te tests/ altında assertion silinmesi/zayıflatması
    aranır. Sonuç `tests` kapısını etkileyebilir (kovan.py bağlar).
 2. **Beceri yaşam döngüsü**: proposed → active → stale → archived.
-   Aktifleşme ölçütleri (OGRENME §5):
+   Aktifleşme ölçütleri (LEARNING §5):
    - becerinin kendi test dosyası var ve GEÇİYOR;
    - kanıt (evidence) en az 2 görev;
    - insan onay notu (m.2: üreten ≠ onaylayan — onay alanı zorunlu).

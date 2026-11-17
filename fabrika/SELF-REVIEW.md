@@ -10,9 +10,9 @@
 | # | İstenen | Teslim edilen | Durum |
 |---|---|---|---|
 | 1 | Sabaha kadar araştırma | 7 paralel hat; 3 tam not + 4 özet; gece ajandası | Kısmi (bkz. §4.2) |
-| 2 | Kendi kendine öğrenen yapı | `OGRENME.md` + beceri damıtma mekanizması (test edilmiş) | Mekanizma var, model yok |
+| 2 | Kendi kendine öğrenen yapı | `LEARNING.md` + beceri damıtma mekanizması (test edilmiş) | Mekanizma var, model yok |
 | 3 | Kendi yapısını geliştiren | C0–C3 sınıfları, H4 halkası, anayasa, 14 gün kuralı | Tasarım tamam |
-| 4 | Şirket tarzı yapı | `ORGANIZASYON.md` (14 ajan, 2 insan, devir/SLA/eskalasyon) + `loop/agents.yaml` | Tamam |
+| 4 | Şirket tarzı yapı | `ORGANIZATION.md` (14 ajan, 2 insan, devir/SLA/eskalasyon) + `loop/agents.yaml` | Tamam |
 | 5 | Karpathy, Pocock, Superpowers, GSD | `ARASTIRMA.md` §1–§4, kaynaklı | Tamam (C seviyesi) |
 | 6 | ADR, PRD gibi proje dosyaları | 8 doküman + 12 ADR + 5 sözleşme dosyası + çalışan kod | Tamam |
 | 7 | Kendini review et | Bu dosya | Tamam |
@@ -174,7 +174,7 @@ Bir başkası bu teslimatı denetlerken şu 8 soruyu sorabilir:
 3. `loop/goal.yaml` ile `constitution.md` çelişiyor mu? (yasak yollar, bütçe)
 4. `runner.py` gerçekten fail-fast mi? (`evaluate` erken çıkıyor mu)
 5. Defter tahrifi gerçekten yakalanıyor mu? (testi çalıştır, sonra elle boz)
-6. `OGRENME.md`'deki "2 tekrar" eşiği `runner.py` ile aynı mı? (`>= 2`)
+6. `LEARNING.md`'deki "2 tekrar" eşiği `runner.py` ile aynı mı? (`>= 2`)
 7. `KALITE.md` metrikleri `PRD.md` ile aynı tanımı mı kullanıyor?
 8. `SELF-REVIEW.md` §3 listesi, `ARASTIRMA.md` §9 ile tutarlı mı?
 

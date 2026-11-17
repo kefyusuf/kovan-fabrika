@@ -64,7 +64,7 @@ sitasyon ister (dosya + satır). Alt-ajan çıktısı **hipotez** sayılır, kan
 (tek seviye); script/CI = deterministik, insansız yaptırım. **[C]**
 
 **Tasarıma aktarılan:** F05 (komutlu kabul kriteri), F06 (deterministik >
-yargı), KALITE §2.2 (gerekçeli inceleme), ORGANIZASYON §5 (devirde artefakt).
+yargı), KALITE §2.2 (gerekçeli inceleme), ORGANIZATION §5 (devirde artefakt).
 
 ---
 
@@ -91,7 +91,7 @@ F06 (kanıt > iddia), KALITE §2.1 (test zayıflatma yasağı), `loop/agents.yam
 devir kuralları.
 
 **Aktarılmayan:** 15 becerinin tamamını taşımak. KOVAN 14 rol + 5–8 beceri ile
-başlar; beceri sayısı bir başarı göstergesi değil (OGRENME §7).
+başlar; beceri sayısı bir başarı göstergesi değil (LEARNING §7).
 
 ---
 
@@ -164,7 +164,7 @@ vakada **F1 1.000**, gerçekçi holdout'ta **0.394** aldı; sonra holdout
 gerekçesi: **dairesel ölçüm, ölçüm değildir.**
 
 **Tasarıma aktarılan:** F06 (D1 > D2 > D3), KALITE §3.2 (holdout disiplini),
-OGRENME §6.3 (eval değiştiren aday otomatik ret), F03 (değişmez çekirdek).
+LEARNING §6.3 (eval değiştiren aday otomatik ret), F03 (değişmez çekirdek).
 
 **Kritik ayrım.** "Kanıtla" (Gödel machine) yerine "ölç" (deney + kapı).
 Daha zayıf garanti, ama uygulanabilir tek garanti.
@@ -205,7 +205,7 @@ kapıları, SBOM, runbook), anayasa madde 6 ve 8.
 | Otonomi kademelidir | İ3 | F08 |
 | Üretim ucuz, kabul pahalı | İ6 | inceleme bütçesi |
 | Değerlendirici tavandır | İ5 | F06, KALITE §3 |
-| Deney > kanıt | İ4 | F02, OGRENME §6.4 |
+| Deney > kanıt | İ4 | F02, LEARNING §6.4 |
 | Bellek dosyada birikir | İ4 | F11 |
 | Çekirdek değişmez olmalı | İ3 | F03 |
 | Koordinasyon maliyeti gerçek | — | ARCHITECTURE §8 |

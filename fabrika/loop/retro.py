@@ -1,6 +1,6 @@
 """KOVAN — haftalık retrospektif üreticisi (Cuma ritüeli).
 
-Kural (ORGANIZASYON §6): her retro en az bir MEKANİK CHECK üretir;
+Kural (ORGANIZATION §6): her retro en az bir MEKANİK CHECK üretir;
 "daha dikkatli olalım" çıktı değildir. Check = koşulabilir KOMUT.
 
 Girdi: runs/*/ledger.jsonl + lessons.jsonl + ozet.json + beceri durumu.
