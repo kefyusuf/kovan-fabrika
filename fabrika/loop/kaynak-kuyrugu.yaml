@@ -7,7 +7,7 @@
 # (kısıt: allowed_hosts). Kuru mod bunlara dokunmaz, rapor işaretler.
 #
 # Kaynaklar repo içinden seçilir ki taze klon üzerinde de koşsun;
-# araştırma sentezleri ARASTIRMA.md özetinde taşınır.
+# araştırma sentezleri RESEARCH.md özetinde taşınır.
 
 kaynaklar:
   - tur: dosya

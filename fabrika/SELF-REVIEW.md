@@ -13,7 +13,7 @@
 | 2 | Kendi kendine öğrenen yapı | `LEARNING.md` + beceri damıtma mekanizması (test edilmiş) | Mekanizma var, model yok |
 | 3 | Kendi yapısını geliştiren | C0–C3 sınıfları, H4 halkası, anayasa, 14 gün kuralı | Tasarım tamam |
 | 4 | Şirket tarzı yapı | `ORGANIZATION.md` (14 ajan, 2 insan, devir/SLA/eskalasyon) + `loop/agents.yaml` | Tamam |
-| 5 | Karpathy, Pocock, Superpowers, GSD | `ARASTIRMA.md` §1–§4, kaynaklı | Tamam (C seviyesi) |
+| 5 | Karpathy, Pocock, Superpowers, GSD | `RESEARCH.md` §1–§4, kaynaklı | Tamam (C seviyesi) |
 | 6 | ADR, PRD gibi proje dosyaları | 8 doküman + 12 ADR + 5 sözleşme dosyası + çalışan kod | Tamam |
 | 7 | Kendini review et | Bu dosya | Tamam |
 | 8 | Hedefden şaşmadan | §4 sapma denetimi | 2 sapma, gerekçeli |
@@ -71,7 +71,7 @@ işe yaradığını kanıtlamaz. İkisi arasındaki fark bu belgenin ana konusu.
 | 4 | Gece vardiyası değer üretir | Hiç gerçek gece koşusu yok | v0.3: 5 gece üst üste |
 | 5 | 12 haftalık plan gerçekçi | Plan, kanıt değil | Haftalık kapılar |
 | 6 | Pazar/müşteri var | Görüşme yapılmadı | 3 müşteri görüşmesi |
-| 7 | Araştırma sayıları (sürüm, tarih, benchmark) | Ajan özetleri; tam metin doğrulanmadı | `ARASTIRMA.md` §9 listesi |
+| 7 | Araştırma sayıları (sürüm, tarih, benchmark) | Ajan özetleri; tam metin doğrulanmadı | `RESEARCH.md` §9 listesi |
 | 8 | Hukuki uyum yeterli | Hukukçu incelemedi | Uzman + resmî metin |
 | 9 | "Kendini geliştirme" güvenli | Sadece C3 kapısı test edildi; gerçek saldırı senaryosu yok | Kırmızı takım tatbikatı |
 | 10 | İki imza kuralı işler | Tek insan var | İkinci insan veya süreç tatbikatı |
@@ -98,11 +98,11 @@ kolaylaştırıyor. **Karar: kabul.**
 
 ### 4.2 Dört araştırma notu dosyalanamadı (sapma: orta)
 **Ne oldu:** 7 araştırma hattından 3'ü tam not yazabildi (`arastirma/`),
-4'ü yalnızca özet döndürdü (araç bütçesi). Özetler `ARASTIRMA.md`'ye **[C]**
+4'ü yalnızca özet döndürdü (araç bütçesi). Özetler `RESEARCH.md`'ye **[C]**
 etiketiyle işlendi; kaynakça korundu.
 **Sapma mı?** Evet: "tam kaynaklı araştırma" hedefinin bir kısmı eksik.
 **Telafi:** Her iddia [C] işaretli, doğrulama listesi §3'te, kaynaklar
-`ARASTIRMA.md` §10'da. Uydurma yok; eksik var. **Karar: kabul, ama eksik.**
+`RESEARCH.md` §10'da. Uydurma yok; eksik var. **Karar: kabul, ama eksik.**
 
 ### 4.3 Gece vardiyasını zamanlanmış göreve bağlamadım (sapma: bilinçli)
 **Karar:** "Loop goal" mekanizması anlatıldı ve kodlandı; ama gerçek bir
@@ -176,7 +176,7 @@ Bir başkası bu teslimatı denetlerken şu 8 soruyu sorabilir:
 5. Defter tahrifi gerçekten yakalanıyor mu? (testi çalıştır, sonra elle boz)
 6. `LEARNING.md`'deki "2 tekrar" eşiği `runner.py` ile aynı mı? (`>= 2`)
 7. `QUALITY.md` metrikleri `PRD.md` ile aynı tanımı mı kullanıyor?
-8. `SELF-REVIEW.md` §3 listesi, `ARASTIRMA.md` §9 ile tutarlı mı?
+8. `SELF-REVIEW.md` §3 listesi, `RESEARCH.md` §9 ile tutarlı mı?
 
 Bu soruların altısı komutla, ikisi okumayla cevaplanır. Cevabı "hayır" olan
 madde, düzeltilecek maddedir.

@@ -151,9 +151,9 @@ This is not an essay — it is a buildable project set:
 | [`LEARNING.md`](LEARNING.md) | Night agenda, knowledge funnel, memory, self-improvement protocol |
 | [`QUALITY.md`](QUALITY.md) | Gates, eval harness, metric definitions, measurement discipline |
 | [`GOVERNANCE.md`](GOVERNANCE.md) | Security, compliance, cost, licensing, incident response |
-| [`YOL-HARITASI.md`](YOL-HARITASI.md) | 12-week plan, risk register, kill criteria |
+| [`ROADMAP.md`](ROADMAP.md) | 12-week plan, risk register, kill criteria |
 | [`ADR.md`](ADR.md) | Architecture decision records (F01–F13) |
-| [`ARASTIRMA.md`](ARASTIRMA.md) | Karpathy, Pocock, Superpowers, GSD, factories, self-improvement — sourced |
+| [`RESEARCH.md`](RESEARCH.md) | Karpathy, Pocock, Superpowers, GSD, factories, self-improvement — sourced |
 | [`SELF-REVIEW.md`](SELF-REVIEW.md) | Self-audit: what was verified, what could not be, the three weakest assumptions |
 | [`loop/`](loop/) | The **running** loop core: constitution, goal, gates, roster, runner, tests |
 
@@ -213,7 +213,7 @@ Behaviors the runner verifies — not claims, tests:
 | Real model connection | **None** | `Adapter` interface empty |
 | Real eval set | **None** | signals fixed in scenario |
 | Cost measurement | **None** | `cost_usd` representative |
-| 12-week plan | Plan exists, no evidence | `YOL-HARITASI.md` |
+| 12-week plan | Plan exists, no evidence | `ROADMAP.md` |
 | Market/customer validation | **None** | concept stage |
 
 This table deliberately does not say "done". The concept's value is that it
