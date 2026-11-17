@@ -1,23 +1,23 @@
 ---
-name: Özellik önerisi
-about: Kapasite/kapı/hat davranışında yeni yetenek
+name: Feature proposal
+about: New capacity/gate/line behavior
 labels: enhancement
 ---
 
 # Problem
 
-<!-- Hangi gerçek görevde hangi sürtünme? Kanıt varsa bağlayın. -->
+<!-- Which real task hits which friction? Link evidence if any. -->
 
-# Önerilen çözüm
+# Proposed solution
 
-<!-- İstenen davranış. -->
+<!-- The desired behavior. -->
 
-# Norm kontrolü
+# Norm check
 
-- [ ] Anayasa (m.2 üreten≠onaylayan, m.6 insan kapısı) ile uyumlu
-- [ ] Kapı sırasına etkisi değerlendirildi (gerekirse ADR)
-- [ ] Kuru mod çalışmaya devam eder (sıfır token varsayılanı)
+- [ ] Compatible with the constitution (m.2 producer≠approver, m.6 human gate)
+- [ ] Impact on the gate order considered (ADR if needed)
+- [ ] Dry mode keeps working (zero-token default)
 
-# Alternatifler
+# Alternatives
 
-<!-- Değerlendirilen diğer yollar ve neden reddedildik. -->
+<!-- Other paths considered and why they were rejected. -->

@@ -1,59 +1,61 @@
-# Değişiklik Günlüğü — KOVAN
+# Changelog — KOVAN
 
-Format: [Keep a Changelog](https://keepachangelog.com/tr/) · Sürümleme: [SemVer](https://semver.org/lang/tr/).
-Tüm tarihler UTC. Bu günlük `fabrika/` paketini (kovan-fabrika) izler.
+Format: [Keep a Changelog](https://keepachangelog.com/) · Versioning: [SemVer](https://semver.org/).
+All dates UTC. This log tracks the `fabrika/` package (kovan-fabrika).
 
 ## [0.2.1] — 2026-11-16
 
-### Düzeltildi
-- **Windows konsol tuzağı (cp1252):** stdout/stderr bir PIPE'a bağlıyken Türkçe
-  `print` süreci `UnicodeEncodeError` ile öldürüyordu; 10 gece koşusu
-  artefaktlar yazıldıktan *sonra* çökmüştü. 11 CLI girişine `konsol.hazirla()`
-  bağlandı (UTF-8 + `errors="replace"`).
-- `gece-kos.ps1` / `hafta-kos.ps1`: `PYTHONIOENCODING=utf-8`, log UTF-8,
-  `--tamamlanan` yolu değişkenle sağlam geçiriliyor.
-- Kuyruk ilerlemesi kanıtlandı: `state/tamamlanan.jsonl` 5→6 kayıt
-  (K-106); blok/ertelenenler hâlâ kayda girmez (m.4 kuralı).
+### Fixed
+- **Windows console trap (cp1252):** with stdout/stderr attached to a pipe,
+  Turkish `print` output killed the process with `UnicodeEncodeError`; ten
+  night runs crashed *after* artifacts were written. `konsol.hazirla()` is
+  now bound at 11 CLI entry points (UTF-8 + `errors="replace"`).
+- `gece-kos.ps1` / `hafta-kos.ps1`: `PYTHONIOENCODING=utf-8`, UTF-8 logs,
+  the `--tamamlanan` path is passed via a variable.
+- Queue progression proven: `state/tamamlanan.jsonl` grew 5→6 records
+  (K-106); blocked/deferred tasks still never count as done (m.4 rule).
 
-### Eklendi
-- `retro.py --log-saglik`: koşum loglarında çöküm imzası taraması
-  (Traceback/UnicodeEncodeError; UTF-16 BOM algılama dahil). Bozuk log varsa
-  çıkış kodu 1 — haftalık retro bunu mekanik check olarak üretir.
-- `state/gece-durum.log`: her gece iki koşumun çıkış kodu + log temizliği
-  kaydı.
-- CI: `test_kuyruk_uret.py` + `test_konsol.py` listeye girdi; "Log bütünlüğü
-  taraması" adımı eklendi.
-- Sektör normu dosyaları: CHANGELOG, SECURITY, CONTRIBUTING, CoC, PR/issue
-  şablonları; pyproject PEP 639 lisans + classifiers.
+### Added
+- `retro.py --log-saglik`: scans run logs for crash signatures
+  (Traceback/UnicodeEncodeError; UTF-16 BOM detection included). Exits 1
+  when a broken log exists — the weekly retro emits this as a mechanical
+  check.
+- `state/gece-durum.log`: nightly record of both runs' exit codes + log
+  cleanliness.
+- CI: `test_kuyruk_uret.py` + `test_konsol.py` joined the list; a "log
+  integrity scan" step was added.
+- Sector-norm files: CHANGELOG, SECURITY, CONTRIBUTING, CoC, PR/issue
+  templates; pyproject PEP 639 license + classifiers.
 
-### Paket
-- `konsol` modülü py-modules'a eklendi (kurulumda eksik kalmasın).
-- Sürüm 0.2.0 → 0.2.1.
+### Package
+- The `konsol` module joined py-modules (never missing after install).
+- Version 0.2.0 → 0.2.1.
 
-## [0.2.0] — 2026-11-08 (v2 sistem)
+## [0.2.0] — 2026-11-08 (v2 system)
 
-### Eklendi
-- 3 hat mimarisi: **vardiya** (gece kaynağı taraması), **gece** (kapı
-  sıralı koşum), **hafta** (retro + tatbikat); 14→6 rol.
-- Kuyruk ilerlemesi: `--tamamlanan` ile kabul edilen işler kayda geçer,
-  bloklananlar girmez.
-- `dogrula.py`: git apply + gerçek test koşumu; kirli ağaç koruması
-  (fail-closed) ve `--geri-al`.
-- `uyum.py`: kopya blok tespiti (yapı imzası, 6 varyant sağlamlık testli),
-  yinelenen fonksiyon, izin listesi.
-- `adapter_http.py`: OpenAI-uyumlu adapter, egress günlüğü; sinyal üretmez.
-- `sbom.py`: SPDX 2.3 JSON (NTIA minimum öğelerine yönelik).
-- `mutasyon.py`: AST mutasyonları + öldürme skoru (6/6 mutant öldü).
-- `tatbikat.py`: S1 runbook 5 adım (5/5 PASS); `simulasyon.py` N günlük
-  operasyon simülasyonu; `kuyruk_uret.py` kanıtlı iş önerileri.
-- Canlı kapı sırası: policy→tests→provenance→lint→types→review→eval
-  (bloklayıcı, 0.90)→cost.
+### Added
+- 3-line architecture: **vardiya** (night source scan), **gece** (gated
+  run), **hafta** (retro + drill); roles reduced 14→6.
+- Queue progression: accepted tasks are recorded via `--tamamlanan`;
+  blocked ones never are.
+- `dogrula.py`: git apply + real test execution; dirty-tree protection
+  (fail-closed) and a `--geri-al` CLI.
+- `uyum.py`: duplicate-block detection (structural signature, 6-variant
+  robustness-tested), duplicate functions, allowlist.
+- `adapter_http.py`: OpenAI-compatible adapter, egress logging; produces
+  no gate signals.
+- `sbom.py`: SPDX 2.3 JSON (toward NTIA minimum elements).
+- `mutasyon.py`: AST mutations + kill score (6/6 mutants killed).
+- `tatbikat.py`: S1 runbook, 5 steps (5/5 PASS); `simulasyon.py` N-day
+  operation simulation; `kuyruk_uret.py` evidence-based task proposals.
+- Live gate order: policy→tests→provenance→lint→types→review→eval
+  (blocking, 0.90)→cost.
 
-## [0.1.0] — 2026-11-04 (ilk hat)
+## [0.1.0] — 2026-11-04 (first line)
 
-### Eklendi
-- `kovan.py` çekirdek: kapasite-bounded plan/run/verify/status; defter
-  (JSONL), bütçe, devre kesici, plato, resume.
-- `kapasite.py`: LOC→saat, M/M/1 kuyruk, kabul kararı; `seedtest.py`
-  deterministik senaryolar.
-- Zamanlayıcı kurulumları: KOVAN-Gece (23:00), KOVAN-Hafta (Cuma 18:00).
+### Added
+- `kovan.py` core: capacity-bounded plan/run/verify/status; ledger (JSONL),
+  budget, circuit breaker, plateau, resume.
+- `kapasite.py`: LOC→hours, M/M/1 queue, acceptance decision; `seedtest.py`
+  deterministic scenarios.
+- Scheduler installations: KOVAN-Gece (23:00), KOVAN-Hafta (Fri 18:00).

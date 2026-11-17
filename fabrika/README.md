@@ -1,224 +1,230 @@
 # KOVAN
 
-> **Gece öğrenen, gündüz üreten yazılım fabrikası.**
-> Konsept sürümü 1.0 · 21 Ekim 2026 · Durum: **konsept tamam, döngü çekirdeği çalışıyor**
+> **A software factory that learns at night and produces by day.**
+> Concept version 1.0 · October 21, 2026 · Status: **concept complete, loop core running**
 
-KOVAN bir "kod yazan ajan" değildir. Kod yazan ajan bir araçtır; KOVAN o aracı
-bir üretim hattına, bir muhasebeye ve bir denetim kaydına bağlayan **işletim
-modelidir**. Fabrikanın çıktısı kod değil, **kanıtlı değişikliktir**: birleşmiş
-bir PR, yanında onu doğrulayan test, ölçüm ve kayıt.
+KOVAN is not a "coding agent". A coding agent is a tool; KOVAN is the
+**operating model** that binds that tool to a production line, an accounting
+system, and an audit trail. The factory's output is not code — it is
+**evidenced change**: a merged PR together with the tests, measurements, and
+records that validate it.
 
-Tek cümlelik tez:
+The one-sentence thesis:
 
-> **Üretimi hızlandıran şey daha iyi model değil, daha iyi kapıdır.**
-> Model öneriyi üretir; kabulü değişmez kapılar verir. Fabrikanın biriktirdiği
-> asıl sermaye de model değil, kendi hatalarından damıttığı **beceri kütüphanesi**
-> ve **değerlendirme setidir**.
+> **What accelerates production is not a better model, but a better gate.**
+> The model produces the proposal; immutable gates decide acceptance. The
+> real capital the factory accumulates is not the model, but the **skill
+> library** and the **evaluation set** distilled from its own mistakes.
 
-> **Araştırma güncellemesi (22 Ekim 2026).** Bu konsept, yedi paralel tarama ve
-> yedi boyutlu derinleşmeyle yeniden denetlendi. Üç cümle düzeltildi:
-> (1) "kendini geliştirme" = model ağırlığı değil, **iskelet + beceri + kapı
-> seti** evrimi; (2) "spec azalması" = spec'in değil **onay kapılarının**
-> kalkması; (3) "gece vardiyası" = takvim kazancı değil, **sabah inceleme
-> kapasitesi kadar** üretim. Gerekçeler ve dosya eşlemesi:
-> [`EVIDENCE-UPDATE.md`](EVIDENCE-UPDATE.md).
-
----
-
-## 1. Neden böyle bir yapı
-
-Üç gözlem bu tasarımı zorunlu kıldı:
-
-1. **Üretmek ucuz, kabul etmek pahalı.** Ajan kod yazmayı öğrendi; sorun
-   "yazamıyor" değil, "yazdığı şeyin doğru olduğunu kim, nasıl anlayacak".
-   Bu yüzden fabrikanın merkezinde üretici değil **kapı** var.
-2. **Kendi kendine öğrenen sistemler, öğrenmeyi değil ölçümü iyileştirmeye
-   kayıyor.** Literatürde ve kendi deneyimimizde tekrar eden arıza bu: sistem
-   testi gevşeterek "başarı" üretiyor. Bu yüzden anayasa, ölçümü üreten ile
-   ölçümü onaylayanı ayırıyor (Madde 2).
-3. **Şirket metaforu, ajan listesinden daha kullanışlı.** Bir ajan listesi
-   ("planner, coder, reviewer") kimin neyi ne zaman devrettiğini söylemez.
-   Bir şirket sözleşmesi söyler: girdi, çıktı, izin, SLA, başarısızlık modu,
-   eskalasyon.
+> **Research update (October 22, 2026).** This concept was re-audited with
+> seven parallel scans and a seven-dimension deep dive. Three sentences were
+> corrected: (1) "self-improvement" = the evolution of the **skeleton +
+> skills + gate set**, not model weights; (2) "spec erosion" = the removal of
+> **approval gates**, not of the spec; (3) "night shift" = production worth
+> **exactly one morning of review capacity**, not calendar savings.
+> Rationale and file mapping: [`EVIDENCE-UPDATE.md`](EVIDENCE-UPDATE.md).
 
 ---
 
-## 2. Ne değil, ne
+## 1. Why this structure
 
-| Değil | Ne |
+Three observations forced this design:
+
+1. **Producing is cheap; accepting is expensive.** Agents learned to write
+   code; the problem is not "it cannot write", but "who decides, and how,
+   that what it wrote is correct". That is why the center of the factory is
+   the **gate**, not the producer.
+2. **Self-improving systems drift toward improving the measurement, not the
+   learning.** The recurring failure in the literature and in our own
+   experience: the system manufactures "success" by loosening tests. That is
+   why the constitution separates the producer from the approver of the
+   measurement (Article 2).
+3. **The company metaphor is more useful than an agent list.** An agent list
+   ("planner, coder, reviewer") does not say who hands off what, when. A
+   company charter does: inputs, outputs, permissions, SLA, failure modes,
+   escalation.
+
+---
+
+## 2. What it is not, and what it is
+
+| Not | Is |
 |---|---|
-| "Bir prompt ile 10 uygulama üreten" bir demo | Sürdürülebilir, denetlenebilir bir üretim hattı |
-| Tek seferlik otonom kodlama | Dört farklı hızda çalışan dört döngü |
-| Modelin kendi kendine iyileşmesi | Kapıların izin verdiği ölçüde, kanıtla yapısal iyileşme |
-| Ajan ordusu | Sözleşmeli, sınırlı sayıda, izole çalışan roller |
-| "İnsan yok" | İnsan yalnızca C3 kapısında ve anayasa değişikliğinde |
-| Bir framework kurulumu | Kendi motoru + ödünç alınmış desenler (ADR-F12) |
+| A demo that "generates 10 apps from one prompt" | A sustainable, auditable production line |
+| One-shot autonomous coding | Four loops running at four different speeds |
+| A model improving itself | Structural improvement with evidence, to the extent gates allow |
+| An army of agents | A small number of contractual, isolated, bounded roles |
+| "No humans" | Humans only at the C3 gate and in constitutional changes |
+| A framework installation | Own engine + borrowed patterns (ADR-F12) |
 
 ---
 
-## 3. Altı ilke
+## 3. The six principles
 
-**İ1 — Kanıt yoksa iş yok.**
-Her iddia bir komut çıktısına, bir dosya satırına veya bir URL'ye bağlanır.
-Üçü yoksa cümle "doğrulanamadı" diye yazılır. Bu bir üslup değil, bir kapı:
-sabah raporundaki her satır denetlenebilir olmak zorunda.
+**P1 (İ1) — No evidence, no work.**
+Every claim binds to a command output, a file line, or a URL. If none of the
+three exists, the sentence is written as "could not be verified". This is not
+style — it is a gate: every line of the morning report must be auditable.
 
-**İ2 — İki vites: gece öğrenir, gündüz üretir.**
-Gece (23:00–06:00) üretim yapılmaz; öğrenilir: kaynak taranır, hata damıtılır,
-beceri adayı çıkarılır, yapı önerisi yazılır. Gündüz bilgi **dondurulur** ve
-üretim yapılır. Sebep: üretim sırasında zemini değiştiren sistem, hatayı da
-aynı anda değiştirir — ve hangi değişikliğin işe yaradığını bilemezsin.
+**P2 (İ2) — Two gears: learn at night, produce by day.**
+At night (23:00–06:00) no production happens; learning does: sources are
+scanned, errors are distilled, skill candidates are extracted, structural
+proposals are written. By day the knowledge is **frozen** and production runs.
+Reason: a system that moves the ground under itself while producing also
+changes its own errors — and you cannot tell which change helped.
 
-**İ3 — Değişmez çekirdek, değişken kabuk.**
-Anayasa, kapı tanımları, eşikler ve model seçimi değişmez çekirdektir; sadece
-insan değiştirir. Kadro, prompt, beceri, plan değişken kabuktur; sistem
-önerir, kapılar kabul eder. Bu ayrım olmadan "kendini geliştirme" tanımsızdır.
+**P3 (İ3) — Immutable core, mutable shell.**
+The constitution, gate definitions, thresholds, and model selection are the
+immutable core; only humans change them. The roster, prompts, skills, and
+plans are the mutable shell: the system proposes, gates accept. Without this
+separation, "self-improvement" is undefined.
 
-**İ4 — Öğrenme, bir dosyaya yazmaktır.**
-"Öğrendim" cümlesinin testi şu: hangi dosya değişti? Değişen bir dosya yoksa
-öğrenilen bir şey de yok. Bu yüzden bellek dosya tabanlı, git versiyonlu ve
-append-only'dir.
+**P4 (İ4) — Learning is writing to a file.**
+The test of "I learned" is: which file changed? If no file changed, nothing
+was learned. Memory is therefore file-based, git-versioned, and append-only.
 
-**İ5 — Değerlendirici tavandır.**
-Sistem, kendi değerlendiricisinden daha iyi olamaz. Bu yüzden değerlendirici
-kutsaldır: ayrı bağlam, ayrı sahiplik, dondurulmuş set, düşürülemeyen eşik.
-Ölçümü iyileştiren her değişiklik, ürünü iyileştiren değişiklikten daha tehlikelidir.
+**P5 (İ5) — The evaluator is sacred.**
+The system can never be better than its own evaluator. That is why the
+evaluator is sacred: separate context, separate ownership, a frozen set, a
+threshold that cannot be lowered. Any change that "improves the measurement"
+is more dangerous than one that improves the product.
 
-**İ6 — Üretim hızı, inceleme kapasitesi kadardır.**
-Ajan sayısını artırmak üretimi artırmaz; inceleme kuyruğunu artırır. Ölçümler
-bunu tekrar ediyor: yüksek AI benimsemesinde PR sayısı ikiye katlanırken
-inceleme süresi de neredeyse ikiye katlanıyor, PR boyutu büyüyor. Bu yüzden
-fabrika, **inceleme bütçesi** kadar iş alır: kapasitenin üstünde üretim,
-kaliteyi değil borcu büyütür. Bu ilke, "daha çok ajan" refleksinin panzehiridir.
+**P6 (İ6) — Production speed equals review capacity.**
+Adding agents does not increase production; it increases the review queue.
+Measurements keep saying so: with high AI adoption, PR counts double while
+review time nearly doubles and PR size grows. The factory therefore accepts
+work up to its **review budget**: production above capacity grows debt, not
+quality. This principle is the antidote to the "more agents" reflex.
 
 ---
 
-## 4. Yapı: dört halka, üç düzlem
+## 4. Structure: four rings, three planes
 
-Fabrika tek bir döngü değil, dört farklı hızda dönen dört halkadır. Her halkanın
-çıktısı bir üst halkaya **öneri** olarak gider; hiçbiri kendi kendini onaylamaz.
+The factory is not a single loop — it is four rings turning at four speeds.
+Each ring's output goes upward as a **proposal**; none approves itself.
 
 ```mermaid
 flowchart TB
-  subgraph H4["Halka 4 — Yapı (haftalar)"]
-    org["Kadro / anayasa / eşik önerisi"]
+  subgraph R4["Ring 4 — Structure (weeks)"]
+    org["Roster / constitution / threshold proposals"]
   end
-  subgraph H3["Halka 3 — Sürüm (günler)"]
-    cap["Yetenek yükseltme + kanarya"]
+  subgraph R3["Ring 3 — Release (days)"]
+    cap["Capability upgrade + canary"]
   end
-  subgraph H2["Halka 2 — Vardiya (7 saat)"]
-    night["Araştırma + damıtma + rapor"]
+  subgraph R2["Ring 2 — Shift (7 hours)"]
+    night["Research + distillation + report"]
   end
-  subgraph H1["Halka 1 — Görev (dakikalar)"]
-    task["Spec → test → kod → inceleme → kapı"]
+  subgraph R1["Ring 1 — Task (minutes)"]
+    task["Spec → test → code → review → gate"]
   end
   task --> night --> cap --> org
-  org -. "onay (insan)" .-> task
+  org -. "approval (human)" .-> task
 ```
 
-| Halka | Periyot | Girdi | Çıktı | Kim onaylar |
+| Ring | Period | Input | Output | Approver |
 |---|---|---|---|---|
-| **H1 Görev** | dk | issue + spec | patch/PR + test + kayıt | kapılar (otomatik) |
-| **H2 Vardiya** | 7 saat | birikmiş dersler, kaynak kuyruğu | beceri adayı, not, sabah raporu | damitici + kapı + insan (sabah) |
-| **H3 Sürüm** | gün | beceri adayı, model/araç değişimi | kanarya sürümü, eval sonucu | eval + insan (yayın) |
-| **H4 Yapı** | hafta | ledger, metrikler, arıza kayıtları | ADR taslağı, kadro önerisi | kurucu (C3) |
+| **R1 Task** | min | issue + spec | patch/PR + tests + records | gates (automatic) |
+| **R2 Shift** | 7 h | accumulated lessons, source queue | skill candidate, notes, morning report | distiller + gate + human (morning) |
+| **R3 Release** | days | skill candidate, model/tool change | canary release, eval result | eval + human (release) |
+| **R4 Structure** | week | ledger, metrics, failure records | ADR draft, roster proposal | founder (C3) |
 
-Üç düzlem:
+Three planes:
 
-- **Kontrol düzlemi:** Vardiya Müdürü (orkestratör), kuyruk, bütçe bekçisi, defter.
-- **Uygulama düzlemi:** konteyner + git worktree içinde çalışan sözleşmeli roller.
-- **Kanıt düzlemi:** hash-zincirli defter, dersler, beceri adayları, eval sonuçları,
-  sabah raporu. Bu düzlem yazma yetkisi olmayan tek düzlemdir — yalnızca eklenir.
+- **Control plane:** shift manager (orchestrator), queue, budget guard, ledger.
+- **Execution plane:** contractual roles running inside a container + git worktree.
+- **Evidence plane:** hash-chained ledger, lessons, skill candidates, eval
+  results, morning report. This is the only plane with no write authority —
+  append-only.
 
 ---
 
-## 5. Bu teslimat ne içeriyor
+## 5. What this delivery contains
 
-Bu bir fikir yazısı değil; uygulanabilir bir proje seti:
+This is not an essay — it is a buildable project set:
 
-| Dosya | Ne |
+| File | Content |
 |---|---|
-| [`SISTEM.md`](SISTEM.md) | **v2: kuracağımız sistem** — 3 hat, 6 bileşen, kapasite valfi, 90 gün |
-| [`PRD.md`](PRD.md) | Ürün gereksinimleri: 19 FR, 8 NFR, kabul kriterleri, hedefler |
-| [`MIMARI.md`](MIMARI.md) | Dört halka, bileşenler, veri akışı, teknoloji kararları |
-| [`ORGANIZASYON.md`](ORGANIZASYON.md) | Şirket yapısı, 14 ajan rolü, devir sözleşmeleri, SLA |
-| [`OGRENME.md`](OGRENME.md) | Gece ajandası, bilgi hunisi, bellek, kendini geliştirme protokolü |
-| [`KALITE.md`](KALITE.md) | Kapılar, eval harness, metrik tanımları, ölçüm disiplini |
-| [`YONETISIM.md`](YONETISIM.md) | Güvenlik, uyum, maliyet, lisans, olay müdahalesi |
-| [`YOL-HARITASI.md`](YOL-HARITASI.md) | 12 haftalık plan, risk kaydı, öldürme kriterleri |
-| [`ADR.md`](ADR.md) | 12 mimari karar kaydı (F01–F12) |
-| [`ARASTIRMA.md`](ARASTIRMA.md) | Karpathy, Pocock, Superpowers, GSD, fabrikalar, kendini geliştirme — kaynaklı |
-| [`SELF-REVIEW.md`](SELF-REVIEW.md) | Öz denetim: ne doğrulandı, ne doğrulanamadı, en zayıf üç varsayım |
-| [`loop/`](loop/) | **Çalışan** döngü çekirdeği: anayasa, hedef, kapılar, kadro, koşucu, 22 test |
+| [`SISTEM.md`](SISTEM.md) | **v2: the system we are building** — 3 lines, components, capacity valve, 90 days |
+| [`PRD.md`](PRD.md) | Product requirements: 19 FR, 8 NFR, acceptance criteria, goals |
+| [`MIMARI.md`](MIMARI.md) | Four rings, components, data flow, technology decisions |
+| [`ORGANIZASYON.md`](ORGANIZASYON.md) | Company structure, agent roles, handoff contracts, SLA |
+| [`OGRENME.md`](OGRENME.md) | Night agenda, knowledge funnel, memory, self-improvement protocol |
+| [`KALITE.md`](KALITE.md) | Gates, eval harness, metric definitions, measurement discipline |
+| [`YONETISIM.md`](YONETISIM.md) | Security, compliance, cost, licensing, incident response |
+| [`YOL-HARITASI.md`](YOL-HARITASI.md) | 12-week plan, risk register, kill criteria |
+| [`ADR.md`](ADR.md) | Architecture decision records (F01–F13) |
+| [`ARASTIRMA.md`](ARASTIRMA.md) | Karpathy, Pocock, Superpowers, GSD, factories, self-improvement — sourced |
+| [`SELF-REVIEW.md`](SELF-REVIEW.md) | Self-audit: what was verified, what could not be, the three weakest assumptions |
+| [`loop/`](loop/) | The **running** loop core: constitution, goal, gates, roster, runner, tests |
 
 ---
 
-## 6. 30 saniyede çalıştır
+## 6. Run it in 30 seconds
 
 ```powershell
 cd fabrika\loop
-python tests\test_runner.py     # 23 test
-python kovan.py plan            # kapasiteye göre kabul listesi
-python kovan.py run             # uçtan uca koşu + rapor
-python vardiya.py run           # gece hattı: damıtma + kırılma + ADR taslağı
-python kovan.py durum           # tüm koşuların çapraz metrikleri
-python tatbikat.py              # S1 runbook tatbikatı (4 adım PASS/FAIL)
-python gorev-kur.ps1            # gece görevini kur (23:00, yerel) — sil: gorev-sil.ps1
+python tests\test_runner.py     # 23 tests
+python kovan.py plan            # acceptance list under capacity
+python kovan.py run             # end-to-end run + report
+python vardiya.py run           # night line: distillation + breakage + ADR draft
+python kovan.py durum           # cross-run metrics
+python tatbikat.py              # S1 runbook drill (steps PASS/FAIL)
+python gorev-kur.ps1            # install the night task (23:00, local) — remove: gorev-sil.ps1
 ```
 
-**Kurulum (public):** `pip install -e fabrika` (gömülü Python'da `--no-build-isolation` ekleyin) → `kovan / vardiya / tatbikat /
-beceri` komutları global olur. İngilizce hızlı başlangıç ve güvenlik
-uyarıları: [`README.en.md`](README.en.md). Kullanıcı ayarları:
-[`loop/kullanici.yaml`](loop/kullanici.yaml).
+**Install (public):** `pip install -e fabrika` (add `--no-build-isolation`
+on embedded Python) → the `kovan / vardiya / tatbikat / beceri` commands
+become global. User settings: [`loop/kullanici.yaml`](loop/kullanici.yaml).
 
-`demo.py` şunu üretir: `ornek-cikti/sabah-raporu-ornek.md` (sabah raporu),
-`ledger.jsonl` (hash zincirli karar defteri), `lessons.jsonl` (dersler),
-`skills.proposed.jsonl` (beceri adayları), `ozet.json` (makine okunur özet).
+`demo.py` produces: `ornek-cikti/sabah-raporu-ornek.md` (morning report),
+`ledger.jsonl` (hash-chained decision ledger), `lessons.jsonl` (lessons),
+`skills.proposed.jsonl` (skill candidates), `ozet.json` (machine-readable
+summary).
 
-Koşucunun doğruladığı davranışlar — iddia değil, test:
+Behaviors the runner verifies — not claims, tests:
 
-| Davranış | Test |
+| Behavior | Test |
 |---|---|
-| Kapı sırası ve fail-fast | `test_fail_fast_stops_at_first_blocking_gate` |
-| "Sinyal yok" ≠ "geçti" | `test_missing_eval_signal_is_not_a_pass` |
-| Sinyalsiz boolean kapı geçmez | `test_missing_boolean_signal_is_not_a_pass` |
-| Anayasa dosyası korunur | `test_constitution_file_is_protected` |
-| Politika ihlali anında insan kapısı | `test_policy_violation_blocks_immediately` |
-| C3 kendi kendine geçmez | `test_c3_change_requires_human` |
-| Bütçe tavanı aşılmaz | `test_budget_exhaustion_stops`, `test_budget_overflow_blocks_before_verification` |
-| Devre kesici (3 hata) | `test_circuit_breaker_after_three_failures` |
-| Plato algılama | `test_plateau_detection` |
-| Defter tahrifi tespit | `test_tampering_is_detected` |
-| Kaldığı yerden devam | `test_resume_skips_completed_tasks` |
-| Tekrar eden hata → beceri adayı | `test_repeated_failure_emits_skill_candidate` |
+| Gate order and fail-fast | `test_fail_fast_stops_at_first_blocking_gate` |
+| "No signal" ≠ "pass" | `test_missing_eval_signal_is_not_a_pass` |
+| Boolean gate without a signal does not pass | `test_missing_boolean_signal_is_not_a_pass` |
+| Constitution file is protected | `test_constitution_file_is_protected` |
+| Policy violation → immediate human gate | `test_policy_violation_blocks_immediately` |
+| C3 does not pass itself | `test_c3_change_requires_human` |
+| Budget ceiling is never crossed | `test_budget_exhaustion_stops`, `test_budget_overflow_blocks_before_verification` |
+| Circuit breaker (3 failures) | `test_circuit_breaker_after_three_failures` |
+| Plateau detection | `test_plateau_detection` |
+| Ledger tampering detected | `test_tampering_is_detected` |
+| Resume from where it stopped | `test_resume_skips_completed_tasks` |
+| Repeated failure → skill candidate | `test_repeated_failure_emits_skill_candidate` |
 
 ---
 
-## 7. Durum: ne var, ne yok
+## 7. Status: what exists, what does not
 
-| Alan | Durum | Kanıt |
+| Area | Status | Evidence |
 |---|---|---|
-| Konsept ve doküman seti | Tamam | bu depo |
-| Hedef/kapı/kadro sözleşmesi | Tamam, makine okunur | `loop/*.yaml` |
-| Anayasa (10 madde) | Tamam | `loop/constitution.md` |
-| Döngü koşucusu | Çalışıyor | `runner.py`, **23 test geçiyor** |
-| Kanıt kaydı | Çalışıyor | hash zinciri doğrulaması, tahrif testi |
-| Beceri damıtma | Kural düzeyinde var | 2-tekrar eşiği, `skills.proposed.jsonl` |
-| Gerçek model bağlantısı | **Yok** | `Adapter` arayüzü boş |
-| Gerçek eval seti | **Yok** | sinyaller senaryoda sabit |
-| Maliyet ölçümü | **Yok** | `cost_usd` temsili |
-| 12 haftalık plan | Plan var, kanıt yok | `YOL-HARITASI.md` |
-| Pazar/müşteri doğrulaması | **Yok** | konsept aşaması |
+| Concept and document set | Done | this repo |
+| Goal/gate/roster contracts | Done, machine-readable | `loop/*.yaml` |
+| Constitution (10 articles) | Done | `loop/constitution.md` |
+| Loop runner | Running | `runner.py`, **23 tests passing** |
+| Evidence ledger | Running | hash-chain verification, tamper test |
+| Skill distillation | Rule-level | 2-repetition threshold, `skills.proposed.jsonl` |
+| Real model connection | **None** | `Adapter` interface empty |
+| Real eval set | **None** | signals fixed in scenario |
+| Cost measurement | **None** | `cost_usd` representative |
+| 12-week plan | Plan exists, no evidence | `YOL-HARITASI.md` |
+| Market/customer validation | **None** | concept stage |
 
-Bu tablo bilinçli olarak "yapıldı" demiyor. Konseptin değeri, neyi
-yapmadığını yazmasında.
+This table deliberately does not say "done". The concept's value is that it
+writes down what it has *not* done.
 
 ---
 
-## 8. "Loop goal" — bu nasıl gece boyu döner
+## 8. "Loop goal" — how this runs overnight
 
-Bir hedefin kendi kendine dönmesi için üç şey gerekir: **hedef sözleşmesi**,
-**durma kuralı**, **kanıt kaydı**. Üçü de `loop/goal.yaml` içinde:
+Three things are needed for a goal to turn on its own: a **goal contract**, a
+**stop rule**, and an **evidence ledger**. All three live in `loop/goal.yaml`:
 
 ```yaml
 goal:      { id: kovan-gece-vardiyasi-v1, horizon: 12 hafta }
@@ -226,26 +232,29 @@ budget:    { tokens_per_shift: 2_400_000, max_usd_per_shift: 40 }
 stop_rules:{ consecutive_failures: 3, plateau_rounds: 5, kill_switch_file: STOP }
 ```
 
-Bu sözleşmeyi üç farklı taşıyıcı çalıştırabilir:
+Three different carriers can run this contract:
 
-| Taşıyıcı | Ne zaman | Nasıl |
+| Carrier | When | How |
 |---|---|---|
-| **Bu oturum** | şimdi | plan → paralel araştırma → sentez → öz denetim (bu teslimat böyle üretildi) |
-| **Zamanlanmış görev** | her gece 23:00 | cron/interval ile aynı prompt, ayrı konuşmada; rapor dosyaya |
-| **CI / yerel runner** | her push / gece | `loop/runner.py` + gerçek `Adapter`; `STOP` dosyası kill switch |
+| **This session** | now | plan → parallel research → synthesis → self-audit (this delivery was produced this way) |
+| **Scheduled task** | nightly 23:00 | same prompt in a separate conversation via cron/interval; report to file |
+| **CI / local runner** | every push / night | `loop/runner.py` + a real `Adapter`; the `STOP` file is the kill switch |
 
-Kritik nokta: **döngü "durmak" üzere tasarlanır, "devam etmek" üzere değil.**
-Bütçe, devre kesici ve plato kuralı olmayan bir döngü öğrenmez; sadece harcar.
+The critical point: **the loop is designed to stop, not to continue.** A loop
+without a budget, a circuit breaker, and a plateau rule does not learn — it
+only burns.
 
 ---
 
-## 9. Açık sorular (bilerek cevaplanmadı)
+## 9. Open questions (deliberately unanswered)
 
-1. **İsim.** "KOVAN" bir çalışma adı; marka taraması yapılmadı. (Airlock'ta da
-   aynı sorun açık — isim kararı bir ADR bekliyor.)
-2. **İlk müşteri kim?** Kendi ürünlerini üreten iç fabrika mı, yoksa dış
-   backlog'a çalışan hizmet mi? İkisi farklı SLA ve farklı risk profili ister.
-3. **Model bağımsızlığı nereye kadar?** Sağlayıcı değişimi C3 sınıfı; ama
-   "model değişti, eval düştü" durumunda geri dönüş prosedürü henüz yok.
+1. ~~**Name.**~~ Resolved — see ADR-F13: brand **KOVAN**, repo/PyPI
+   **kovan-fabrika**.
+2. **Who is the first customer?** An internal factory producing its own
+   products, or a service working on an external backlog? The two demand
+   different SLAs and different risk profiles.
+3. **How far does model independence go?** Provider change is class C3; but
+   there is no rollback procedure yet for "model changed, eval dropped".
 
-Bu üçü `SELF-REVIEW.md` içinde de en zayıf varsayımlar olarak işaretli.
+Questions 2 and 3 are also flagged as the weakest assumptions in
+`SELF-REVIEW.md`.

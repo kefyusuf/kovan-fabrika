@@ -1,25 +1,25 @@
 ---
-name: Hata raporu
-about: KOVAN davranışında beklenmeyen sonuç
+name: Bug report
+about: Unexpected KOVAN behavior
 labels: bug
 ---
 
-# Belirti
+# Symptom
 
-<!-- Beklenen vs görülen davranış, bir-iki cümle. -->
+<!-- Expected vs observed behavior, in one or two sentences. -->
 
-# Yeniden üretme
+# Reproduction
 
-<!-- Komutlar + ortam; adım adım. -->
+<!-- Commands + environment; step by step. -->
 
-# Kanıt
+# Evidence
 
-<!-- Koşum logu (state/gece-durum.log satırı, runs/<id>/ozet.json) veya
-     `python retro.py --log-saglik` çıktısı. Halka açık yere anahtar
-     koymayın. -->
+<!-- A run log (state/gece-durum.log line, runs/<id>/ozet.json) or the
+     output of `python retro.py --log-saglik`. Never paste keys anywhere
+     public. -->
 
-# Ortam
+# Environment
 
-- Sürüm: <!-- kovan-fabrika x.y.z -->
+- Version: <!-- kovan-fabrika x.y.z -->
 - Python / OS:
-- Mod: <!-- kuru (varsayılan) / canlı -->
+- Mode: <!-- dry (default) / live -->

@@ -14,14 +14,14 @@ jobs:
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Bağımlılıklar
+      - name: Dependencies
         run: pip install pyyaml
-      - name: Örnek repo hazırlığı (testler git deposu bekliyor)
+      - name: Bootstrap example repo (tests expect a git repo)
         run: |
           git -C fabrika/loop/ornek-repo init -q
           git -C fabrika/loop/ornek-repo add -A
-          git -C fabrika/loop/ornek-repo -c user.name=ci -c user.email=ci@local commit -qm "ornek-repo ilk sürüm"
-      - name: Birim testler (model çağrısı yok)
+          git -C fabrika/loop/ornek-repo -c user.name=ci -c user.email=ci@local commit -qm "ornek-repo initial state"
+      - name: Unit tests (no model calls)
         working-directory: fabrika/loop
         run: |
           set -e
@@ -36,12 +36,12 @@ jobs:
             echo "== $t"
             python "$t"
           done
-      - name: Haftalık retro üretici (duman testi)
+      - name: Weekly retro generator (smoke)
         working-directory: fabrika/loop
         run: python retro.py --runs runs --out reports --json > /dev/null
-      - name: Log bütünlüğü taraması
+      - name: Log integrity scan
         working-directory: fabrika/loop
         run: python retro.py --log-saglik --runs runs
-      - name: S1 runbook tatbikatı
+      - name: S1 runbook drill
         working-directory: fabrika/loop
         run: python tatbikat.py

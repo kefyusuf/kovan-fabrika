@@ -1,46 +1,49 @@
-﻿# KOVAN — kovan-fabrika
+# KOVAN — kovan-fabrika
 
 ![tests](https://github.com/kefyusuf/kovan-fabrika/actions/workflows/tests.yml/badge.svg)
 
-**Kapasite-bounded, evidence-first yazılım üretim hattı** — *a capacity-bounded, evidence-first software factory.*
+**A capacity-bounded, evidence-first software factory.**
 
-KOVAN, yazılım işlerini kapasite hesabıyla kabul eden, her değişikliği
-kapı sırasından (policy → tests → provenance → lint → types → review →
-eval → cost) geçiren, üretenle onaylayanı ayıran ve her kararı defterine
-kanıtla yazan bir hattır. Kuru mod tamamen çevrimdışıdır (sıfır token);
-canlı mod yalnızca kendi API anahtarınızla çalışır (BYOK).
+KOVAN accepts software tasks under explicit capacity accounting, pushes every
+change through a fixed gate sequence (policy → tests → provenance → lint →
+types → review → eval → cost), separates the producer from the approver, and
+records every decision with evidence in a tamper-checked ledger. Dry mode is
+fully offline (zero tokens); live mode uses your own API key (BYOK).
 
-## Hızlı başlangıç
+## Quick start
 
 ```bash
-pip install -e fabrika --no-build-isolation   # gömülü Python'da gerekli
+pip install -e fabrika --no-build-isolation   # needed on embedded Python
 cd fabrika/loop
-kovan plan          # kapasite planı (kuru, deterministik)
-kovan run           # kapı sıralı koşum + defter + SBOM
-python retro.py     # haftalık retro + mekanik checkler
+kovan plan          # capacity plan (dry, deterministic)
+kovan run           # gated run + ledger + SBOM
+python retro.py     # weekly retro + mechanical checks
 ```
 
-Detaylı kurulum ve taze klon notu: [fabrika/CONTRIBUTING.md](CONTRIBUTING.md).
+Full setup and the fresh-clone note: [CONTRIBUTING.md](CONTRIBUTING.md).
 
-## Doküman haritası
+## Documentation map
 
-| Belge | İçerik |
+| Document | Content |
 |---|---|
-| [fabrika/SISTEM.md](fabrika/SISTEM.md) | v2 sistem tanımı: 3 hat, bileşen tablosu, 167 test |
-| [fabrika/README.md](fabrika/README.md) | 6 ilke (İ1–İ6), dosya haritası, kurulum |
-| [fabrika/ADR.md](fabrika/ADR.md) | Mimari karar kayıtları (F01–F13) |
-| [fabrika/EVIDENCE-UPDATE.md](fabrika/EVIDENCE-UPDATE.md) | Kanıt güncellemeleri (§1–§18) |
-| [CHANGELOG.md](CHANGELOG.md) | Sürüm geçmişi (SemVer) |
+| [fabrika/SISTEM.md](fabrika/SISTEM.md) | v2 system definition: 3 lines, component table, 167 tests |
+| [fabrika/README.md](fabrika/README.md) | The 6 principles (İ1–İ6), file map, setup |
+| [fabrika/ADR.md](fabrika/ADR.md) | Architecture decision records (F01–F13) |
+| [fabrika/EVIDENCE-UPDATE.md](fabrika/EVIDENCE-UPDATE.md) | Evidence log (§1–§21) |
+| [CHANGELOG.md](CHANGELOG.md) | Release history (SemVer) |
 
-## Normlar
+## Norms
 
-- **Üreten ≠ onaylayan (m.2):** sistem kendi onayını kendi kabul edemez.
-- **İnsan kapıları (C1/C3):** beceri aktivasyonu ve kırılma giderme insan onayı ister.
-- **Fail-closed:** şüphede kapı bloklar, geçmez; kirli git ağacında doğrulama koşmaz.
-- **Kanıt:** her koşum defter (JSONL) + SBOM (SPDX 2.3) + gece durum kaydı üretir.
+- **Producer ≠ approver (m.2):** the system cannot accept its own approval.
+- **Human gates (C1/C3):** skill activation and breakage remediation require a
+  human decision.
+- **Fail-closed:** gates block on doubt; verification never runs on a dirty
+  git tree.
+- **Evidence:** every run produces a ledger (JSONL), an SBOM (SPDX 2.3), and a
+  night-status record.
 
-Güvenlik açığı bildirimi: [SECURITY.md](SECURITY.md) — halka açık issue kullanmayın.
+Security disclosure: [SECURITY.md](SECURITY.md) — never use public issues.
 
-## Lisans
+## License
 
-Apache-2.0 — bkz. [LICENSE](LICENSE).
+Apache-2.0 — see [LICENSE](LICENSE).

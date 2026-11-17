@@ -1,25 +1,25 @@
-# Amaç
+# Purpose
 
-<!-- Bu PR neyi çözüyor? Bir cümle. -->
+<!-- What does this PR solve? One sentence. -->
 
-# Değişiklikler
+# Changes
 
 -
 
-# Test kanıtı
+# Test evidence
 
-- Koşulan dosyalar:
-- Toplam test sayısı: <!-- SISTEM.md toplamıyla uyuşmalı -->
-- Determinizm kontrolü: <!-- aynı seed → aynı kararlar, gerekiyorsa -->
+- Files run:
+- Total test count: <!-- must match the SISTEM.md total -->
+- Determinism check: <!-- same seed → same decisions, when relevant -->
 
-# Doküman senkronu (zorunlu)
+# Doc sync (mandatory)
 
-- [ ] `SISTEM.md` test sayısı / bileşen tablosu güncel
-- [ ] `CHANGELOG.md` güncellendi (davranış değişikliği varsa)
-- [ ] `EVIDENCE-UPDATE.md`'ye kanıt bölümü eklendi
-- [ ] Kapı sırası etkilenmedi ya da `ADR.md` kaydı yapıldı
+- [ ] `SISTEM.md` test count / component table up to date
+- [ ] `CHANGELOG.md` updated (if behavior changed)
+- [ ] Evidence section added to `EVIDENCE-UPDATE.md`
+- [ ] Gate order untouched, or recorded in `ADR.md`
 
-# m.2 hatırlatması
+# m.2 reminder
 
-- [ ] Bu PR'ı bağımsız bir incelemeci (ya da kurucu) onaylayacak — üreten
-      onaylamaz.
+- [ ] An independent reviewer (or the founder) will approve this PR — the
+      producer does not approve.
