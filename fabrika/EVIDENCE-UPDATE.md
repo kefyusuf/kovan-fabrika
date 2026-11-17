@@ -487,4 +487,32 @@ ModuleNotFoundError) ve CI listesine eksik `test_simulasyon.py`. CI
 sonucu: **success** (run 44081160418) — 20 test dosyası (167 test) +
 retro dumanı + log bütünlüğü + S1 tatbikatı, taze Linux klonunda yeşil.
 SISTEM toplam satırı 167'ye güncellendi.
+
+---
+
+## 21. Yayın sonrası dikkatli denetim + yayın akışı (17 Kasım 2026)
+
+**CI çift-yeşil:** doküman push'u (a2b95f7) da success — run
+44081360845. Rozet aktif.
+
+**Dependabot güvenlik uyarıları:** repo API'siyle açıldı (vulnerability
+alerts). Branch protection bilinçli olarak AÇILMADI: saklı kimlik
+belirtecinin admin kapsamı bilinmiyor; tek geliştiricili ilk dönemde
+main'e doğrudan push normu (m.2 incelemeci kuralı PR akışına geçince
+değerlendirilir).
+
+**Gece hattı — kuyruk ilerlemesinin ilk gerçek kanıtı:** 16/17 Kasım
+koşumları `kabul 0 | blok 1 | dur is_kalmadi` — tamamlananlar (K-101…
+K-106) yeniden SEÇİLMİYOR; kalan tek iş insan kapısında (C1/C3)
+bekliyor. `state/gece-durum.log` iki temiz kayıt (çıkış 0, loglar
+EVET). Sistem boş işle dolandırıcılık yapmıyor — dürüst duruş.
+
+**Yayın akışı kurallılaştırıldı:** kaynak düzenleme `Default\fabrika`
+de; `sync-yayin.ps1` (proje kökü) yalnız izlenen dosya kümesini
+kovan-fabrika\'ya aynalar (kanıt dizinleri hariç; norm dosyaları köke,
+fabrika/ içindeki kopyalar silinir). İlk koşum kanıtı: değişiklik
+yokken git TEMİZ çıktı. Akış: düzenle → sync → commit → push.
+
+**Kalan eşikler:** API anahtarı (canlı hat), gerçek backlog,
+opsiyonel branch protection.
 \n
