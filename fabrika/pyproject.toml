@@ -1,0 +1,53 @@
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "kovan-fabrika"
+version = "0.2.1"
+description = "KOVAN — capacity-bounded, evidence-first AI software factory (dry mode offline; live mode with your own API key)"
+readme = "README.en.md"
+requires-python = ">=3.11"
+license = "Apache-2.0"
+license-files = ["LICENSE"]
+classifiers = [
+    "Development Status :: 4 - Beta",
+    "Intended Audience :: Developers",
+    "Natural Language :: Turkish",
+    "Operating System :: OS Independent",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Topic :: Software Development :: Quality Assurance",
+]
+keywords = ["ai-agents", "software-factory", "capacity-planning", "evidence-based", "spdx", "mutation-testing"]
+dependencies = ["pyyaml>=6,<7"]
+
+[project.scripts]
+kovan = "kovan:main"
+vardiya = "vardiya:main"
+tatbikat = "tatbikat:ana"
+beceri = "beceri:ana"
+
+[tool.setuptools]
+package-dir = { "" = "loop" }
+py-modules = [
+    "kovan",
+    "runner",
+    "kapasite",
+    "seedtest",
+    "dogrula",
+    "uyum",
+    "sbom",
+    "eval_kos",
+    "incelemeci",
+    "beceri",
+    "vardiya",
+    "adapter_http",
+    "tatbikat",
+    "retro",
+    "mutasyon",
+    "kuyruk_uret",
+    "konsol",
+]

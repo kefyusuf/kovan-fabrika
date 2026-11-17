@@ -1,0 +1,11 @@
+{
+  "accepted": 2,
+  "rejected": 0,
+  "blocked": 2,
+  "revised": 1,
+  "tokens_spent": 49000,
+  "stopped": "is_kalmadi",
+  "accept_rate": 0.4,
+  "ledger_records": 5,
+  "ledger_ok": true
+}

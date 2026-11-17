@@ -1,0 +1,46 @@
+name: tests
+
+on:
+  push:
+    branches: [main, master]
+  pull_request:
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Bağımlılıklar
+        run: pip install pyyaml
+      - name: Örnek repo hazırlığı (testler git deposu bekliyor)
+        run: |
+          git -C fabrika/loop/ornek-repo init -q
+          git -C fabrika/loop/ornek-repo add -A
+          git -C fabrika/loop/ornek-repo -c user.name=ci -c user.email=ci@local commit -qm "ornek-repo ilk sürüm"
+      - name: Birim testler (model çağrısı yok)
+        working-directory: fabrika/loop
+        run: |
+          set -e
+          for t in tests/test_runner.py tests/test_kapasite.py tests/test_seedtest.py \
+                   tests/test_kovan_cli.py tests/test_adapter_http.py tests/test_dogrula.py \
+                   tests/test_eval_kos.py tests/test_incelemeci.py tests/test_vardiya.py \
+                   tests/test_durum.py tests/test_uyum.py tests/test_sbom.py \
+                   tests/test_beceri.py tests/skills/test_tests_kapisi.py \
+                   tests/test_tatbikat.py tests/test_retro.py tests/test_mutasyon.py \
+                   tests/test_kuyruk_uret.py tests/test_konsol.py; do
+            echo "== $t"
+            python "$t"
+          done
+      - name: Haftalık retro üretici (duman testi)
+        working-directory: fabrika/loop
+        run: python retro.py --runs runs --out reports --json > /dev/null
+      - name: Log bütünlüğü taraması
+        working-directory: fabrika/loop
+        run: python retro.py --log-saglik --runs runs
+      - name: S1 runbook tatbikatı
+        working-directory: fabrika/loop
+        run: python tatbikat.py

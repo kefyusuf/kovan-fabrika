@@ -1,0 +1,17 @@
+{
+  "goal": "kovan-gece-vardiyasi-v1",
+  "budget_left": 2389200,
+  "tokens_spent": 10800,
+  "consecutive_failures": 0,
+  "rounds_since_progress": 0,
+  "accepted": [
+    "S-01",
+    "S-13",
+    "S-09"
+  ],
+  "blocked": [
+    "S-07"
+  ],
+  "pending": [],
+  "stopped": "is_kalmadi"
+}

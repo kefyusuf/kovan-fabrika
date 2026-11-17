@@ -1,0 +1,33 @@
+# KOVAN — gece tarama kuyruğu
+#
+# tur: dosya → yerel markdown (workspace kökü içinde, izolasyon sınırı)
+# tur: url   → dış kaynak; KURU modda atlanır, canlı model gerekir
+#
+# Not: URL'ler yalnızca goal.yaml'daki izinli hostlardan olabilir
+# (kısıt: allowed_hosts). Kuru mod bunlara dokunmaz, rapor işaretler.
+
+kaynaklar:
+  - tur: dosya
+    yol: arastirma/01-karpathy.md
+    konu: Karpathy söylemi ve doğrulanabilirlik
+  - tur: dosya
+    yol: arastirma/03-superpowers.md
+    konu: Beceri/subagent ekosistemi
+  - tur: dosya
+    yol: arastirma/05-fabrikalar.md
+    konu: Otonom yazılım fabrikaları
+  - tur: dosya
+    yol: arastirma/derin-20261021-0134/insight.md
+    konu: Çapraz boyut içgörüleri
+  - tur: dosya
+    yol: arastirma/derin-20261021-0134/verify.md
+    konu: Güvenilirlik sınıflandırması
+  - tur: dosya
+    yol: arastirma/KOVAN-DERIN-ARASTIRMA-2026-10-22.md
+    konu: Derin araştırma sentezi
+  - tur: url
+    url: https://metr.org/blog/2026-02-24-uplift-update
+    konu: METR ölçüm güncellemesi
+  - tur: url
+    url: https://openai.com/index/why-we-no-longer-evaluate-swe-bench-verified/
+    konu: Benchmark emekliliği

@@ -1,0 +1,44 @@
+{
+  "accepted": 3,
+  "rejected": 0,
+  "blocked": 1,
+  "revised": 1,
+  "tokens_spent": 10800,
+  "stopped": "is_kalmadi",
+  "accept_rate": 0.6,
+  "run_id": "gun-4",
+  "kanarya": null,
+  "kapasite_saat": 1.5,
+  "kabul": [
+    "S-01",
+    "S-07",
+    "S-13",
+    "S-09"
+  ],
+  "ertelenen": [
+    "S-02",
+    "S-17",
+    "S-03",
+    "S-11",
+    "S-04",
+    "S-16",
+    "S-12",
+    "S-20",
+    "S-06",
+    "S-14",
+    "S-15",
+    "S-19",
+    "S-18",
+    "S-10",
+    "S-05"
+  ],
+  "insan_kuyrugu": [
+    "S-08"
+  ],
+  "doluluk": 0.9467,
+  "defter": {
+    "ok": true,
+    "kayit": 15,
+    "neden": ""
+  }
+}

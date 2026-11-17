@@ -1,0 +1,103 @@
+{
+  "gun_sayisi": 5,
+  "seed": 7,
+  "gunluk": [
+    {
+      "gun": 1,
+      "saat": 3.0,
+      "kabul": 6,
+      "blok": 1,
+      "ret": 0,
+      "revizyon": 1,
+      "ertelenen": 13,
+      "tokens": 28000,
+      "doluluk": 0.9267,
+      "kalan_havuz": 13,
+      "gece_rapor": true
+    },
+    {
+      "gun": 2,
+      "saat": 3.0,
+      "kabul": 6,
+      "blok": 1,
+      "ret": 0,
+      "revizyon": 3,
+      "ertelenen": 13,
+      "tokens": 42800,
+      "doluluk": 0.9267,
+      "kalan_havuz": 13,
+      "gece_rapor": true
+    },
+    {
+      "gun": 3,
+      "saat": 3.0,
+      "kabul": 6,
+      "blok": 1,
+      "ret": 0,
+      "revizyon": 1,
+      "ertelenen": 13,
+      "tokens": 30000,
+      "doluluk": 0.9267,
+      "kalan_havuz": 13,
+      "gece_rapor": true
+    },
+    {
+      "gun": 4,
+      "saat": 1.5,
+      "kabul": 4,
+      "blok": 1,
+      "ret": 0,
+      "revizyon": 1,
+      "ertelenen": 15,
+      "tokens": 10800,
+      "doluluk": 0.9467,
+      "kalan_havuz": 13,
+      "gece_rapor": true
+    },
+    {
+      "gun": 5,
+      "saat": 3.0,
+      "kabul": 6,
+      "blok": 1,
+      "ret": 0,
+      "revizyon": 1,
+      "ertelenen": 13,
+      "tokens": 27600,
+      "doluluk": 0.9267,
+      "kalan_havuz": 13,
+      "gece_rapor": true
+    }
+  ],
+  "retro": {
+    "hafta": "2026-W46",
+    "gpk": {
+      "gorev": 28,
+      "ilk_tur_kabul": 16,
+      "gpk": 0.571,
+      "run_bazli": true
+    },
+    "istatik": {
+      "koşu": 5,
+      "kabul": 23,
+      "blok": 5,
+      "ertelenen_is": 67,
+      "ortalama_doluluk": 0.931,
+      "kapı_hatalari": [],
+      "vardiya_raporu": 5
+    },
+    "checkler": [
+      {
+        "tetik": "67 iş ertelendi (kapasite)",
+        "komut": "python kovan.py plan --saat 3.0",
+        "neden": "ertelenenler için ayrı kapasite günü planla"
+      }
+    ],
+    "dosya": "C:\\Users\\yukonit\\AppData\\Roaming\\AutoClaw-oversea-official\\accounts\\6d3c95e07febd60b1ece48db0f31a2e8701cf1ba72ecd454f2c50d788e639eb5\\projects\\Default\\fabrika\\loop\\simulasyon-runs\\reports\\retro-2026-W46.md"
+  },
+  "toplam_kabul": 28,
+  "toplam_tokens": 139200,
+  "token_basi_gorev_proxy": 4971.4,
+  "istatik_kullanildi": {
+    "vardiya_raporu": 5
+  }
+}

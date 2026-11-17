@@ -1,0 +1,3 @@
+# KOVAN — izinli üçüncü taraf import listesi (C3: yalnızca insan düzenler)
+paketler:
+  - yaml

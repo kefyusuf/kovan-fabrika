@@ -1,0 +1,202 @@
+# KOVAN — Kadro Sözleşmeleri
+#
+# Bir ajan, "iyi iş yapan model" değildir. Bir ajan = (girdi, çıktı, izin,
+# devir sözleşmesi, başarısızlık modu) beşlisidir. Bu dosyada beşi de yazılı.
+#
+# Kural: hiçbir ajan kendi çıktısını onaylayamaz. Hiçbir ajan kendi iznini
+# genişletemez. Hiçbir ajan "anayasa/" altına yazamaz.
+
+meta:
+  version: 0.1.0
+  owner: insan/kurucu
+  model_tiers:
+    T0: deterministik, model yok (kural, test, tip denetimi, hash)
+    T1: küçük ve hızlı model (sınıflandırma, özet, taslak)
+    T2: orta model (kod yazma, inceleme)
+    T3: en yetenekli model (mimari, zor hata ayıklama, spec)
+
+insan_rolleri:
+  - id: kurucu
+    yetki: [anayasa_değişikliği, bütçe_tavanı, model_seçimi, isim_ve_lisans]
+    not: Tek gerçek "root". Bütün C3 onayları buradan geçer.
+  - id: kapi_bekcisi
+    yetki: [c3_onayi, guvenlik_istisnasi, yayin_onayi]
+    not: Kurucudan farklı bir insan olabilir; aynı kişiyse bile ayrı bir
+         onay kaydı üretilir (tek kişi iki imza atamaz kuralı).
+
+ajanlar:
+  # ------------------------------------------------------------------ yönetim
+  - id: vardiya-muduru
+    departman: yönetim
+    model: T2
+    girdi: [goal.yaml, backlog.yaml, dunku_rapor, butce_durumu]
+    cikti: [gece_plani, gorev_atamalari, sabah_raporu]
+    yazma_izi: ["reports/", "loop/state.json"]
+    yapamaz: [kod_yazmak, kapi_gecmek, butce_artirmak]
+    sla: "vardiya başında 10 dk içinde plan hazır"
+    basarisizlik: "plan şişer, 6 saatlik işi 12 saatlik listeye böler"
+    devir: "plan -> urun-spec ve arastirmaci; sabah raporu -> insan"
+
+  # ------------------------------------------------------------------- ürün
+  - id: urun-spec
+    departman: ürün
+    model: T3
+    girdi: [issue, mevcut_spec, kabul_kriterleri_şablonu]
+    cikti: [spec.md, kabul_kriterleri, kapsam_disi_listesi]
+    yazma_izi: ["specs/"]
+    yapamaz: [kod_yazmak, test_yazmak]
+    kural: "Her kabul kriteri bir komutla doğrulanabilir olmalı."
+    basarisizlik: "belirsiz spec üretir; kodlayıcı kendi yorumunu yazar"
+    devir: "spec -> test-yazari (önce), sonra kodlayici"
+
+  # ------------------------------------------------------------- mühendislik
+  - id: test-yazari
+    departman: mühendislik
+    model: T2
+    girdi: [spec.md, mevcut_testler]
+    cikti: [başarısız_testler, test_gerekçesi]
+    yazma_izi: ["tests/"]
+    yapamaz: [uygulama_kodu_yazmak, test_silmek]
+    kural: "Kod yazılmadan önce test yazılır ve kırmızı olduğu görülür."
+    basarisizlik: "testi koda uydurur (yeşil görünsün diye)"
+    devir: "kırmızı test -> kodlayici"
+
+  - id: kidemli-kodlayici
+    departman: mühendislik
+    model: T3
+    girdi: [spec.md, kirmizi_testler, mimari_notlari]
+    cikti: [patch, tasarim_gerekcesi, risk_notu]
+    yazma_izi: ["src/", "lib/"]
+    yapamaz: [test_zayiflatmak, kapi_esigi_degistirmek, bagimlilik_eklemek_izinsiz]
+    sla: "C2 görev, ilk turda kapılardan geçme oranı >= %60 (hedef)"
+    basarisizlik: "testi geçmek için özel durum ekler; 3 ay sonra bakım borcu"
+    devir: "patch -> incelemeci"
+
+  - id: kodlayici
+    departman: mühendislik
+    model: T2
+    girdi: [sinirli_gorev, mevcut_kod]
+    cikti: [patch]
+    yazma_izi: ["src/"]
+    yapamaz: [mimari_karar_almak]
+    basarisizlik: "yerel olarak doğru, bütün olarak yanlış değişiklik"
+
+  - id: cirak
+    departman: mühendislik
+    model: T1
+    girdi: [C0/C1_gorev]
+    cikti: [varyantlar, yazım/doküman düzeltmesi]
+    yazma_izi: ["docs/", "src/**/*.md"]
+    basarisizlik: "üretken ama gürültülü; insan filtresi gerekir"
+
+  # ------------------------------------------------------------------ kalite
+  - id: incelemeci
+    departman: kalite
+    model: T2
+    girdi: [patch, spec.md, testler]
+    cikti: [onay_veya_ret + gerekce, bulgu_listesi]
+    yazma_izi: []            # sadece yorum yazar, kod değiştirmez
+    yapamaz: [kendi_yazdigi_kodu_onaylamak, "LGTM" demek]
+    kural: >
+      İncelemeci, kodu yazan oturumdan farklı bir bağlamda çalışır ve
+      spec'e bakar, koda değil. Gerekçesiz onay geçersizdir.
+    basarisizlik: "lastik damga; her şeyi onaylar, kapı işlevsizleşir"
+    devir: "ret -> kodlayici; onay -> eval kapısı"
+
+  - id: kizil-takim
+    departman: kalite
+    model: T2
+    girdi: [patch, tehdit_modeli, onceki_bulgular]
+    cikti: [saldiri_testleri, kirilma_senaryolari]
+    yazma_izi: ["tests/redteam/"]
+    yapamaz: [üretim_kodu_değiştirmek]
+    kural: "En az bir adversarial test üretmeden vardiyayı kapatamaz."
+    basarisizlik: "kolay örneklerle oyalanır; gerçek enjeksiyonu kaçırır"
+
+  # -------------------------------------------------------------------- Ar-Ge
+  - id: arastirmaci
+    departman: ar-ge
+    model: T3
+    girdi: [arastirma_kuyrugu, izinli_kaynak_listesi, onceki_notlar]
+    cikti: [kaynakli_not, iddia_url_ciftleri, "doğrulanamadı" listesi]
+    yazma_izi: ["arastirma/"]
+    yapamaz: [kod_yazmak, kaynaksiz_iddia_yayinlamak]
+    kural: >
+      Her iddia bir URL veya arXiv kimliği taşır. Erişilemeyen kaynak
+      "doğrulanamadı" olarak işaretlenir; tahminle doldurulmaz.
+    basarisizlik: "ikinci el blog zincirini birincil kaynak sanar"
+    devir: "not -> damitici"
+
+  - id: damitici
+    departman: ar-ge
+    model: T2
+    girdi: [arastirma_notlari, lessons.jsonl, tekrar_eden_hatalar]
+    cikti: [SKILL.md_adaylari, beceri_testi, "neden_bu_beceri" notu]
+    yazma_izi: ["skills/"]
+    yapamaz: [beceriyi_otomatik_aktiflestirmek]
+    kural: >
+      Bir beceri ancak (a) en az 2 kez tekrarlamış bir hatadan veya
+      (b) kaynaklı bir yöntemden doğar. Beceri, uygulandığı görev sınıfında
+      ölçülmeden "aktif" sayılmaz.
+    basarisizlik: "genel geçer tavsiye damıtır ('temiz kod yaz') — beceri değil"
+
+  # --------------------------------------------------- organizasyon geliştirme
+  - id: yapi-tasarimcisi
+    departman: organizasyon
+    model: T3
+    girdi: [ledger, metrikler, kadro_sozlesmeleri, basarisizlik_kayitlari]
+    cikti: [ADR_taslagi, kadro_degisikligi_onerisi, beklenen_etki_ve_olcum]
+    yazma_izi: ["oneri/"]
+    yapamaz: [kadroyu_kendisi_değiştirmek, anayasa_yazmak]
+    kural: >
+      Her öneri bir C sınıfı taşır ve "bu değişiklik hangi metrikte ne kadar
+      iyileşme bekliyor" cümlesini içerir. Ölçüsüz öneri reddedilir.
+    basarisizlik: "sürekli yeniden yapılanma; üretim durur, doküman çoğalır"
+
+  # ------------------------------------------------------------ finans / uyum
+  - id: butce-bekcisi
+    departman: finans
+    model: T0
+    girdi: [token_kullanimi, model_fiyatlari, tavan]
+    cikti: [uyari, kisitlama_karari, gunluk_maliyet_raporu]
+    yazma_izi: ["reports/maliyet/"]
+    yapamaz: [tavan_artirmak]
+    kural: "Tavanın %80'inde model kademesini düşürür; %100'de durdurur."
+    basarisizlik: "maliyeti görünmez kılar; fatura sabah sürpriz olur"
+
+  - id: uyum-denetci
+    departman: hukuk
+    model: T1
+    girdi: [bagimlilik_listesi, lisanslar, uretilen_kodun_kaynaklari]
+    cikti: [provenance_kaydi, lisans_uyarisi, SBOM]
+    yazma_izi: ["uyum/"]
+    yapamaz: [lisans_degistirmek, hukuki_görüş_vermek]
+    kural: "Kaynağı gösterilemeyen kod birleşmez."
+    basarisizlik: "kopyala-yapıştır kodun lisansını kaçırır"
+
+  # ------------------------------------------------------------------- bellek
+  - id: arsivci
+    departman: bellek
+    model: T1
+    girdi: [notlar, beceriler, dersler, eskimiş_kayitlar]
+    cikti: [indeks, tekrar_birlesimi, çürüme_raporu]
+    yazma_izi: ["bellek/"]
+    yapamaz: [kanıt_silmek]
+    kural: "Siler değil, arşivler; her kayıt bir 'neden hâlâ burada' notu taşır."
+    basarisizlik: "bellek şişer, gerçek bilgi gürültüde kaybolur"
+
+# ---------------------------------------------------------------------------
+# Devir kuralları: bir ajanın çıktısı, diğerinin girdisi olurken ne taşınır?
+handoff_rules:
+  tasima_zorunlu: [spec_id, kabul_kriteri, onceki_denemeler, acik_sorular]
+  tasima_yasak: [tam_sohbet_gecmisi, model_ici_dusunce, diger_ajanin_guveni]
+  gerekce: >
+    Bağlam taşınmaz, artefakt taşınır. Ajanlar arasında konuşma geçmişi
+    taşımak, hatayı da taşımak demektir; dosya taşımak ise denetlenebilir.
+
+# Aynı anda kaç ajan?
+eszamanlilik:
+  gece_vardiyasi: 3
+  gunduz_uretim: 5
+  neden_sinirli: "yazma çakışması ve incelemeci yükü; 5'ten sonra hata oranı artıyor"
+  izolasyon: "her ajan kendi git worktree'sinde; ortak dosya yok"

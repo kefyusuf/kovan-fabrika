@@ -1,0 +1,141 @@
+isler:
+- id: S-03
+  baslik: API hata mesajları tutarsız
+  sinif: C2
+  loc: 120
+  oncelik: 2
+  dokunur:
+  - src/api/hatalar.py
+- id: S-04
+  baslik: Rapor modülü refactor
+  sinif: C2
+  loc: 600
+  oncelik: 2
+  dokunur:
+  - src/rapor/modul.py
+- id: S-05
+  baslik: Test kapsamını artır
+  sinif: C1
+  loc: 200
+  oncelik: 3
+  dokunur:
+  - tests/
+- id: S-06
+  baslik: Log formatını düzelt
+  sinif: C0
+  loc: 90
+  oncelik: 3
+  dokunur:
+  - src/log.py
+- id: S-10
+  baslik: Mutasyon skoru raporu
+  sinif: C1
+  loc: 150
+  oncelik: 3
+  dokunur:
+  - reports/
+- id: S-11
+  baslik: Istatistik fonksiyon testi
+  sinif: C2
+  loc: 180
+  oncelik: 2
+  dokunur:
+  - src/istatistik.py
+- id: S-12
+  baslik: Yapılandırma şablonu
+  sinif: C1
+  loc: 70
+  oncelik: 3
+  dokunur:
+  - docs/yapilandirma.md
+- id: S-14
+  baslik: Gece planı şablonu
+  sinif: C1
+  loc: 100
+  oncelik: 3
+  dokunur:
+  - docs/gece-plani.md
+- id: S-15
+  baslik: Egress log örneği
+  sinif: C1
+  loc: 120
+  oncelik: 3
+  dokunur:
+  - docs/egress.md
+- id: S-16
+  baslik: Retro şablonu dokümanı
+  sinif: C0
+  loc: 60
+  oncelik: 3
+  dokunur:
+  - docs/retro.md
+- id: S-18
+  baslik: Kanarya kılavuzu
+  sinif: C1
+  loc: 140
+  oncelik: 3
+  dokunur:
+  - docs/kanarya.md
+- id: S-19
+  baslik: Kopya tespit dokümanı
+  sinif: C1
+  loc: 130
+  oncelik: 3
+  dokunur:
+  - docs/kopya.md
+- id: S-20
+  baslik: Eval şablon çevirisi
+  sinif: C0
+  loc: 80
+  oncelik: 3
+  dokunur:
+  - docs/eval-tr.md
+- id: S-01
+  baslik: README yazım hatası
+  sinif: C0
+  loc: 40
+  oncelik: 1
+  dokunur:
+  - docs/README.md
+- id: S-02
+  baslik: Sıcaklık sınır hatası
+  sinif: C2
+  loc: 320
+  oncelik: 1
+  dokunur:
+  - src/sicaklik.py
+- id: S-07
+  baslik: Sır okuma isteği
+  sinif: C2
+  loc: 60
+  oncelik: 1
+  dokunur:
+  - .secrets/prod.env
+- id: S-08
+  baslik: Anayasa maddesi ekle
+  sinif: C3
+  loc: 80
+  oncelik: 4
+  dokunur:
+  - anayasa/madde-11.md
+- id: S-09
+  baslik: Ortalama fonksiyon dokümanı
+  sinif: C1
+  loc: 60
+  oncelik: 2
+  dokunur:
+  - docs/
+- id: S-13
+  baslik: Kapasite tablosu dokümanı
+  sinif: C0
+  loc: 50
+  oncelik: 2
+  dokunur:
+  - docs/kapasite.md
+- id: S-17
+  baslik: Defter şema dokümanı
+  sinif: C1
+  loc: 110
+  oncelik: 2
+  dokunur:
+  - docs/defter.md

@@ -1,0 +1,17 @@
+# KOVAN — kanıtlı iş önerileri (insan onayı bekler)
+# Onaylanmadan üretim kuyruğuna girmez. Kanıt: oneri-raporu.md
+isler:
+- id: O-01
+  baslik: tests kapısı tekrarını azaltacak beceri kapsamı
+  sinif: C1
+  loc: 120
+  oncelik: 2
+  dokunur: []
+  gerekce: Aynı hata sınıfı 3 kez tekrar etti; beceri kapsamı genişletilmeli.
+- id: O-02
+  baslik: 'Canlı profilde yakalanmayan türler için kapı: tasarim_hatasi'
+  sinif: C3
+  loc: 80
+  oncelik: 1
+  dokunur: []
+  gerekce: Kırmızı takım, canlı profilin bu hata türlerini kaçırdığını ölçtü.

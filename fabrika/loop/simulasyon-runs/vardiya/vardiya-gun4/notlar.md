@@ -1,0 +1,62 @@
+# Kaynaklı Notlar (kuru mod)
+
+- **Karpathy söylemi ve doğrulanabilirlik** — `arastirma\01-karpathy.md` → https://www.latent.space/p/s3 — TEKRAR TARAMA
+  - Kanıt: Latent Space derlemesi, "Software 3.0" bölümü — https://www.latent.space/p/s3 · Seviye: `[S]` (transkript derlemesi; YC videosu birebir doğrulanamadı). Aynı çerçeve Sequoia 
+- **Karpathy söylemi ve doğrulanabilirlik** — `arastirma\01-karpathy.md` → https://x.com/karpathy/status/2015883857489522876 — TEKRAR TARAMA
+  - Kanıt: Claude coding notları, 26 Oca 2026 — https://x.com/karpathy/status/2015883857489522876 `[B]`; Sequoia metni — https://karpathy.bearblog.dev/sequoia-ascent-2026 `[Y]`.
+- **Karpathy söylemi ve doğrulanabilirlik** — `arastirma\01-karpathy.md` → https://x.com/karpathy/status/1886192184808149383 — TEKRAR TARAMA
+  - Kanıt: X, 2 Şub 2025 — https://x.com/karpathy/status/1886192184808149383 `[B]`; MenuGen yazısı, 27 Nis 2025 — https://karpathy.bearblog.dev/vibe-coding-menugen/ `[B]`.
+- **Karpathy söylemi ve doğrulanabilirlik** — `arastirma\01-karpathy.md` → https://karpathy.bearblog.dev/vibe-coding-menugen/ — TEKRAR TARAMA
+  - Kanıt: MenuGen yazısı — https://karpathy.bearblog.dev/vibe-coding-menugen/ `[B]`; Sequoia metnindeki "Some apps should stop existing as apps" bölümü `[Y]`.
+- **Karpathy söylemi ve doğrulanabilirlik** — `arastirma\01-karpathy.md` → https://karpathy.bearblog.dev/sequoia-ascent-2026 — TEKRAR TARAMA
+  - Kanıt: Sequoia metni — https://karpathy.bearblog.dev/sequoia-ascent-2026 `[Y]`; aynı cümlenin kaynağı olarak gösterilen 26 Şub 2026 X gönderisi — https://x.com/karpathy/status/2027
+- **Beceri/subagent ekosistemi** — `arastirma\03-superpowers.md` → https://github.com/obra/superpowers — TEKRAR TARAMA
+  - Kanıt: https://github.com/obra/superpowers (README, ilk paragraf) · Seviye: resmî README.
+- **Beceri/subagent ekosistemi** — `arastirma\03-superpowers.md` → https://api.github.com/repos/obra/superpowers/releases/latest — TEKRAR TARAMA
+  - Kanıt: https://api.github.com/repos/obra/superpowers/releases/latest · https://github.com/obra/superpowers/releases/tag/v7.0.0
+- **Beceri/subagent ekosistemi** — `arastirma\03-superpowers.md` → https://api.github.com/repos/obra/superpowers/contents/skills` — TEKRAR TARAMA
+  - Kanıt: `https://api.github.com/repos/obra/superpowers/contents/skills` (21.10.2026 çekimi, 15 `dir`).
+- **Beceri/subagent ekosistemi** — `arastirma\03-superpowers.md` → https://raw.githubusercontent.com/obra/superpowers/main/commands/brainstorm.md — TEKRAR TARAMA
+  - Kanıt: https://raw.githubusercontent.com/obra/superpowers/main/commands/brainstorm.md (tam dosya 5 satır).
+- **Beceri/subagent ekosistemi** — `arastirma\03-superpowers.md` → https://agentskills.io/specification` — TEKRAR TARAMA
+  - **B15 — Frontmatter: iki zorunlu alan, 1024 karakter tavanı.** `name` + `description`; toplam **max 1024 karakter**; `name` yalnız harf/rakam/tire; `description` üçüncü tekil şahıs
+- **Otonom yazılım fabrikaları** — `arastirma\05-fabrikalar.md` → https://factory.com/product/droids — TEKRAR TARAMA
+  - - **[K1]** Factory, "Droids" ürün sayfası — https://factory.com/product/droids
+- **Otonom yazılım fabrikaları** — `arastirma\05-fabrikalar.md` → https://factory.com/news — TEKRAR TARAMA
+  - - **[K2]** Factory, haberler dizini (15.09.2026 $200M/$5B; 23.09.2026 Router −63%; 30.09.2026 Automations GA; 02.10.2026 Analytics; 13.08.2026 Agent Effectiveness; 24.09.2026 Legac
+- **Otonom yazılım fabrikaları** — `arastirma\05-fabrikalar.md` → https://factory.com/news/terminal-bench — TEKRAR TARAMA
+  - - **[K3]** Factory, "Droid: The #1 Software Development Agent on Terminal-Bench" (25.09.2025) — https://factory.com/news/terminal-bench
+- **Otonom yazılım fabrikaları** — `arastirma\05-fabrikalar.md` → https://cognition.com/blog — TEKRAR TARAMA
+  - - **[K4]** Cognition blog dizini (08.09.2026 Series E; 25.09.2026 $1B ARR; 19.03.2026 Manage Devins; 20.03.2026 Schedule Devins; 04.06.2026 Productivity Guarantee; 29.06.2026 Fusio
+- **Otonom yazılım fabrikaları** — `arastirma\05-fabrikalar.md` → https://cognition.com/blog/devin-annual-performance-review-2025 — TEKRAR TARAMA
+  - - **[K6]** Cognition, "Devin's 2025 Performance Review: Learnings From 18 Months of Agents At Work" (14.11.2025) — https://cognition.com/blog/devin-annual-performance-review-2025
+- **Çapraz boyut içgörüleri** — `arastirma\derin-20261021-0134\insight.md` → https://www.faros.ai/research/ai-acceleration-whiplash — TEKRAR TARAMA
+  - [^faros-2026]: Faros AI, AI Acceleration Whiplash, Nis 2026. https://www.faros.ai/research/ai-acceleration-whiplash
+- **Çapraz boyut içgörüleri** — `arastirma\derin-20261021-0134\insight.md` → https://kiro.dev/docs/specs — TEKRAR TARAMA
+  - [^kiro-specs]: Kiro, Specs dokümanı, 15 Eki 2026. https://kiro.dev/docs/specs
+- **Çapraz boyut içgörüleri** — `arastirma\derin-20261021-0134\insight.md` → https://github.com/github/spec-kit — TEKRAR TARAMA
+  - [^spec-kit]: GitHub Spec Kit. https://github.com/github/spec-kit
+- **Çapraz boyut içgörüleri** — `arastirma\derin-20261021-0134\insight.md` → https://github.com/open-gsd/gsd-core/blob/main/commands/gsd/quick.md — TEKRAR TARAMA
+  - [^gsd-core]: open-gsd/gsd-core, quick.md. https://github.com/open-gsd/gsd-core/blob/main/commands/gsd/quick.md
+- **Çapraz boyut içgörüleri** — `arastirma\derin-20261021-0134\insight.md` → https://github.com/bmad-code-org/bmad-method — TEKRAR TARAMA
+  - [^bmad]: BMAD-METHOD. https://github.com/bmad-code-org/bmad-method
+- **Güvenilirlik sınıflandırması** — `arastirma\derin-20261021-0134\verify.md` → https://www.faros.ai/research/ai-acceleration-whiplash — TEKRAR TARAMA
+  - [^faros-2026]: Faros AI, "AI Acceleration Whiplash", Nis 2026; 22.000 geliştirici telemetrisi. https://www.faros.ai/research/ai-acceleration-whiplash
+- **Güvenilirlik sınıflandırması** — `arastirma\derin-20261021-0134\verify.md` → https://dora.dev/ai/gen-ai-report — TEKRAR TARAMA
+  - [^dora-2026]: DORA, "Impact of Generative AI in Software Development", 13 Nis 2026. https://dora.dev/ai/gen-ai-report
+- **Güvenilirlik sınıflandırması** — `arastirma\derin-20261021-0134\verify.md` → https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study — TEKRAR TARAMA
+  - [^metr-2025]: METR, RCT, 10 Tem 2025, n=16/246. https://metr.org/blog/2025-07-10-early-2025-ai-experienced-os-dev-study
+- **Güvenilirlik sınıflandırması** — `arastirma\derin-20261021-0134\verify.md` → https://metr.org/blog/2026-02-24-uplift-update — TEKRAR TARAMA
+  - [^metr-2026]: METR, "Changing our Developer Productivity Experiment", 24 Şub 2026. https://metr.org/blog/2026-02-24-uplift-update
+- **Güvenilirlik sınıflandırması** — `arastirma\derin-20261021-0134\verify.md` → https://openai.com/index/why-we-no-longer-evaluate-swe-bench-verified/ — TEKRAR TARAMA
+  - [^openai-swebench]: OpenAI, "Why we no longer evaluate SWE-bench Verified", 23 Şub 2026. https://openai.com/index/why-we-no-longer-evaluate-swe-bench-verified/
+- **Derin araştırma sentezi** — `arastirma\KOVAN-DERIN-ARASTIRMA-2026-10-22.md` → https://openai.com/index/why-we-no-longer-evaluate-swe-bench-verified/ — TEKRAR TARAMA
+  - [^openai-swebench]: OpenAI, "Why we no longer evaluate SWE-bench Verified", 23 Şub 2026. https://openai.com/index/why-we-no-longer-evaluate-swe-bench-verified/
+- **Derin araştırma sentezi** — `arastirma\KOVAN-DERIN-ARASTIRMA-2026-10-22.md` → https://www.tbench.ai/leaderboard — TEKRAR TARAMA
+  - [^tbench]: Terminal-Bench 2.0 liderlik tablosu, 2026. https://www.tbench.ai/leaderboard
+- **Derin araştırma sentezi** — `arastirma\KOVAN-DERIN-ARASTIRMA-2026-10-22.md` → https://kiro.dev/docs/specs — TEKRAR TARAMA
+  - [^kiro]: Kiro, "Specs", güncelleme 15 Eki 2026. https://kiro.dev/docs/specs
+- **Derin araştırma sentezi** — `arastirma\KOVAN-DERIN-ARASTIRMA-2026-10-22.md` → https://github.com/github/spec-kit — TEKRAR TARAMA
+  - [^speckit]: GitHub Spec Kit README. https://github.com/github/spec-kit
+- **Derin araştırma sentezi** — `arastirma\KOVAN-DERIN-ARASTIRMA-2026-10-22.md` → https://github.com/open-gsd/gsd-core/blob/main/commands/gsd/quick.md — TEKRAR TARAMA
+  - [^gsd]: open-gsd/gsd-core, `/gsd-quick`. https://github.com/open-gsd/gsd-core/blob/main/commands/gsd/quick.md

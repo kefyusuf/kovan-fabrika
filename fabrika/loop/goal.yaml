@@ -1,0 +1,106 @@
+# KOVAN — Makine Okunabilir Hedef Sözleşmesi
+#
+# Bu dosya bir "prompt" değil, bir sözleşmedir. Döngü koşucusu (loop/runner.py)
+# ve gece vardiyası bu dosyayı okur; insan da aynı dosyayı okur. İkisinin
+# anladığı şey aynı olmak zorunda — yoksa "ajan hedefi saptı" demek anlamsız
+# olur, çünkü hedef hiç yazılmamış olur.
+#
+# Kural: bu dosyada ölçülemeyen hiçbir cümle yok. "Daha iyi kod" yazmıyoruz;
+# "insan düzeltmesi olmadan birleşen PR oranı" yazıyoruz.
+
+goal:
+  id: kovan-gece-vardiyasi-v1
+  name: Gece Vardiyası
+  owner: insan/kurucu
+  horizon: 12 hafta
+  statement: >
+    Her gece 23:00-06:00 arasında, insan uyurken çalışan; sabaha kadar
+    (a) doğrulanmış bilgi üreten, (b) bu bilgiyi yeniden kullanılabilir
+    becerilere damıtan, (c) kendi yapısına dair en fazla 3 değişiklik
+    önerisi bırakan bir üretim döngüsü kurmak.
+  definition_of_done:
+    - id: D1
+      text: Sabah raporu 06:00'da hazır ve tek sayfada okunabilir.
+      measure: reports/sabah-YYYY-MM-DD.md dosyası var ve 5 bölümü dolu
+    - id: D2
+      text: Gece boyunca en az 2 beceri adayı üretilmiş, her biri kaynaklı.
+      measure: skills.proposed.jsonl içinde status=proposed, en az 2 kayıt
+    - id: D3
+      text: Üretilen hiçbir değişiklik anayasa dosyalarına dokunmamış.
+      measure: ledger.jsonl içinde policy=blocked dışında anayasa/ geçen kayıt yok
+    - id: D4
+      text: Gece maliyeti tavanı aşılmamış.
+      measure: state.json budget_left >= 0
+    - id: D5
+      text: Aynı hata sınıfı iki gecede tekrar etmişse beceri adayı açılmış.
+      measure: lessons.jsonl fingerprint tekrarı -> skills.proposed.jsonl
+
+  anti_goals:
+    - "Ürün kodunu gece yarısı otomatik merge etmek (C2 gece kapalı)."
+    - "Anayasayı kendi kendine değiştirmek (C3 sadece insan)."
+    - "Ölçümü iyileştirmek: eval setini, eşiği veya testi gevşetmek."
+    - "Sessizce yeni bir dış servise veya modele geçmek."
+    - "Sabah raporunda doğrulanmamış iddiayı doğrulanmış gibi sunmak."
+
+# ---------------------------------------------------------------------------
+constraints:
+  forbidden_paths:
+    - anayasa/
+    - politika/
+    - .secrets/
+    - .github/workflows/
+    - loop/goal.yaml
+    - loop/constitution.md
+    - loop/gates.yaml
+    - loop/agents.yaml
+  max_attempts: 2
+  allowed_hosts:
+    - arxiv.org
+    - export.arxiv.org
+    - github.com
+    - raw.githubusercontent.com
+    - docs.anthropic.com
+    - platform.openai.com
+    - modelcontextprotocol.io
+  require_human_for:
+    - constitutional_change
+    - model_change
+    - network_policy_change
+    - secret_access
+    - production_deploy
+    - license_change
+  sandbox:
+    kind: container
+    network: allowlist
+    filesystem: worktree_only
+    secrets: none
+
+# ---------------------------------------------------------------------------
+budget:
+  tokens_per_shift: 2_400_000
+  wall_clock_minutes: 420
+  max_usd_per_merged_pr: 6.00
+  max_usd_per_shift: 40.00
+  max_parallel_workers: 3
+
+stop_rules:
+  consecutive_failures: 3
+  plateau_rounds: 5
+  max_hours: 7
+  kill_switch_file: STOP
+  on_budget_exhausted: report_and_stop
+  on_policy_violation: block_and_page_human
+
+# ---------------------------------------------------------------------------
+report:
+  path: reports/sabah-{date}.md
+  deadline: "06:00"
+  must_include:
+    - "Ne öğrenildi (kaynaklı, en fazla 5 madde)"
+    - "Ne üretildi (dosya + durum)"
+    - "Ne reddedildi ve neden"
+    - "Bugünün ilk 3 işi (insan kararı bekleyenler önce)"
+    - "Dürüstlük notu: doğrulanamayanlar"
+  must_not_include:
+    - "Ölçülmemiş başarı yüzdesi"
+    - "Kaynaksız iddia"

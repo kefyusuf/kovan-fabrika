@@ -1,0 +1,17 @@
+# Python
+__pycache__/
+*.py[cod]
+*.egg-info/
+build/
+dist/
+
+# KOVAN çalışma zamanı kanıtları — repoya girmez (yerelde kalır)
+*.log
+.anahtar*
+egress*.jsonl
+fabrika/loop/runs/
+fabrika/loop/vardiya-runs/
+fabrika/loop/state/
+fabrika/loop/reports/
+fabrika/loop/ornek-repo-sbom.json
+fabrika/loop/skills/kullanim.jsonl
