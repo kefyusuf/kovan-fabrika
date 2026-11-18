@@ -445,7 +445,7 @@ kept on disk).
    installed (editable, loop/); `kovan --help` and `vardiya --help` exit 0.
    Note: the CLI files (backlog etc.) resolve relative to cwd — the entry
    point giving `plan` in an empty directory is expected behavior.
-2. CI: `test_kuyruk_uret.py` + `test_konsol.py` added to the test list
+2. CI: `test_queue_build.py` + `test_konsol.py` added to the test list
    (19 files); the "Log integrity scan" step entered (`--log-saglik`).
 3. `.gitignore`: `fabrika/loop/state/` and `fabrika/loop/reports/` added
    (runtime state does not enter the repo; the ledger/evidence stays

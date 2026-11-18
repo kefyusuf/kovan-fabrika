@@ -10,7 +10,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-import kuyruk_uret  # noqa: E402
+import queue_build  # noqa: E402
 import yaml  # noqa: E402
 
 
@@ -44,24 +44,24 @@ class KuyrukUretTest(unittest.TestCase):
         self._t.cleanup()
 
     def test_tekrar_eden_ders_onerisi(self):
-        liste = kuyruk_uret.oneriler(self.runs, self.vd)
+        liste = queue_build.oneriler(self.runs, self.vd)
         c1 = [o for o in liste if o["sinif"] == "C1" and "test" in o["baslik"].lower()]
         self.assertTrue(c1)
         self.assertEqual(c1[0]["kanit"]["seen"], 3)
 
     def test_kirilma_c3_onerisi(self):
-        liste = kuyruk_uret.oneriler(self.runs, self.tmp / "vardiya-runs")
+        liste = queue_build.oneriler(self.runs, self.tmp / "vardiya-runs")
         c3 = [o for o in liste if o["sinif"] == "C3"]
         self.assertTrue(c3)
         self.assertIn("tasarim_hatasi", c3[0]["baslik"])
 
     def test_yuksek_doluluk_onerisi(self):
-        liste = kuyruk_uret.oneriler(self.runs, self.vd)
+        liste = queue_build.oneriler(self.runs, self.vd)
         self.assertTrue(any("kapasite" in o["baslik"].lower() for o in liste))
 
     def test_yaml_yazilir_ve_onay_alani(self):
-        liste = kuyruk_uret.oneriler(self.runs, self.vd)
-        y, _ = kuyruk_uret.yaz(liste, self.tmp / "out")
+        liste = queue_build.oneriler(self.runs, self.vd)
+        y, _ = queue_build.yaz(liste, self.tmp / "out")
         veri = yaml.safe_load(y.read_text(encoding="utf-8"))
         self.assertTrue(all("gerekce" in i for i in veri["isler"]))
         self.assertTrue((self.tmp / "out" / "oneri-raporu.md").exists())
@@ -69,7 +69,7 @@ class KuyrukUretTest(unittest.TestCase):
     def test_bos_veri_onerisiz(self):
         bos = self.tmp / "bosluk"
         bos.mkdir()
-        liste = kuyruk_uret.oneriler(bos, self.tmp / "v")
+        liste = queue_build.oneriler(bos, self.tmp / "v")
         self.assertEqual(liste, [])
 
 

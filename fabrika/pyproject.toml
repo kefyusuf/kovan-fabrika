@@ -53,6 +53,6 @@ py-modules = [
     "tatbikat",
     "retro",
     "mutasyon",
-    "kuyruk_uret",
+    "queue_build",
     "konsol",
 ]

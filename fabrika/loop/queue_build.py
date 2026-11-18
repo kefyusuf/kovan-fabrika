@@ -9,7 +9,7 @@ Girdi: defterler (tekrar eden dersler, doluluk), son vardiya raporu
 Çıktı: backlog-proposals.yaml + oneri-raporu.md (her öneri kanıtlı).
 
 Kullanim:
-    python kuyruk_uret.py --runs runs --vardiya-runs vardiya-runs --out .
+    python queue_build.py --runs runs --vardiya-runs vardiya-runs --out .
 """
 
 from __future__ import annotations
