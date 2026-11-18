@@ -80,7 +80,7 @@ would, the line stops and writes a report.
 | 2f | **Reviewer** | `loop/reviewer.py` | Second model endpoint; accept/reject + rationale (approval without rationale is invalid) | **Running**, 4 tests |
 | 3 | **Gates** | `loop/gates.yaml`, `loop/seedtest.py` | 6 gates + coverage measurement with seeded faults | **Running**, 9 tests |
 | 4 | **Ledger** | `loop/ledger.jsonl` | Hash-chained decision record, tamper detection | **Running** |
-| 5 | **Memory** | `loop/beceri.py` + `skills/` + `lessons.jsonl` | Skill lifecycle (proposed→active→stale) + usage counter + decay | **First skill ACTIVE** |
+| 5 | **Memory** | `loop/skill.py` + `skills/` + `lessons.jsonl` | Skill lifecycle (proposed→active→stale) + usage counter + decay | **First skill ACTIVE** |
 | 2j | **Mutation testing** | `loop/mutation.py` | Runs AST mutations in a temp clone; eval+test kill score | **Running**, 4 tests (6/6 killed) |
 | 2k | **Operations simulation** | `loop/simulation.py` | Runs an N-day operation in one command: capacity+lines+night+retro; crisis day and determinism tested | **Running**, 5 tests |
 | 2l | **Console UTF-8** | `loop/console.py` | stdout/stderr UTF-8 + replace against the cp1252 trap | **Running**, 3 tests |

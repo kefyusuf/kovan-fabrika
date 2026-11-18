@@ -37,7 +37,7 @@ console.hazirla()
 import yaml
 
 from adapter_http import AdapterError, HttpAdapter  # noqa: E402
-import beceri  # noqa: E402
+import skill  # noqa: E402
 from verify import sinyaller  # noqa: E402
 from eval_run import kos as eval_kos  # noqa: E402
 from reviewer import Incelemeci, IncelemeciError  # noqa: E402
@@ -116,14 +116,14 @@ class _DogrulayanAdapter:
         # (anayasa m.6: proposed beceri pipeline'ı etkileyemez).
         aktif_mi = any(
             b["ad"] == "tests-kapisi-tekrar-dusmesi" and b.get("durum") == "active"
-            for b in beceri.skills_tara()
+            for b in skill.skills_tara()
         )
         if aktif_mi:
-            tarama = beceri.test_zayiflatma_tespiti(cand.diff)
+            tarama = skill.test_zayiflatma_tespiti(cand.diff)
             if tarama["ihlal"]:
                 birlesik["tests"] = False
                 birlesik["tests_not"] = f"beceri taraması: {tarama['neden']}"
-                beceri.kullanim_yaz(BURASI / "skills", "tests-kapisi-tekrar-dusmesi")
+                skill.kullanim_yaz(BURASI / "skills", "tests-kapisi-tekrar-dusmesi")
         prov = uyum_sinyali(cand.diff, self.uyum_izinli, self.repo)
         birlesik["provenance"] = bool(prov["provenance"])
         birlesik["uyum_not"] = str(prov["not"])

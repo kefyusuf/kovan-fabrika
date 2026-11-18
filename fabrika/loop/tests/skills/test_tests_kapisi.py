@@ -8,7 +8,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent.parent))
 
-from beceri import test_zayiflatma_tespiti  # noqa: E402
+from skill import test_zayiflatma_tespiti  # noqa: E402
 
 
 class TespitTest(unittest.TestCase):

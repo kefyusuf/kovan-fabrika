@@ -12,9 +12,9 @@
    - insan onay notu (m.2: üreten ≠ onaylayan — onay alanı zorunlu).
 
 Kullanim:
-    python beceri.py liste
-    python beceri.py aktiflestir --ad tests-kapisi-tekrar-dusmesi --onay "kurucu"
-    python beceri.py rapor
+    python skill.py liste
+    python skill.py aktiflestir --ad tests-kapisi-tekrar-dusmesi --onay "kurucu"
+    python skill.py rapor
 """
 
 from __future__ import annotations

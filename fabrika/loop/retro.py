@@ -26,7 +26,7 @@ import console
 
 console.hazirla()
 
-from beceri import skills_tara  # noqa: E402
+from skill import skills_tara  # noqa: E402
 
 BURASI = Path(__file__).resolve().parent
 
@@ -116,7 +116,7 @@ def mekanik_checkler(istatik: dict, dersler: dict, beceriler: list[dict]) -> lis
         checkler.append(
             {
                 "tetik": f"{len(aday)} beceri adayı insan onayı bekliyor",
-                "komut": "python beceri.py liste",
+                "komut": "python skill.py liste",
                 "neden": "C1 insan kapısı: onaylanmayan öğrenme birikir",
             }
         )

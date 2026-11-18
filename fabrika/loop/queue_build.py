@@ -26,7 +26,7 @@ import console
 
 console.hazirla()
 
-from beceri import skills_tara  # noqa: E402
+from skill import skills_tara  # noqa: E402
 
 BURASI = Path(__file__).resolve().parent
 

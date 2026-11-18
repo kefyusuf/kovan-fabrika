@@ -330,7 +330,7 @@ claim is now enforcement-proven (a continuation of §12, November 10, 2026).
 decision (ask_user) and the approval was recorded.
 
 - **The skill:** `tests-kapisi-tekrar-dusmesi` v0.2.0 — the procedure was
-  turned into real code: `beceri.test_zayiflatma_tespiti(diff)` (5 test
+  turned into real code: `skill.test_zayiflatma_tespiti(diff)` (5 test
   cases: deletion, `assert True` weakening, a legitimate swap, outside
   tests/, file deletion).
 - **Conditional execution:** the runner applies the skill only while
@@ -341,7 +341,7 @@ decision (ask_user) and the approval was recorded.
   record landed in `kullanim.jsonl` (ÖVD is now measurable).
 - **The life cycle:** proposed → active → stale (90 days) → archived;
   activation criteria: the skill's test passes + evidence ≥ 2 tasks + human
-  approval. The decay report: `beceri.py rapor`.
+  approval. The decay report: `skill.py rapor`.
 
 **The learning loop closed end-to-end for the first time:** error → lesson →
 skill candidate → human approval → active skill → enforcement in the

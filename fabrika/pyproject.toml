@@ -33,7 +33,7 @@ Changelog = "https://github.com/kefyusuf/kovan-fabrika/blob/main/CHANGELOG.md"
 kovan = "kovan:main"
 vardiya = "vardiya:main"
 tatbikat = "tatbikat:ana"
-beceri = "beceri:ana"
+skill = "skill:ana"
 
 [tool.setuptools]
 package-dir = { "" = "loop" }
@@ -47,7 +47,7 @@ py-modules = [
     "sbom",
     "eval_run",
     "reviewer",
-    "beceri",
+    "skill",
     "vardiya",
     "adapter_http",
     "tatbikat",
