@@ -12,7 +12,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-import vardiya  # noqa: E402
+import shift  # noqa: E402
 from runner import Ledger  # noqa: E402
 
 KAYNAK = Path(__file__).resolve().parent.parent / "source-queue.yaml"
@@ -21,7 +21,7 @@ KAYNAK = Path(__file__).resolve().parent.parent / "source-queue.yaml"
 def calistir(*argv: str) -> tuple[int, str]:
     buf = io.StringIO()
     with contextlib.redirect_stdout(buf):
-        kod = vardiya.main(list(argv))
+        kod = shift.main(list(argv))
     return kod, buf.getvalue()
 
 
@@ -114,13 +114,13 @@ class VardiyaTest(unittest.TestCase):
             {"tur": "dosya", "yol": "eski.md", "konu": "eski"},
             {"tur": "dosya", "yol": "yeni.md", "konu": "yeni"},
         ]
-        eski_kok = vardiya.KOK
-        vardiya.KOK = kok
+        eski_kok = shift.KOK
+        shift.KOK = kok
         try:
             harcanan = frozenset({str((kok / "eski.md").resolve())})
-            okunan, atlanan = vardiya.kaynak_tara(kaynaklar, harcanan)
+            okunan, atlanan = shift.kaynak_tara(kaynaklar, harcanan)
         finally:
-            vardiya.KOK = eski_kok
+            shift.KOK = eski_kok
 
         atlanan_yollar = {
             a.get("yol") for a in atlanan if a.get("neden") == "önceden okundu (rotasyon)"
@@ -133,19 +133,19 @@ class VardiyaTest(unittest.TestCase):
         kok = Path(tempfile.mkdtemp())
         (kok / "eski.md").write_text("bak: https://ornek.three/c\n", encoding="utf-8")
         kaynaklar = [{"tur": "dosya", "yol": "eski.md", "konu": "k"}]
-        eski_kok = vardiya.KOK
-        vardiya.KOK = kok
+        eski_kok = shift.KOK
+        shift.KOK = kok
         try:
             harcanan = frozenset({str((kok / "eski.md").resolve())})
-            okunan, atlanan = vardiya.kaynak_tara(kaynaklar, harcanan)
+            okunan, atlanan = shift.kaynak_tara(kaynaklar, harcanan)
         finally:
-            vardiya.KOK = eski_kok
+            shift.KOK = eski_kok
         self.assertGreater(len(okunan), 0)
         self.assertTrue(okunan[0]["tekrar_tarama"])
         self.assertEqual(atlanan, [])
 
     def test_kok_disi_kaynak_reddedilir(self):
-        okunan, atlanan = vardiya.kaynak_tara(
+        okunan, atlanan = shift.kaynak_tara(
             [{"tur": "dosya", "yol": "C:/Windows/win.ini", "konu": "disari"}]
         )
         self.assertEqual(okunan, [])

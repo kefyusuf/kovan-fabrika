@@ -29,7 +29,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import yaml
 
 from runner import ChangeClass, Ledger, Loop, ScriptedAdapter, Spec, Task
-from vardiya import kos_vardiyasi as vardiya_kos
+from shift import kos_vardiyasi as vardiya_kos
 
 BURASI = Path(__file__).resolve().parent
 HAVUZ = [
@@ -131,11 +131,11 @@ def _gun_kos(gun: int, saat: float, seed: int, sim_kok: Path) -> dict:
 
 
 def _gece_kos(gun: int, sim_kok: Path, seed: int) -> dict:
-    import vardiya
+    import shift
 
     buf = io.StringIO()
     with contextlib.redirect_stdout(buf):
-        vardiya.main(
+        shift.main(
             [
                 "run",
                 "--id", f"vardiya-gun{gun}",

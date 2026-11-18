@@ -19,7 +19,7 @@ python kovan.py run --run-id "gece-$id" --out runs `
     Out-File -FilePath $kovanLog -Encoding utf8
 $kovanKod = $LASTEXITCODE
 
-python vardiya.py run --id "vardiya-$id" 2>&1 |
+python shift.py run --id "vardiya-$id" 2>&1 |
     Out-File -FilePath $vardiyaLog -Encoding utf8
 $vardiyaKod = $LASTEXITCODE
 

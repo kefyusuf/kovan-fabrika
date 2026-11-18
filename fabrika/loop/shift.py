@@ -10,7 +10,7 @@ olcum planli ADR taslagi yazar. Model baglandiginda ayni adimlar adapter'a
 gecer; dosya sozlesmesi degismez.
 
 Kullanim:
-    python vardiya.py run --id ornek-vardiya
+    python shift.py run --id ornek-vardiya
 """
 
 from __future__ import annotations

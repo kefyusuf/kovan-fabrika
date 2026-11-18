@@ -166,14 +166,14 @@ cd fabrika\loop
 python tests\test_runner.py     # 23 tests
 python kovan.py plan            # acceptance list under capacity
 python kovan.py run             # end-to-end run + report
-python vardiya.py run           # night line: distillation + breakage + ADR draft
+python shift.py run            # night line: distillation + breakage + ADR draft
 python kovan.py durum           # cross-run metrics
 python drill.py                # S1 runbook drill (steps PASS/FAIL)
 powershell -File task-register.ps1   # install the night task (23:00, local) — remove: task-remove.ps1
 ```
 
 **Install (public):** `pip install -e fabrika` (add `--no-build-isolation`
-on embedded Python) → the `kovan / vardiya / tatbikat / beceri` commands
+on embedded Python) → the `kovan / shift / drill / skill` commands
 become global. User settings: [`loop/user.yaml`](loop/user.yaml).
 
 `demo.py` produces: `ornek-cikti/sabah-raporu-ornek.md` (morning report),

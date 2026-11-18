@@ -18,7 +18,7 @@ When a real model is connected:
 ```powershell
 $env:KOVAN_ADAPTER="http"      # coming in v0.2
 $env:KOVAN_MODEL="<model>"
-python -m kovan.vardiya --goal goal.yaml --until 06:00
+python -m shift --goal goal.yaml --until 06:00
 ```
 
 There is no `--until` today, because there is no real adapter. This file
@@ -92,7 +92,7 @@ never left blank.
 | **Scheduled task** | every night 23:00, repeating | Runs in a separate conversation; the output goes to a file |
 | **Windows Task Scheduler** | `schtasks /create /tn KOVAN /tr "python -m kovan.vardiya" /sc daily /st 23:00` | with the v0.2 CLI |
 | **GitHub Actions** | `schedule: cron "0 20 * * *"` (UTC) | No secret on the runner; allowlist |
-| **Manually** | `python -m kovan.vardiya --plan-only` | See the plan, then start |
+| **Manually** | `python -m shift --plan-only` | See the plan, then start |
 
 **The common rule:** every carrier reads the same `goal.yaml`. When the
 carrier changes, the goal does not; that is why the question "why did it

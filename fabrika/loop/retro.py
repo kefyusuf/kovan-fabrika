@@ -124,7 +124,7 @@ def mekanik_checkler(istatik: dict, dersler: dict, beceriler: list[dict]) -> lis
         checkler.append(
             {
                 "tetik": "vardiya raporu yok",
-                "komut": "python vardiya.py run",
+                "komut": "python shift.py run",
                 "neden": "gece hattı bu hafta koşmamış",
             }
         )

@@ -193,7 +193,7 @@ The real model connection (adapter_http.py) and the real verification layer
    auto-rejected. When `--inceleme-url` is given, the review gate escalates
    to programmatic blocking and the decisions land in the report; without
    it, it stays advisory.
-4. **The night line runs (dry mode).** `vardiya.py`: sourced notes from
+4. **The night line runs (dry mode).** `shift.py`: sourced notes from
    local sources (15 claims), skill candidates from recurring lessons
    (seen ≥ 2), a seedtest-based break report (the type the live profile
    missed: a design error), a measurement-planned ADR draft from ledger

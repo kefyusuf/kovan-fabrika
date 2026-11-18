@@ -85,13 +85,13 @@ would, the line stops and writes a report.
 | 2k | **Operations simulation** | `loop/simulation.py` | Runs an N-day operation in one command: capacity+lines+night+retro; crisis day and determinism tested | **Running**, 5 tests |
 | 2l | **Console UTF-8** | `loop/console.py` | stdout/stderr UTF-8 + replace against the cp1252 trap | **Running**, 3 tests |
 | 6 | **Reports** | `reports/sabah-*.md`, `reports/kapasite-*.md` | Morning report + capacity report | Partial (`demo.py`) |
-| 7 | **Night line** | `loop/vardiya.py` + `loop/source-queue.yaml` | Scan (**source rotation: read ones are skipped**) → distillation (idempotent) → red team → ADR draft → morning report; C2 closed | **Running**, 11 tests |
+| 7 | **Night line** | `loop/shift.py` + `loop/source-queue.yaml` | Scan (**source rotation: read ones are skipped**) → distillation (idempotent) → red team → ADR draft → morning report; C2 closed | **Running**, 11 tests |
 | 8 | **Scheduler** | `loop/night-run.ps1` + `task-register.ps1` / `task-remove.ps1` | Nightly 23:00 local python (dry mode, zero tokens) | **Installed** (KOVAN-Night; first real night Nov 4) |
 | 10 | **S1 drill** | `loop/drill.py` | Executes and audits the runbook's **5 steps** (run, ledger, STOP, **chaos/resume**, rollback) — **Friday task installed as KOVAN-Week** | **Running**, 3 tests |
 | 13 | **Weekly retro** | `loop/retro.py` | GPK proxy + gate trend + mechanical checks (runnable commands); **log integrity scan** (`--log-saglik`, UTF-8/UTF-16 BOM aware) | **Running**, 11 tests |
 | 9 | **Status board** | `kovan.py durum` | Cross-run metrics for all runs; data source for the weekly retro | **Running**, 3 tests |
 | 11 | **Configuration** | `loop/user.yaml` | User defaults (hours, repo, model…); CLI overrides | **Running**, 3 tests |
-| 12 | **Packaging** | `fabrika/pyproject.toml` | `pip install -e fabrika` → `kovan/vardiya/tatbikat/beceri` commands | **Proven** (entry points from repo root) |
+| 12 | **Packaging** | `fabrika/pyproject.toml` | `pip install -e fabrika` → `kovan/shift/drill/skill` commands | **Proven** (entry points from repo root) |
 | 13 | **Eval set template** | `loop/eval_set/TEMPLATE.md` | Rules for public users to build their own frozen set | Published |
 | 15 | **Queue producer** | `loop/queue_build.py` | Evidence-based task proposals: repeated lesson, breakage scenario, saturation → backlog-proposals (awaits human approval) | **Running**, 5 tests |
 
@@ -251,7 +251,7 @@ python kovan.py plan          # acceptance list under capacity
 python kovan.py run --run-id ornek-01   # end-to-end run + report
 python kovan.py verify --run runs\ornek-01
 
-python vardiya.py run        # night line: source → distill → breakage → ADR → morning report
+python shift.py run          # night line: source → distill → breakage → ADR → morning report
 python sbom.py --repo ornek-repo    # SPDX 2.3 SBOM (stdlib/local/third-party split)
 python mutation.py --maks 6      # gate kill score (6/6 killed)
 python retro.py                  # weekly retro: GPK proxy + mechanical checks
@@ -278,7 +278,7 @@ python tests\test_kovan_cli.py # 13 tests
 167 tests; none of them mandatorily calls a model. The system's skeleton is
 verified independently of the model.
 
-**Night line note:** `vardiya.py` produces three artifacts: a sourced note
+**Night line note:** `shift.py` produces three artifacts: a sourced note
 (from local sources; URLs open in live mode), a skill candidate from a
 repeated lesson (seen ≥ 2), and a gate-coverage breakage report (types the
 live profile misses). C2 is closed at night; the output is artifacts only.
