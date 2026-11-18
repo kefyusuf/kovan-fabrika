@@ -52,7 +52,7 @@ def kos(repo: str | Path, set_dosyasi: str | Path, diff: str | None = None) -> d
 
     try:
         son = subprocess.run(
-            [sys.executable, str(BURASI / "eval_set" / "kosucu.py"), str(set_p.resolve())],
+            [sys.executable, str(BURASI / "eval_set" / "runner.py"), str(set_p.resolve())],
             cwd=str(repo_p),
             capture_output=True,
             text=True,

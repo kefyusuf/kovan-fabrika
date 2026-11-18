@@ -1,7 +1,7 @@
 """Eval v1 kosucusu: dondurulmus vaka setini calistirir (repo icinde).
 
 Kullanim (eval_run.py cagirir):
-    python kosucu.py <set.jsonl>
+    python runner.py <set.jsonl>
 
 Cikti: son satirda KOSONUC={"gecen":n,"toplam":m,"hatalar":[...]}
 Beklenen deger "ValueError" ise fonksiyonun o hatayi firlatmasi beklenir.
