@@ -26,7 +26,7 @@ jobs:
         run: |
           set -e
           for t in tests/test_runner.py tests/test_kapasite.py tests/test_seedtest.py \
-                   tests/test_kovan_cli.py tests/test_adapter_http.py tests/test_dogrula.py \
+                   tests/test_kovan_cli.py tests/test_adapter_http.py tests/test_verify.py \
                    tests/test_eval_kos.py tests/test_incelemeci.py tests/test_vardiya.py \
                    tests/test_durum.py tests/test_uyum.py tests/test_sbom.py \
                    tests/test_beceri.py tests/skills/test_tests_kapisi.py \

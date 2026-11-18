@@ -159,7 +159,7 @@ And both establish the only measurable ground of the "factory" claim.
 ## 7. The live-profile deviation (S2 · November 4, 2026)
 
 The real model connection (adapter_http.py) and the real verification layer
-(dogrula.py) went live. Two records:
+(verify.py) went live. Two records:
 
 1. **The runner boolean-signal bug was fixed.** On a gate carrying a
    `signal` field, a boolean `False` was counted as the numeric `0.0` and
@@ -232,7 +232,7 @@ clean; the previous two ledgers unchanged.
 2. **Copy suspicion (uyum.py):** a Copyright/SPDX header in the added lines
    → provenance False, rationale "human decision". seedtest's `kopya_kod`
    error type is now tied to a measurable signal.
-3. **`dogrula.py --geri-al`:** turns the repo back to HEAD and reports
+3. **`verify.py --geri-al`:** turns the repo back to HEAD and reports
    cleanliness.
 4. **`kovan.py --kanarya N`:** only the first N of the accepted tasks run;
    the rest are counted as having spent capacity (honest accounting) and the
@@ -269,7 +269,7 @@ the file count does not grow, and the report writes "Zaten adaydı".
 
 ## 13. The release package (November 10, 2026)
 
-1. **Security: dirty-tree protection.** `dogrula.uygula` now REFUSES to
+1. **Security: dirty-tree protection.** `verify.uygula` now REFUSES to
    apply if `git status --porcelain` is dirty — in live mode it cannot wipe
    the user's uncommitted work with `reset --hard` (fail-closed, tested).
 2. **Installation:** `fabrika/pyproject.toml` + entry points
@@ -543,7 +543,7 @@ the tests and the night queue depended on non-published workspace files
    temporary markdown (with a URL line); the dependency on document
    content — beyond `kaynak_tara`'s "produces records only from URL-carrying
    lines" fact — was removed (the root monkeypatched, finally-restored).
-3. `test_dogrula`/`test_eval_kos` expect a real git repo: a "Sample repo
+3. `test_verify`/`test_eval_kos` expect a real git repo: a "Sample repo
    preparation" step in CI (init+commit), a fresh-clone note in
    CONTRIBUTING.
 

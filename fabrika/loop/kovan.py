@@ -38,7 +38,7 @@ import yaml
 
 from adapter_http import AdapterError, HttpAdapter  # noqa: E402
 import beceri  # noqa: E402
-from dogrula import sinyaller  # noqa: E402
+from verify import sinyaller  # noqa: E402
 from eval_kos import kos as eval_kos  # noqa: E402
 from incelemeci import Incelemeci, IncelemeciError  # noqa: E402
 from uyum import sinyal as uyum_sinyali  # noqa: E402

@@ -3,7 +3,7 @@
 Amac: hat koşucusunun `Adapter` arayuzunu gercek bir modele baglamak.
 Sozlesme:
 - adapter SADECE diff (oneren degisiklik) uretir; "testler gecti" gibi
-  sinyalleri MODEL SOYLEMEZ. Sinyaller dogrulama katmanindan (dogrula.py)
+  sinyalleri MODEL SOYLEMEZ. Sinyaller dogrulama katmanindan (verify.py)
   gelir. Bu, "ajanin kendi testi kendi kodunu dogrulamaz" kuralinin
   kod karsiligidir.
 - Ag/JSON hatasinda iki deneme yapar, sonra AdapterError firlatir.

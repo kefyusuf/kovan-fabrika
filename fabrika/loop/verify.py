@@ -10,7 +10,7 @@ Sözleşme:
 - sinyal sözlüğünde "tests" yoksa kapı geçmez (runner zaten böyle).
 
 Kullanim:
-    python dogrula.py --repo ornek-repo --diff-dosya yama.diff \
+    python verify.py --repo ornek-repo --diff-dosya yama.diff \
         --komut "python -m unittest discover -s tests -t ."
 """
 

@@ -72,7 +72,7 @@ would, the line stops and writes a report.
 | 1 | **Capacity valve + queue** | `loop/kapasite.py` + `kovan.py --tamamlanan` | LOC→hours, M/M/1, Little's law, task acceptance; **completed tasks accumulate, the queue progresses** (blocked ones are never recorded) | **Running**, 18+3 tests |
 | 2 | **Line runner** | `loop/runner.py` | Task loop, gate order, budget, circuit breaker | **Running**, 23 tests |
 | 2b | **Model adapter** | `loop/adapter_http.py` | OpenAI-compatible call; produces NO signals, only diffs; **egress log** (JSONL) | **Running**, 5 tests |
-| 2c | **Verification** | `loop/dogrula.py` | Applies the diff to a real git repo, runs real tests, produces the `tests` signal; `--geri-al` resets the repo | **Running**, 8 tests |
+| 2c | **Verification** | `loop/verify.py` | Applies the diff to a real git repo, runs real tests, produces the `tests` signal; `--geri-al` resets the repo | **Running**, 8 tests |
 | 2c2 | **Compliance** | `loop/uyum.py` + `compliance-allowlist.yaml` | import inference, allowlist, dependency-file detection, copy suspicion, duplicate functions, **duplicate block (structural signature, 6-variant robustness-tested)** → `provenance` signal | **Running**, 18 tests |
 | 2h | **SBOM seed** | `loop/sbom.py` | Scans the repo with `ast`; SPDX 2.3 JSON; **root package + supplier field (NTIA)**; versions from lock files (module→distribution via `packages_distributions`) | **Running**, 8 tests |
 | 2d | **Live profile** | `loop/gates-live.yaml` | S2/S3: eval **blocking** (90 cases), review conditionally blocking | Active |
@@ -286,7 +286,7 @@ When a model is connected, the same line switches to the adapter — the file
 contract does not change.
 
 **Live mode note:** with `--adapter http` the diff comes from a real model;
-the `tests` signal is produced **from a real test run** via `dogrula.py` —
+the `tests` signal is produced **from a real test run** via `verify.py` —
 the model never declares a signal. An unreachable server/key is fail-closed:
 the task blocks, a lesson is written, and after 3 consecutive failures the
 circuit breaker stops. review/eval gates are temporarily warning-only in the

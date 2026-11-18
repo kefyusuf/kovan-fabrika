@@ -24,7 +24,7 @@ import konsol
 
 konsol.hazirla()
 
-from dogrula import geri_al, repo_gecerli_mi, uygula  # noqa: E402
+from verify import geri_al, repo_gecerli_mi, uygula  # noqa: E402
 
 KOMUT_TIMEOUT = 180
 KOSONUC_ONEK = "KOSONUC="

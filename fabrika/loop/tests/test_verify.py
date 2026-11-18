@@ -10,7 +10,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from dogrula import repo_gecerli_mi, sinyaller, uygula  # noqa: E402
+from verify import repo_gecerli_mi, sinyaller, uygula  # noqa: E402
 
 REPO = Path(__file__).resolve().parent.parent / "ornek-repo"
 KOMUT = "python -m unittest discover -s tests -t ."
@@ -76,7 +76,7 @@ class DogrulaTest(unittest.TestCase):
 
     def test_geri_al_cli(self):
         kod = subprocess.run(
-            [sys.executable, "dogrula.py", "--repo", str(REPO), "--geri-al"],
+            [sys.executable, "verify.py", "--repo", str(REPO), "--geri-al"],
             capture_output=True, text=True, cwd=str(REPO.parent),
         )
         self.assertEqual(kod.returncode, 0)

@@ -35,7 +35,7 @@ import konsol
 
 konsol.hazirla()
 
-from dogrula import geri_al, repo_gecerli_mi, uygula  # noqa: E402
+from verify import geri_al, repo_gecerli_mi, uygula  # noqa: E402
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 

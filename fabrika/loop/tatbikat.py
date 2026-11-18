@@ -138,7 +138,7 @@ def tatbikat(repo: Path | None = None) -> dict:
 
         # A4 — geri alma: geçici KLON kirletilir, gerçek depoya dokunulmaz
         try:
-            import dogrula
+            import verify
 
             klon = tmp / "a4-klon"
             klonlama = subprocess.run(
@@ -155,7 +155,7 @@ def tatbikat(repo: Path | None = None) -> dict:
                 )
                 buf = io.StringIO()
                 with contextlib.redirect_stdout(buf):
-                    kod = dogrula.ana(["--repo", str(klon), "--geri-al"])
+                    kod = verify.ana(["--repo", str(klon), "--geri-al"])
                 temiz = _porcelain(klon) == ""
                 kirlik_gitti = "# tatbikat kirliği" not in sicaklik.read_text(encoding="utf-8")
                 adimlar.append(

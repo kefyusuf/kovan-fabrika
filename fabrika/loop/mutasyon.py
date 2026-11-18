@@ -32,7 +32,7 @@ import konsol
 
 konsol.hazirla()
 
-from dogrula import test_calistir  # noqa: E402
+from verify import test_calistir  # noqa: E402
 from eval_kos import kos as eval_kos  # noqa: E402
 
 BURASI = Path(__file__).resolve().parent
