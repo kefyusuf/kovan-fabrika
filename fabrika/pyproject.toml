@@ -40,7 +40,7 @@ package-dir = { "" = "loop" }
 py-modules = [
     "kovan",
     "runner",
-    "kapasite",
+    "capacity",
     "seedtest",
     "verify",
     "compliance",

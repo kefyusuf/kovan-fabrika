@@ -25,7 +25,7 @@ jobs:
         working-directory: fabrika/loop
         run: |
           set -e
-          for t in tests/test_runner.py tests/test_kapasite.py tests/test_seedtest.py \
+          for t in tests/test_runner.py tests/test_capacity.py tests/test_seedtest.py \
                    tests/test_kovan_cli.py tests/test_adapter_http.py tests/test_verify.py \
                    tests/test_eval_run.py tests/test_incelemeci.py tests/test_vardiya.py \
                    tests/test_durum.py tests/test_compliance.py tests/test_sbom.py \

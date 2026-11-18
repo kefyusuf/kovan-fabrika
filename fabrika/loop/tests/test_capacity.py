@@ -9,7 +9,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from kapasite import (  # noqa: E402
+from capacity import (  # noqa: E402
     Gorev,
     cakisan_cift,
     inceleme_saati,

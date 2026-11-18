@@ -19,8 +19,8 @@ Not: M/M/1'de kuyruk *uzunluğu* (rho/(1-rho)) ile kuyruk *süresi*
 (rho/(mu-lam)) karıştırılmamalı. Bu modül süreyi saat olarak verir.
 
 Kullanim:
-    python kapasite.py --inceleyici 2 --saat 3
-    python kapasite.py --lam 9 --mu 10
+    python capacity.py --inceleyici 2 --saat 3
+    python capacity.py --lam 9 --mu 10
 """
 
 from __future__ import annotations

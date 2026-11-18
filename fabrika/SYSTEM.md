@@ -69,7 +69,7 @@ would, the line stops and writes a report.
 | # | Component | File | Responsibility | Status |
 |---|---|---|---|---|
 | 0 | **CLI** | `loop/kovan.py` | plan / run / verify / status; end-to-end run | **Running**, 13 tests |
-| 1 | **Capacity valve + queue** | `loop/kapasite.py` + `kovan.py --tamamlanan` | LOC→hours, M/M/1, Little's law, task acceptance; **completed tasks accumulate, the queue progresses** (blocked ones are never recorded) | **Running**, 18+3 tests |
+| 1 | **Capacity valve + queue** | `loop/capacity.py` + `kovan.py --tamamlanan` | LOC→hours, M/M/1, Little's law, task acceptance; **completed tasks accumulate, the queue progresses** (blocked ones are never recorded) | **Running**, 18+3 tests |
 | 2 | **Line runner** | `loop/runner.py` | Task loop, gate order, budget, circuit breaker | **Running**, 23 tests |
 | 2b | **Model adapter** | `loop/adapter_http.py` | OpenAI-compatible call; produces NO signals, only diffs; **egress log** (JSONL) | **Running**, 5 tests |
 | 2c | **Verification** | `loop/verify.py` | Applies the diff to a real git repo, runs real tests, produces the `tests` signal; `--geri-al` resets the repo | **Running**, 8 tests |
@@ -203,7 +203,7 @@ work (≈1–2 small artifacts). The rest piles into the next day's queue.
 
 | Sprint | Week | Work | Exit criteria |
 |---|---|---|---|
-| **S1 Capacity** | 1–2 | `kapasite.py` + queue + capacity report; real backlog | Daily acceptance list produced; 18 tests |
+| **S1 Capacity** | 1–2 | `capacity.py` + queue + capacity report; real backlog | Daily acceptance list produced; 18 tests |
 | **S2 Line** | 3–4 | Real adapter (single model), single repo, 20 tasks; eval v1 (≥50 cases) | **Tool ready:** adapter + verification + live profile; waiting for a real key and 20 tasks |
 | **S3 Night** | 5–6 | Night line: agenda, source allowlist, distillation, morning report — **1 real night run done (23:00, LastTaskResult 0)** | 5 consecutive nights with reports; ≥3 sourced notes/night |
 | **S4 Hardening** | 7–8 | `seedtest` integration, canary, rollback, SBOM | **SBOM + duplicate detection + canary + rollback CLI ready**; waiting for 2 uninterrupted weeks of runs |
@@ -267,9 +267,9 @@ python kovan.py run --adapter http --base-url https://api.openai.com/v1 \
     --model gpt-4o-mini --anahtar-dosya .anahtar --repo ..\ornek-repo \
     --test-komut "python -m unittest discover -s tests -t ."
 
-python kapasite.py            # 3.0 hours -> ~2.9 PRs/day (400 LOC)
+python capacity.py            # 3.0 hours -> ~2.9 PRs/day (400 LOC)
 python seedtest.py            # full set 100%, without tests 83.3%
-python tests\test_kapasite.py # 18 tests
+python tests\test_capacity.py # 18 tests
 python tests\test_seedtest.py # 9 tests
 python tests\test_runner.py   # 23 tests
 python tests\test_kovan_cli.py # 13 tests
@@ -303,7 +303,7 @@ uninterrupted code review can you do per day?**
 - 3 hours → ~3–5 PRs/day; night line ~1.5 h.
 - 6 hours → ~6–10 PRs/day; night line ~3 h (unsustainable risk).
 
-Once this number is in, `kapasite.py` produces every acceptance decision; the
+Once this number is in, `capacity.py` produces every acceptance decision; the
 rest of the system tunes itself around it.
 
 ---
