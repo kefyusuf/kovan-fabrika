@@ -11,7 +11,7 @@ SİMÜLE olan parça (dürüstlük notunda da yazar):
 - token/maliyet: gerçek fatura değil, muhasebe alıştırması
 
 Kullanim:
-    python simulasyon.py --gun 5 --saat 3.0 --seed 7
+    python simulation.py --gun 5 --saat 3.0 --seed 7
 """
 
 from __future__ import annotations

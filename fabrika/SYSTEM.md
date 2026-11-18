@@ -82,7 +82,7 @@ would, the line stops and writes a report.
 | 4 | **Ledger** | `loop/ledger.jsonl` | Hash-chained decision record, tamper detection | **Running** |
 | 5 | **Memory** | `loop/beceri.py` + `skills/` + `lessons.jsonl` | Skill lifecycle (proposed→active→stale) + usage counter + decay | **First skill ACTIVE** |
 | 2j | **Mutation testing** | `loop/mutation.py` | Runs AST mutations in a temp clone; eval+test kill score | **Running**, 4 tests (6/6 killed) |
-| 2k | **Operations simulation** | `loop/simulasyon.py` | Runs an N-day operation in one command: capacity+lines+night+retro; crisis day and determinism tested | **Running**, 5 tests |
+| 2k | **Operations simulation** | `loop/simulation.py` | Runs an N-day operation in one command: capacity+lines+night+retro; crisis day and determinism tested | **Running**, 5 tests |
 | 2l | **Console UTF-8** | `loop/console.py` | stdout/stderr UTF-8 + replace against the cp1252 trap | **Running**, 3 tests |
 | 6 | **Reports** | `reports/sabah-*.md`, `reports/kapasite-*.md` | Morning report + capacity report | Partial (`demo.py`) |
 | 7 | **Night line** | `loop/vardiya.py` + `loop/source-queue.yaml` | Scan (**source rotation: read ones are skipped**) → distillation (idempotent) → red team → ADR draft → morning report; C2 closed | **Running**, 11 tests |

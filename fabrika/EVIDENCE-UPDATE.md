@@ -557,7 +557,7 @@ invented URLs would violate the evidence-first norm.
 
 **Closure (same day):** a third run with two more fixes — `sys.path.insert`
 in `test_console.py` (locally the pip install masked it; on CI
-ModuleNotFoundError) and the missing `test_simulasyon.py` added to the CI
+ModuleNotFoundError) and the missing `test_simulation.py` added to the CI
 list. The CI result: **success** (run 44081160418) — 20 test files (167
 tests) + the retro smoke + log integrity + the S1 drill, green on a fresh
 Linux clone. The SYSTEM.md totals row was updated to 167.

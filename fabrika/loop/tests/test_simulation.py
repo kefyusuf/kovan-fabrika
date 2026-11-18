@@ -12,9 +12,9 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-import simulasyon  # noqa: E402
+import simulation  # noqa: E402
 
-REPO = simulasyon.BURASI / "ornek-repo"
+REPO = simulation.BURASI / "ornek-repo"
 
 
 class SimulasyonTest(unittest.TestCase):
@@ -22,7 +22,7 @@ class SimulasyonTest(unittest.TestCase):
         sim = Path(tmp) / f"sim-{gun}-{seed}"
         buf = io.StringIO()
         with contextlib.redirect_stdout(buf):
-            kod = simulasyon.ana(
+            kod = simulation.ana(
                 ["--gun", str(gun), "--seed", str(seed), "--saat", str(saat), "--out", str(sim)]
             )
         self.assertEqual(kod, 0)
