@@ -81,7 +81,7 @@ would, the line stops and writes a report.
 | 3 | **Gates** | `loop/gates.yaml`, `loop/seedtest.py` | 6 gates + coverage measurement with seeded faults | **Running**, 9 tests |
 | 4 | **Ledger** | `loop/ledger.jsonl` | Hash-chained decision record, tamper detection | **Running** |
 | 5 | **Memory** | `loop/beceri.py` + `skills/` + `lessons.jsonl` | Skill lifecycle (proposed→active→stale) + usage counter + decay | **First skill ACTIVE** |
-| 2j | **Mutation testing** | `loop/mutasyon.py` | Runs AST mutations in a temp clone; eval+test kill score | **Running**, 4 tests (6/6 killed) |
+| 2j | **Mutation testing** | `loop/mutation.py` | Runs AST mutations in a temp clone; eval+test kill score | **Running**, 4 tests (6/6 killed) |
 | 2k | **Operations simulation** | `loop/simulasyon.py` | Runs an N-day operation in one command: capacity+lines+night+retro; crisis day and determinism tested | **Running**, 5 tests |
 | 2l | **Console UTF-8** | `loop/console.py` | stdout/stderr UTF-8 + replace against the cp1252 trap | **Running**, 3 tests |
 | 6 | **Reports** | `reports/sabah-*.md`, `reports/kapasite-*.md` | Morning report + capacity report | Partial (`demo.py`) |
@@ -253,7 +253,7 @@ python kovan.py verify --run runs\ornek-01
 
 python vardiya.py run        # night line: source → distill → breakage → ADR → morning report
 python sbom.py --repo ornek-repo    # SPDX 2.3 SBOM (stdlib/local/third-party split)
-python mutasyon.py --maks 6      # gate kill score (6/6 killed)
+python mutation.py --maks 6      # gate kill score (6/6 killed)
 python retro.py                  # weekly retro: GPK proxy + mechanical checks
 python tatbikat.py               # S1 runbook drill (5 steps PASS/FAIL)
 python kovan.py durum        # cross-run metrics for all runs

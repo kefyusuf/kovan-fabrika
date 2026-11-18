@@ -41,7 +41,7 @@ production and writing the eval set backwards so it passes. The latter is
 circularity.
 
 The set itself must also produce evidence: **after writing the set, inject
-a broken diff** (`mutasyon.py` or by hand) and watch the score drop — if it
+a broken diff** (`mutation.py` or by hand) and watch the score drop — if it
 does not drop, the set is dead.
 
 ---
@@ -88,4 +88,4 @@ the **eval gate blocking**: a score < 0.90 → the patch is rejected.
 4. **Editing the set without opening a version file** — comparison with old
    scores becomes a lie.
 5. **Making the score the single success metric** — read it together with
-   the mutation score (`mutasyon.py`) and a real test run.
+   the mutation score (`mutation.py`) and a real test run.

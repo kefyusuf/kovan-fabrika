@@ -52,7 +52,7 @@ py-modules = [
     "adapter_http",
     "tatbikat",
     "retro",
-    "mutasyon",
+    "mutation",
     "queue_build",
     "console",
 ]

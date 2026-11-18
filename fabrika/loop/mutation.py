@@ -10,7 +10,7 @@ Mutant "öldü" = en az bir kapı yakaladı. Mutasyon skoru = ölen / toplam.
 Ölen yoksa ("survived"), bu bir kapsam boşluğudur — rapor açıkça yazar.
 
 Kullanim:
-    python mutasyon.py --repo ornek-repo --set eval_set/sicaklik-v1.jsonl \
+    python mutation.py --repo ornek-repo --set eval_set/sicaklik-v1.jsonl \
         --test-komut "python -m unittest discover -s tests -t ." --maks 12
 """
 

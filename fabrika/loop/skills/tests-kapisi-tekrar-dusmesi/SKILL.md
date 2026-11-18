@@ -23,6 +23,6 @@ silinmesi veya assertion zayıflatması. Kapı yeşil, davranış bozuk.
 takas, tests/ dışı, dosya silme).
 
 ## Sınırlar
-- Kapsam artışını ölçmez (satır sayısı yanıltıcıdır); **mutation testi devrede: mutasyon.py** (yapı imzalı mutantlar, eval+test öldürme skoru ölçülür).
+- Kapsam artışını ölçmez (satır sayısı yanıltıcıdır); **mutation testi devrede: mutation.py** (yapı imzalı mutantlar, eval+test öldürme skoru ölçülür).
 
 <!-- aktiflesme: 2026-11-04 · onay: kurucu (ask_user onayi, 2026-11-05) -->
