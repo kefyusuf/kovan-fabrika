@@ -210,7 +210,7 @@ The real model connection (adapter_http.py) and the real verification layer
    `night-run.ps1`; the line stays the same. The task was verified by running
    it once by hand (gece-20261104-2026 / vardiya-20261104-2026; both ledgers
    sound).
-7. **The provenance signal was tied to a real measurement.** `uyum.py`:
+7. **The provenance signal was tied to a real measurement.** `compliance.py`:
    extracts the new import roots from the diff; stdlib is free, third-party
    is free only if it is on the `compliance-allowlist.yaml` list, and a
    dependency-file change is REJECT (C3). This way all four blocking gates
@@ -229,7 +229,7 @@ clean; the previous two ledgers unchanged.
    `ast` (no exec); stdlib and local modules do not enter the SBOM,
    third parties become SPDX 2.3 Packages (version if installed, otherwise
    NOASSERTION). ornek-repo: packages = 0 (only stdlib + local).
-2. **Copy suspicion (uyum.py):** a Copyright/SPDX header in the added lines
+2. **Copy suspicion (compliance.py):** a Copyright/SPDX header in the added lines
    → provenance False, rationale "human decision". seedtest's `kopya_kod`
    error type is now tied to a measurable signal.
 3. **`verify.py --geri-al`:** turns the repo back to HEAD and reports

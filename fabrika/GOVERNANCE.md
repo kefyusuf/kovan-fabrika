@@ -1,7 +1,7 @@
 # KOVAN — Governance, Security, and Cost
 
 > **v2 note (November 4, 2026):** The current system definition is
-> [`SYSTEM.md`](SYSTEM.md). The compliance layer `uyum.py` is live (import
+> [`SYSTEM.md`](SYSTEM.md). The compliance layer `compliance.py` is live (import
 > allowlist + dependency-file detection + copy suspicion + duplicate
 > function = the provenance signal); the SBOM seed (`sbom.py`, SPDX 2.3,
 > lock versions) and the **egress log** (`adapter_http --egress-log`) are

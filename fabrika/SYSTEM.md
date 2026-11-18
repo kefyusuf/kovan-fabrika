@@ -73,7 +73,7 @@ would, the line stops and writes a report.
 | 2 | **Line runner** | `loop/runner.py` | Task loop, gate order, budget, circuit breaker | **Running**, 23 tests |
 | 2b | **Model adapter** | `loop/adapter_http.py` | OpenAI-compatible call; produces NO signals, only diffs; **egress log** (JSONL) | **Running**, 5 tests |
 | 2c | **Verification** | `loop/verify.py` | Applies the diff to a real git repo, runs real tests, produces the `tests` signal; `--geri-al` resets the repo | **Running**, 8 tests |
-| 2c2 | **Compliance** | `loop/uyum.py` + `compliance-allowlist.yaml` | import inference, allowlist, dependency-file detection, copy suspicion, duplicate functions, **duplicate block (structural signature, 6-variant robustness-tested)** → `provenance` signal | **Running**, 18 tests |
+| 2c2 | **Compliance** | `loop/compliance.py` + `compliance-allowlist.yaml` | import inference, allowlist, dependency-file detection, copy suspicion, duplicate functions, **duplicate block (structural signature, 6-variant robustness-tested)** → `provenance` signal | **Running**, 18 tests |
 | 2h | **SBOM seed** | `loop/sbom.py` | Scans the repo with `ast`; SPDX 2.3 JSON; **root package + supplier field (NTIA)**; versions from lock files (module→distribution via `packages_distributions`) | **Running**, 8 tests |
 | 2d | **Live profile** | `loop/gates-live.yaml` | S2/S3: eval **blocking** (90 cases), review conditionally blocking | Active |
 | 2e | **Eval runner** | `loop/eval_kos.py` + `eval_set/sicaklik-v1.jsonl` | Runs the frozen 90-case set on the diffed repo, produces a score | **Running**, 4 tests |

@@ -43,7 +43,7 @@ py-modules = [
     "kapasite",
     "seedtest",
     "verify",
-    "uyum",
+    "compliance",
     "sbom",
     "eval_kos",
     "incelemeci",

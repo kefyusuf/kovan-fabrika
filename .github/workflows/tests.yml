@@ -28,7 +28,7 @@ jobs:
           for t in tests/test_runner.py tests/test_kapasite.py tests/test_seedtest.py \
                    tests/test_kovan_cli.py tests/test_adapter_http.py tests/test_verify.py \
                    tests/test_eval_kos.py tests/test_incelemeci.py tests/test_vardiya.py \
-                   tests/test_durum.py tests/test_uyum.py tests/test_sbom.py \
+                   tests/test_durum.py tests/test_compliance.py tests/test_sbom.py \
                    tests/test_beceri.py tests/skills/test_tests_kapisi.py \
                    tests/test_tatbikat.py tests/test_retro.py tests/test_mutasyon.py \
                    tests/test_kuyruk_uret.py tests/test_konsol.py \

@@ -12,7 +12,7 @@ Bu, "kaynağı gösterilemeyen kod birleşmez" kuralının bugünkü ölçülebi
 hâlidir. Kopya kod tespiti ve tam SBOM (SPDX) S4'te eklenir.
 
 Kullanim:
-    python uyum.py --diff-dosya yama.diff [--izinli compliance-allowlist.yaml]
+    python compliance.py --diff-dosya yama.diff [--izinli compliance-allowlist.yaml]
 """
 
 from __future__ import annotations
