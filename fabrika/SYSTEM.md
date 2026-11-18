@@ -87,7 +87,7 @@ would, the line stops and writes a report.
 | 6 | **Reports** | `reports/sabah-*.md`, `reports/kapasite-*.md` | Morning report + capacity report | Partial (`demo.py`) |
 | 7 | **Night line** | `loop/vardiya.py` + `loop/source-queue.yaml` | Scan (**source rotation: read ones are skipped**) → distillation (idempotent) → red team → ADR draft → morning report; C2 closed | **Running**, 11 tests |
 | 8 | **Scheduler** | `loop/night-run.ps1` + `task-register.ps1` / `task-remove.ps1` | Nightly 23:00 local python (dry mode, zero tokens) | **Installed** (KOVAN-Night; first real night Nov 4) |
-| 10 | **S1 drill** | `loop/tatbikat.py` | Executes and audits the runbook's **5 steps** (run, ledger, STOP, **chaos/resume**, rollback) — **Friday task installed as KOVAN-Week** | **Running**, 3 tests |
+| 10 | **S1 drill** | `loop/drill.py` | Executes and audits the runbook's **5 steps** (run, ledger, STOP, **chaos/resume**, rollback) — **Friday task installed as KOVAN-Week** | **Running**, 3 tests |
 | 13 | **Weekly retro** | `loop/retro.py` | GPK proxy + gate trend + mechanical checks (runnable commands); **log integrity scan** (`--log-saglik`, UTF-8/UTF-16 BOM aware) | **Running**, 11 tests |
 | 9 | **Status board** | `kovan.py durum` | Cross-run metrics for all runs; data source for the weekly retro | **Running**, 3 tests |
 | 11 | **Configuration** | `loop/user.yaml` | User defaults (hours, repo, model…); CLI overrides | **Running**, 3 tests |
@@ -255,7 +255,7 @@ python vardiya.py run        # night line: source → distill → breakage → A
 python sbom.py --repo ornek-repo    # SPDX 2.3 SBOM (stdlib/local/third-party split)
 python mutation.py --maks 6      # gate kill score (6/6 killed)
 python retro.py                  # weekly retro: GPK proxy + mechanical checks
-python tatbikat.py               # S1 runbook drill (5 steps PASS/FAIL)
+python drill.py                 # S1 runbook drill (5 steps PASS/FAIL)
 python kovan.py durum        # cross-run metrics for all runs
 powershell -File task-register.ps1  # install the night task (23:00, local, zero tokens) — remove: task-remove.ps1
 

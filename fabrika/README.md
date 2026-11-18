@@ -168,7 +168,7 @@ python kovan.py plan            # acceptance list under capacity
 python kovan.py run             # end-to-end run + report
 python vardiya.py run           # night line: distillation + breakage + ADR draft
 python kovan.py durum           # cross-run metrics
-python tatbikat.py              # S1 runbook drill (steps PASS/FAIL)
+python drill.py                # S1 runbook drill (steps PASS/FAIL)
 powershell -File task-register.ps1   # install the night task (23:00, local) — remove: task-remove.ps1
 ```
 

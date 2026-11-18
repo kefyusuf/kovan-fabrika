@@ -181,7 +181,7 @@ otherwise the cost table turns into an advertisement banner.
 ## 8. Incident response
 
 > **Drill (November 4, 2026):** the four steps of this section were audited
-> as runnable via `tatbikat.py` (a normal run, ledger verification, stopping
+> as runnable via `drill.py` (a normal run, ledger verification, stopping
 > with STOP, rollback on a dirty clone) — 4/4 PASS. A4's first version fell
 > wrongly on a line-ending (CRLF) comparison; the criterion was corrected to
 > `git status --porcelain`.

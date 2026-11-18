@@ -7,8 +7,8 @@ Dört adım:
   A4 Geri alma: geçici klon kirletilir → depo başa döner, ağaç temiz.
 
 Kullanim:
-    python tatbikat.py            # PASS/FAIL tablosu
-    python tatbikat.py --json
+    python drill.py            # PASS/FAIL tablosu
+    python drill.py --json
 """
 
 from __future__ import annotations

@@ -30,7 +30,7 @@ jobs:
                    tests/test_eval_run.py tests/test_reviewer.py tests/test_vardiya.py \
                    tests/test_durum.py tests/test_compliance.py tests/test_sbom.py \
                    tests/test_skill.py tests/skills/test_tests_kapisi.py \
-                   tests/test_tatbikat.py tests/test_retro.py tests/test_mutation.py \
+                   tests/test_drill.py tests/test_retro.py tests/test_mutation.py \
                    tests/test_queue_build.py tests/test_console.py \
                    tests/test_simulation.py; do
             echo "== $t"
@@ -44,4 +44,4 @@ jobs:
         run: python retro.py --log-saglik --runs runs
       - name: S1 runbook drill
         working-directory: fabrika/loop
-        run: python tatbikat.py
+        run: python drill.py

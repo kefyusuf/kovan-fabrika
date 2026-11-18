@@ -32,7 +32,7 @@ Changelog = "https://github.com/kefyusuf/kovan-fabrika/blob/main/CHANGELOG.md"
 [project.scripts]
 kovan = "kovan:main"
 vardiya = "vardiya:main"
-tatbikat = "tatbikat:ana"
+drill = "drill:ana"
 skill = "skill:ana"
 
 [tool.setuptools]
@@ -50,7 +50,7 @@ py-modules = [
     "skill",
     "vardiya",
     "adapter_http",
-    "tatbikat",
+    "drill",
     "retro",
     "mutation",
     "queue_build",

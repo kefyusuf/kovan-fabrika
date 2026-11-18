@@ -300,7 +300,7 @@ A hosted service (SaaS) is the X2 non-goal (GOVERNANCE).
    the `istatistik` function with renamed variables scored 1.0 → provenance
    False. Live profile: copy suspicion makes provenance False (fail-closed,
    a human decision is required).
-2. **The S1 runbook drill (`tatbikat.py`):** a normal run, ledger
+2. **The S1 runbook drill (`drill.py`):** a normal run, ledger
    verification, stopping with STOP, rollback on a dirty clone — 4/4 PASS.
    The CRLF comparison bug in A4's first version was fixed with the
    `git status --porcelain` criterion.
