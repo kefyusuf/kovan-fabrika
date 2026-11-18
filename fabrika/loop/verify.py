@@ -22,9 +22,9 @@ import subprocess
 import tempfile
 from pathlib import Path
 
-import konsol
+import console
 
-konsol.hazirla()
+console.hazirla()
 
 KOMUT_TIMEOUT = 180
 

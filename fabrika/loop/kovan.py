@@ -30,9 +30,9 @@ from pathlib import Path
 BURASI = Path(__file__).resolve().parent
 sys.path.insert(0, str(BURASI))
 
-import konsol
+import console
 
-konsol.hazirla()
+console.hazirla()
 
 import yaml
 

@@ -26,9 +26,9 @@ import yaml
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-import konsol
+import console
 
-konsol.hazirla()
+console.hazirla()
 
 from runner import Ledger  # noqa: E402
 from seedtest import kos as seedtest_kos, varsayilan_hatalar, varsayilan_kapilar  # noqa: E402

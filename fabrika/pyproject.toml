@@ -54,5 +54,5 @@ py-modules = [
     "retro",
     "mutasyon",
     "queue_build",
-    "konsol",
+    "console",
 ]

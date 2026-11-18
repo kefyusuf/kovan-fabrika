@@ -31,7 +31,7 @@ jobs:
                    tests/test_durum.py tests/test_compliance.py tests/test_sbom.py \
                    tests/test_beceri.py tests/skills/test_tests_kapisi.py \
                    tests/test_tatbikat.py tests/test_retro.py tests/test_mutasyon.py \
-                   tests/test_queue_build.py tests/test_konsol.py \
+                   tests/test_queue_build.py tests/test_console.py \
                    tests/test_simulasyon.py; do
             echo "== $t"
             python "$t"

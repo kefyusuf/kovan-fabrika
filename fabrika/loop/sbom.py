@@ -23,9 +23,9 @@ import sys
 from datetime import datetime, timezone
 from pathlib import Path
 
-import konsol
+import console
 
-konsol.hazirla()
+console.hazirla()
 
 ATLANAN_DIZINLER = {
     ".git", "__pycache__", ".venv", "venv", "node_modules", "target",

@@ -31,9 +31,9 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-import konsol
+import console
 
-konsol.hazirla()
+console.hazirla()
 
 from verify import geri_al, repo_gecerli_mi, uygula  # noqa: E402
 

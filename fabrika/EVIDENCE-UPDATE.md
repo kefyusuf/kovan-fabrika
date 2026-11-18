@@ -396,14 +396,14 @@ short. Also, `--tamamlanan` was never passed in the old gece-kos version;
 that is why the record file did not exist.
 
 **The fix:**
-1. `konsol.py` + 11 CLI entries get `konsol.hazirla()`: stdout/stderr
+1. `console.py` + 11 CLI entries get `console.hazirla()`: stdout/stderr
    `encoding="utf-8", errors="replace"`. Output is not lost, the process
    does not die.
 2. `night-run.ps1` / `week-run.ps1`: `PYTHONIOENCODING=utf-8` +
    `Out-File -Encoding utf8` (the Turkish log is now readable).
 3. The `--tamamlanan` path is first taken into a variable and passed
    explicitly.
-4. `konsol` was added to pyproject.toml py-modules (so it is not missing
+4. `console` was added to pyproject.toml py-modules (so it is not missing
    from the install).
 
 **Evidence (end-to-end, with the entry the Scheduler uses):**
@@ -445,7 +445,7 @@ kept on disk).
    installed (editable, loop/); `kovan --help` and `vardiya --help` exit 0.
    Note: the CLI files (backlog etc.) resolve relative to cwd — the entry
    point giving `plan` in an empty directory is expected behavior.
-2. CI: `test_queue_build.py` + `test_konsol.py` added to the test list
+2. CI: `test_queue_build.py` + `test_console.py` added to the test list
    (19 files); the "Log integrity scan" step entered (`--log-saglik`).
 3. `.gitignore`: `fabrika/loop/state/` and `fabrika/loop/reports/` added
    (runtime state does not enter the repo; the ledger/evidence stays
@@ -556,7 +556,7 @@ invented URLs would violate the evidence-first norm.
 **Result:** 162/162 local. The CI re-run was being watched.
 
 **Closure (same day):** a third run with two more fixes — `sys.path.insert`
-in `test_konsol.py` (locally the pip install masked it; on CI
+in `test_console.py` (locally the pip install masked it; on CI
 ModuleNotFoundError) and the missing `test_simulasyon.py` added to the CI
 list. The CI result: **success** (run 44081160418) — 20 test files (167
 tests) + the retro smoke + log integrity + the S1 drill, green on a fresh

@@ -29,9 +29,9 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-import konsol
+import console
 
-konsol.hazirla()
+console.hazirla()
 
 BURASI = Path(__file__).resolve().parent
 SKILLS = BURASI / "skills"
