@@ -45,7 +45,7 @@ py-modules = [
     "verify",
     "compliance",
     "sbom",
-    "eval_kos",
+    "eval_run",
     "incelemeci",
     "beceri",
     "vardiya",

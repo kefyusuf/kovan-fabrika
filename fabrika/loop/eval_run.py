@@ -6,7 +6,7 @@ Sozlesme:
 - Depo her durumda basa dondurulur.
 
 Kullanim:
-    python eval_kos.py --repo ornek-repo --set eval_set/sicaklik-v1.jsonl \
+    python eval_run.py --repo ornek-repo --set eval_set/sicaklik-v1.jsonl \
         [--diff-dosya yama.diff]
 """
 

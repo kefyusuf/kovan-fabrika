@@ -76,7 +76,7 @@ would, the line stops and writes a report.
 | 2c2 | **Compliance** | `loop/compliance.py` + `compliance-allowlist.yaml` | import inference, allowlist, dependency-file detection, copy suspicion, duplicate functions, **duplicate block (structural signature, 6-variant robustness-tested)** → `provenance` signal | **Running**, 18 tests |
 | 2h | **SBOM seed** | `loop/sbom.py` | Scans the repo with `ast`; SPDX 2.3 JSON; **root package + supplier field (NTIA)**; versions from lock files (module→distribution via `packages_distributions`) | **Running**, 8 tests |
 | 2d | **Live profile** | `loop/gates-live.yaml` | S2/S3: eval **blocking** (90 cases), review conditionally blocking | Active |
-| 2e | **Eval runner** | `loop/eval_kos.py` + `eval_set/sicaklik-v1.jsonl` | Runs the frozen 90-case set on the diffed repo, produces a score | **Running**, 4 tests |
+| 2e | **Eval runner** | `loop/eval_run.py` + `eval_set/sicaklik-v1.jsonl` | Runs the frozen 90-case set on the diffed repo, produces a score | **Running**, 4 tests |
 | 2f | **Reviewer** | `loop/incelemeci.py` | Second model endpoint; accept/reject + rationale (approval without rationale is invalid) | **Running**, 4 tests |
 | 3 | **Gates** | `loop/gates.yaml`, `loop/seedtest.py` | 6 gates + coverage measurement with seeded faults | **Running**, 9 tests |
 | 4 | **Ledger** | `loop/ledger.jsonl` | Hash-chained decision record, tamper detection | **Running** |
@@ -260,7 +260,7 @@ python kovan.py durum        # cross-run metrics for all runs
 powershell -File task-register.ps1  # install the night task (23:00, local, zero tokens) — remove: task-remove.ps1
 
 # eval v1 (frozen 90 cases), with a broken diff:
-python eval_kos.py --repo ornek-repo --set eval_set\sicaklik-v1.jsonl --diff-dosya yama-kirik.diff
+python eval_run.py --repo ornek-repo --set eval_set\sicaklik-v1.jsonl --diff-dosya yama-kirik.diff
 
 # live mode (needs a key + target repo):
 python kovan.py run --adapter http --base-url https://api.openai.com/v1 \

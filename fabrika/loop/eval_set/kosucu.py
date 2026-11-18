@@ -1,6 +1,6 @@
 """Eval v1 kosucusu: dondurulmus vaka setini calistirir (repo icinde).
 
-Kullanim (eval_kos.py cagirir):
+Kullanim (eval_run.py cagirir):
     python kosucu.py <set.jsonl>
 
 Cikti: son satirda KOSONUC={"gecen":n,"toplam":m,"hatalar":[...]}

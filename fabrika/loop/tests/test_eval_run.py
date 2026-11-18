@@ -11,7 +11,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from eval_kos import kos  # noqa: E402
+from eval_run import kos  # noqa: E402
 
 REPO = Path(__file__).resolve().parent.parent / "ornek-repo"
 HEDEF = REPO / "sicaklik.py"  # diff üretimi için salt-okunur kaynak (testler KLON üzerinde koşar)

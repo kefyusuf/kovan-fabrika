@@ -180,7 +180,7 @@ The real model connection (adapter_http.py) and the real verification layer
 1. **Eval v1 is live and blocking.** `eval_set/sicaklik-v1.jsonl` — a frozen
    90-case set (the golden values come from the existing reference behavior;
    the set catches behavior change, it does not prove mathematical
-   correctness). `eval_kos.py` applies the diff to the repo and runs the
+   correctness). `eval_run.py` applies the diff to the repo and runs the
    set, blocking at a 0.90 threshold. The broken-formula diff dropped the
    score below 0.90 (verified in a test). In the live profile, eval is now
    `blocking: true`.
@@ -543,7 +543,7 @@ the tests and the night queue depended on non-published workspace files
    temporary markdown (with a URL line); the dependency on document
    content — beyond `kaynak_tara`'s "produces records only from URL-carrying
    lines" fact — was removed (the root monkeypatched, finally-restored).
-3. `test_verify`/`test_eval_kos` expect a real git repo: a "Sample repo
+3. `test_verify`/`test_eval_run` expect a real git repo: a "Sample repo
    preparation" step in CI (init+commit), a fresh-clone note in
    CONTRIBUTING.
 

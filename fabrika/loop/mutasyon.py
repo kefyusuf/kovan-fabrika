@@ -33,7 +33,7 @@ import konsol
 konsol.hazirla()
 
 from verify import test_calistir  # noqa: E402
-from eval_kos import kos as eval_kos  # noqa: E402
+from eval_run import kos as eval_kos  # noqa: E402
 
 BURASI = Path(__file__).resolve().parent
 BINOP = {ast.Add: ast.Sub, ast.Sub: ast.Add, ast.Mult: ast.Div, ast.Div: ast.Mult, ast.Mod: ast.Mult}
