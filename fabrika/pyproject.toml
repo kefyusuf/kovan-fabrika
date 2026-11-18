@@ -46,7 +46,7 @@ py-modules = [
     "compliance",
     "sbom",
     "eval_run",
-    "incelemeci",
+    "reviewer",
     "beceri",
     "vardiya",
     "adapter_http",

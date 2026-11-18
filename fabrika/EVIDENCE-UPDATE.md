@@ -188,7 +188,7 @@ The real model connection (adapter_http.py) and the real verification layer
    cases produced 7 inconsistencies because of argument unpacking; the score
    dropped to 0.922. The set was fixed → 90/90. Lesson: the eval set must
    also pass the gate.
-3. **The independent reviewer contract:** `incelemeci.py` — a second model
+3. **The independent reviewer contract:** `reviewer.py` — a second model
    endpoint, a structured decision JSON, approval without a rationale
    auto-rejected. When `--inceleme-url` is given, the review gate escalates
    to programmatic blocking and the decisions land in the report; without

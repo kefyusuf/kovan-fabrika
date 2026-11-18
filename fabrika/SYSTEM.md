@@ -77,7 +77,7 @@ would, the line stops and writes a report.
 | 2h | **SBOM seed** | `loop/sbom.py` | Scans the repo with `ast`; SPDX 2.3 JSON; **root package + supplier field (NTIA)**; versions from lock files (module→distribution via `packages_distributions`) | **Running**, 8 tests |
 | 2d | **Live profile** | `loop/gates-live.yaml` | S2/S3: eval **blocking** (90 cases), review conditionally blocking | Active |
 | 2e | **Eval runner** | `loop/eval_run.py` + `eval_set/sicaklik-v1.jsonl` | Runs the frozen 90-case set on the diffed repo, produces a score | **Running**, 4 tests |
-| 2f | **Reviewer** | `loop/incelemeci.py` | Second model endpoint; accept/reject + rationale (approval without rationale is invalid) | **Running**, 4 tests |
+| 2f | **Reviewer** | `loop/reviewer.py` | Second model endpoint; accept/reject + rationale (approval without rationale is invalid) | **Running**, 4 tests |
 | 3 | **Gates** | `loop/gates.yaml`, `loop/seedtest.py` | 6 gates + coverage measurement with seeded faults | **Running**, 9 tests |
 | 4 | **Ledger** | `loop/ledger.jsonl` | Hash-chained decision record, tamper detection | **Running** |
 | 5 | **Memory** | `loop/beceri.py` + `skills/` + `lessons.jsonl` | Skill lifecycle (proposed→active→stale) + usage counter + decay | **First skill ACTIVE** |
