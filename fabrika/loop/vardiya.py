@@ -224,7 +224,7 @@ def main(argv: list[str] | None = None) -> int:
     sub = parser.add_subparsers(dest="komut", required=True)
     r = sub.add_parser("run")
     r.add_argument("--id", default=datetime.now().strftime("vardiya-%Y%m%d-%H%M"))
-    r.add_argument("--kaynak", default=str(BURASI / "kaynak-kuyrugu.yaml"))
+    r.add_argument("--kaynak", default=str(BURASI / "source-queue.yaml"))
     r.add_argument("--runs", default=str(BURASI / "runs"))
     r.add_argument("--out", default=str(BURASI / "vardiya-runs"))
     args = parser.parse_args(argv)

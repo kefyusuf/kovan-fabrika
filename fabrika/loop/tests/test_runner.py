@@ -325,7 +325,7 @@ class SpecTests(unittest.TestCase):
         spec_dir = Path(__file__).resolve().parent.parent
         spec = Spec.load(spec_dir)
 
-        self.assertEqual(spec.goal_id, "kovan-gece-vardiyasi-v1")
+        self.assertEqual(spec.goal_id, "kovan-night-shift-v1")
         names = [g.name for g in spec.gates]
         self.assertEqual(names[0], "policy")
         self.assertIn("eval", names)

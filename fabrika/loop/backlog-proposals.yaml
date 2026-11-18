@@ -1,0 +1,17 @@
+# KOVAN — evidence-backed work proposals (awaiting human approval)
+# They do not enter the production queue without approval. Evidence: oneri-raporu.md
+isler:
+- id: O-01
+  baslik: skill scope that will reduce the recurrence of the tests gate
+  sinif: C1
+  loc: 120
+  oncelik: 2
+  dokunur: []
+  gerekce: The same error class recurred 3 times; the skill scope must widen.
+- id: O-02
+  baslik: 'a gate for the types the live profile misses: tasarim_hatasi'
+  sinif: C3
+  loc: 80
+  oncelik: 1
+  dokunur: []
+  gerekce: The red team measured that the live profile misses these error types.

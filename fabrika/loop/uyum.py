@@ -3,7 +3,7 @@
 Ölçülen şey: diff'te YENİ import edilen modüller ve bağımlılık dosyası
 değişimi. Kural:
 - standart kütüphane import'u → serbest;
-- üçüncü taraf import → yalnızca `uyum-izinli.yaml` listesindeyse serbest;
+- üçüncü taraf import → yalnızca `compliance-allowlist.yaml` listesindeyse serbest;
 - requirements/pyproject/package.json/Cargo.toml değişimi → REDDET (C3:
   yeni bağımlılık insan kararıdır);
 - ölçülemeyen durum → False (fail-closed).
@@ -12,7 +12,7 @@ Bu, "kaynağı gösterilemeyen kod birleşmez" kuralının bugünkü ölçülebi
 hâlidir. Kopya kod tespiti ve tam SBOM (SPDX) S4'te eklenir.
 
 Kullanim:
-    python uyum.py --diff-dosya yama.diff [--izinli uyum-izinli.yaml]
+    python uyum.py --diff-dosya yama.diff [--izinli compliance-allowlist.yaml]
 """
 
 from __future__ import annotations
@@ -314,7 +314,7 @@ def sinyal(diff: str, izinli_dosya: str | Path | None = None, repo: Path | None 
 def ana(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="KOVAN uyum katmanı (provenance sinyali)")
     parser.add_argument("--diff-dosya", required=True)
-    parser.add_argument("--izinli", default=str(Path(__file__).resolve().parent / "uyum-izinli.yaml"))
+    parser.add_argument("--izinli", default=str(Path(__file__).resolve().parent / "compliance-allowlist.yaml"))
     args = parser.parse_args(argv)
 
     diff = Path(args.diff_dosya).read_text(encoding="utf-8")

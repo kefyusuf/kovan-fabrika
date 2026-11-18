@@ -1,7 +1,8 @@
-# KOVAN gece kosesi — gorev zamanlayici bunu her gece calistirir.
-# Cikislar runs/ ve vardiya-runs/ altina yazilir; log UTF-8.
-# EVIDENCE §15: artefakt var ≠ kosu basarili — exit kodu ve log bütünlüğü
-# state\gece-durum.log'a islenir; haftalik retro bunu --log-saglik ile tarar.
+# KOVAN night run — the task scheduler runs this every night.
+# Outputs are written under runs/ and vardiya-runs/; the log is UTF-8.
+# EVIDENCE §15: artifacts exist ≠ the run succeeded — the exit code and log
+# integrity are recorded into state\gece-durum.log; the weekly retro scans
+# it with --log-saglik.
 $ErrorActionPreference = "Continue"
 $env:PYTHONIOENCODING = "utf-8"
 $kok = Split-Path -Parent $PSScriptRoot

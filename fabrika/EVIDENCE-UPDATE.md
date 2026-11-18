@@ -166,7 +166,7 @@ The real model connection (adapter_http.py) and the real verification layer
    passed the gate. Now a boolean signal is treated as boolean under all
    conditions; a regression test was added (test_runner:
    `test_bool_signal_with_signal_field_is_boolean`).
-2. **The live profile (gates-canli.yaml):** the review and eval gates are
+2. **The live profile (gates-live.yaml):** the review and eval gates are
    temporarily *advisory*. Rationale: in S2 these gates produce no signal.
    This is not a loosening but a deferral: every line carries a dated
    rationale and, in S3 (eval v1 ≥50 cases + an independent reviewer), they
@@ -205,14 +205,14 @@ The real model connection (adapter_http.py) and the real verification layer
    occupancy, the most-falling gates, recurring lessons, the shift count).
    A **KOVAN-Gece** task was installed into Windows Task Scheduler: every
    night at 23:00 local python, dry mode (zero tokens); outputs go under
-   `runs/` and `vardiya-runs/` + a log side file. Removal: `gorev-sil.ps1`.
+   `runs/` and `vardiya-runs/` + a log side file. Removal: `task-remove.ps1`.
    When the model key arrives, an `--adapter http` line is added inside
-   `gece-kos.ps1`; the line stays the same. The task was verified by running
+   `night-run.ps1`; the line stays the same. The task was verified by running
    it once by hand (gece-20261104-2026 / vardiya-20261104-2026; both ledgers
    sound).
 7. **The provenance signal was tied to a real measurement.** `uyum.py`:
    extracts the new import roots from the diff; stdlib is free, third-party
-   is free only if it is on the `uyum-izinli.yaml` list, and a
+   is free only if it is on the `compliance-allowlist.yaml` list, and a
    dependency-file change is REJECT (C3). This way all four blocking gates
    in the live profile (policy, tests, provenance, eval) run on real
    measurement; review is conditional (the reviewer), cost warns. SBOM
@@ -278,7 +278,7 @@ the file count does not grow, and the report writes "Zaten adaydı".
    repo root; the capacity valve correctly deferred K-103 at hour=2. Note:
    since py-modules live under `loop/`, the `package-dir` mapping was
    needed.
-3. **Configuration:** `loop/kullanici.yaml` — user defaults apply to all
+3. **Configuration:** `loop/user.yaml` — user defaults apply to all
    subcommands, CLI overrides. The argparse trap (the subparser default
    overriding the main default) was documented with a test.
 4. **README.en.md** (an English quick start + security warnings) and **CI**
@@ -399,7 +399,7 @@ that is why the record file did not exist.
 1. `konsol.py` + 11 CLI entries get `konsol.hazirla()`: stdout/stderr
    `encoding="utf-8", errors="replace"`. Output is not lost, the process
    does not die.
-2. `gece-kos.ps1` / `hafta-kos.ps1`: `PYTHONIOENCODING=utf-8` +
+2. `night-run.ps1` / `week-run.ps1`: `PYTHONIOENCODING=utf-8` +
    `Out-File -Encoding utf8` (the Turkish log is now readable).
 3. The `--tamamlanan` path is first taken into a variable and passed
    explicitly.
@@ -407,7 +407,7 @@ that is why the record file did not exist.
    from the install).
 
 **Evidence (end-to-end, with the entry the Scheduler uses):**
-`gece-kos.ps1` was run by hand → `runs/gece-20261116-0941`: 5 accepted / 8,
+`night-run.ps1` was run by hand → `runs/gece-20261116-0941`: 5 accepted / 8,
 4 accepted + 1 block, ledger OK; `state/tamamlanan.jsonl` was created
 (236 bytes, only the accepted ones); the log is **clean** (no Traceback,
 Turkish readable). From 23:00 tonight, the queue will advance.
@@ -420,13 +420,13 @@ those too.
 
 ## 16. Queue progress evidence + the log-integrity net + publish prep (November 16, 2026)
 
-**Queue progress (§15's promise, now real):** `gece-kos.ps1` was run by hand
+**Queue progress (§15's promise, now real):** `night-run.ps1` was run by hand
 → `state/tamamlanan.jsonl` grew from 5 to 6 records (K-106 accepted and
 recorded); blocks/deferrals still do not enter the record (the art. 4 rule
 is preserved). The system no longer lives the same night twice: completed
 tasks are not selected again.
 
-**The night status ledger (a new safety net):** `gece-kos.ps1` now checks
+**The night status ledger (a new safety net):** `night-run.ps1` now checks
 both runs' **exit codes** and whether their logs contain a **crash
 signature**, writing to `state/gece-durum.log`. The first record:
 `20261116-1353 | kovan-cikis: 0 temiz: EVET | vardiya-cikis: 0 temiz: EVET`.
@@ -536,7 +536,7 @@ the tests and the night queue depended on non-published workspace files
 (`arastirma/…`); inside a fresh clone those files do not exist.
 
 **The fix (the intent preserved, the mechanical dependency removed):**
-1. `kaynak-kuyrugu.yaml`: the 6 file sources are now inside the repo —
+1. `source-queue.yaml`: the 6 file sources are now inside the repo —
    fabrika/README, SYSTEM, ADR, PRD, QUALITY, EVIDENCE-UPDATE (+ the same
    2 URLs). A fresh clone + CI + local behave the same.
 2. The `test_vardiya` rotation tests were made hermetic: a temporary root +

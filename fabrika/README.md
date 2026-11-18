@@ -169,12 +169,12 @@ python kovan.py run             # end-to-end run + report
 python vardiya.py run           # night line: distillation + breakage + ADR draft
 python kovan.py durum           # cross-run metrics
 python tatbikat.py              # S1 runbook drill (steps PASS/FAIL)
-python gorev-kur.ps1            # install the night task (23:00, local) — remove: gorev-sil.ps1
+powershell -File task-register.ps1   # install the night task (23:00, local) — remove: task-remove.ps1
 ```
 
 **Install (public):** `pip install -e fabrika` (add `--no-build-isolation`
 on embedded Python) → the `kovan / vardiya / tatbikat / beceri` commands
-become global. User settings: [`loop/kullanici.yaml`](loop/kullanici.yaml).
+become global. User settings: [`loop/user.yaml`](loop/user.yaml).
 
 `demo.py` produces: `ornek-cikti/sabah-raporu-ornek.md` (morning report),
 `ledger.jsonl` (hash-chained decision ledger), `lessons.jsonl` (lessons),

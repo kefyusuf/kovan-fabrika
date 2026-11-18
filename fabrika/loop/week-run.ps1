@@ -1,5 +1,5 @@
-# KOVAN haftalik kosesi — Cuma retrosu + tatbikat.
-# Ciktilar reports/ altina yazilir; log UTF-8.
+# KOVAN weekly run — the Friday retro + the drill.
+# Outputs are written under reports/; the log is UTF-8.
 $ErrorActionPreference = "Continue"
 $env:PYTHONIOENCODING = "utf-8"
 $kok = Split-Path -Parent $PSScriptRoot

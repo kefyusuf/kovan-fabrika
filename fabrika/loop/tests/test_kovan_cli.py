@@ -15,7 +15,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import kovan  # noqa: E402
 from runner import Ledger  # noqa: E402
 
-BACKLOG = Path(__file__).resolve().parent.parent / "ornek-backlog.yaml"
+BACKLOG = Path(__file__).resolve().parent.parent / "sample-backlog.yaml"
 
 
 def calistir(*argv: str) -> tuple[int, str]:
@@ -76,7 +76,7 @@ class RunTest(unittest.TestCase):
 
     def test_yapilandirma_saat_uygulanir(self):
         with tempfile.TemporaryDirectory() as tmp:
-            yol = Path(tmp) / "kullanici.yaml"
+            yol = Path(tmp) / "user.yaml"
             yol.write_text("saat: 1.5\n", encoding="utf-8")
             buf = io.StringIO()
             with contextlib.redirect_stdout(buf):
@@ -88,7 +88,7 @@ class RunTest(unittest.TestCase):
 
     def test_cli_yapilandirmayi_ezer(self):
         with tempfile.TemporaryDirectory() as tmp:
-            yol = Path(tmp) / "kullanici.yaml"
+            yol = Path(tmp) / "user.yaml"
             yol.write_text("saat: 1.5\n", encoding="utf-8")
             buf = io.StringIO()
             with contextlib.redirect_stdout(buf):
@@ -102,7 +102,7 @@ class RunTest(unittest.TestCase):
 
     def test_bozuk_yapilandirma_uyari_verir_ve_devam_eder(self):
         with tempfile.TemporaryDirectory() as tmp:
-            yol = Path(tmp) / "kullanici.yaml"
+            yol = Path(tmp) / "user.yaml"
             yol.write_text("saat: [bozuk", encoding="utf-8")
             buf = io.StringIO()
             with contextlib.redirect_stdout(buf):

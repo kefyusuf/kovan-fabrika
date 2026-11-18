@@ -1,0 +1,51 @@
+# KOVAN — live-profile gates (TEMPORARY)
+#
+# This profile is used in S2 (a real model + a real test run).
+# Deviation: because the review and eval gates cannot produce a measurement
+# yet, they do not BLOCK, they only warn. This is NOT against the
+# constitution because the gate is not removed: the moment they produce a
+# signal they return to blocking (S3, eval v1).
+#
+# Rule: when taking a gate out of blocking in this file, a rationale and a
+# date MUST be written. An unreasoned loosening = a C3 violation.
+
+gates:
+  - name: policy
+    order: 10
+    blocking: true
+
+  - name: tests
+    order: 40
+    blocking: true
+    signal: tests
+
+  - name: provenance
+    order: 45
+    blocking: true
+
+  - name: lint
+    order: 20
+    blocking: false   # 2026-11-04: not measured yet; ruff will be wired in S3
+    signal: lint
+
+  - name: types
+    order: 30
+    blocking: false   # 2026-11-04: not measured yet; mypy will be wired in S3
+    signal: types
+
+  - name: review
+    order: 50
+    blocking: false   # 2026-11-04: kovan.py escalates this to blocking only when --inceleme-url is given
+    signal: review
+
+  - name: eval
+    order: 60
+    blocking: true    # 2026-11-04: eval v1 live — a frozen 90-case set (sicaklik-v1.jsonl)
+    signal: eval
+    threshold: 0.90
+
+  - name: cost
+    order: 70
+    blocking: false
+    signal: cost_usd
+    threshold: 6.0

@@ -1,12 +1,15 @@
-# KOVAN — Kalite Kapıları
+# KOVAN — Quality Gates
 #
-# Kapı sırası tesadüf değil: en ucuz ve en deterministik kapı önce çalışır.
-# Amaç, pahalı model çağrısını hak etmeyen adayı 200 ms'de elemek.
+# The gate order is no accident: the cheapest and most deterministic gate
+# runs first. The aim is to eliminate, in 200 ms, the candidate that does not
+# deserve an expensive model call.
 #
-# Üç kural:
-# 1. `blocking: true` olan bir kapı geçilmeden sonraki kapı çalışmaz (fail-fast).
-# 2. Sinyal yoksa kapı GEÇMEZ. "Ölçülmedi" ile "geçti" aynı şey değil.
-# 3. Hiçbir kapı tek başına yeterli değil; LLM yargıcı asla tek kapı olamaz.
+# Three rules:
+# 1. While a gate with `blocking: true` has not passed, the next gate does
+#    not run (fail-fast).
+# 2. If there is no signal, the gate does NOT pass. "Unmeasured" and
+#    "passed" are not the same thing.
+# 3. No gate is sufficient alone; an LLM judge can never be a single gate.
 
 gates:
   - name: policy
@@ -15,88 +18,92 @@ gates:
     kind: deterministic
     owner: airlock
     description: >
-      Yasak yol, ağ hedefi veya izin ihlali var mı. Araç çağrısı düzeyinde
-      Airlock, değişiklik düzeyinde bu kapı bakılır.
+      Is there a forbidden path, a network target, or a permission violation.
+      Checked at the tool-call level by Airlock, and at the change level by
+      this gate.
     on_fail: block_and_page_human
 
   - name: lint
     order: 20
     blocking: true
     kind: deterministic
-    owner: kalite/statik
-    description: Biçim ve stil. Tartışmaya kapalı, otomatik düzeltilebilir.
+    owner: quality/static
+    description: Format and style. Not up for debate; automatically fixable.
     on_fail: revise
 
   - name: types
     order: 30
     blocking: true
     kind: deterministic
-    owner: kalite/statik
-    description: Tip denetimi. Tip hatası varsa niyet belirsizdir.
+    owner: quality/static
+    description: Type checking. If there is a type error, the intent is unclear.
     on_fail: revise
 
   - name: tests
     order: 40
     blocking: true
     kind: deterministic
-    owner: kalite/test
+    owner: quality/test
     description: >
-      Birim + entegrasyon. Adayın eklediği test, adayın kendi kodunu
-      doğrulamak zorunda; testi silmek veya zayıflatmak kapıyı geçirmez.
+      Unit + integration. The test the candidate brings must verify the
+      candidate's own code; deleting or weakening the test does not pass
+      the gate.
     on_fail: revise
 
   - name: provenance
     order: 45
     blocking: true
     kind: deterministic
-    owner: hukuk/uyum
+    owner: legal/compliance
     description: >
-      Yeni bağımlılık, kopyalanmış kod veya lisans uyumsuzluğu. Üretilen
-      kodun nereden geldiği kayıtlı olmalı (kaynak dosya + commit).
+      New dependencies, copied code, or a license incompatibility. Where the
+      produced code came from must be on record (source file + commit).
     on_fail: block_and_page_human
 
   - name: review
     order: 50
     blocking: true
     kind: agent
-    owner: kalite/incelemeci
+    owner: quality/reviewer
     description: >
-      Bağımsız incelemeci; kodu yazan ajandan farklı bir oturumda çalışır.
-      Onay gerekçesi yazılı olmak zorunda ("LGTM" geçersiz).
+      An independent reviewer; runs in a different session from the agent
+      that wrote the code. The approval must carry a written rationale
+      ("LGTM" is invalid).
     on_fail: revise
 
   - name: eval
     order: 60
     blocking: true
     kind: statistical
-    owner: arge/olcum
+    owner: rnd/measurement
     signal: eval
     threshold: 0.90
     description: >
-      Görev sınıfına ait regresyon setinde geçme oranı. Eşik, mevcut
-      baseline'ın altına düşemez; düşerse otomatik geri alma.
+      The pass rate on the regression set belonging to the task class. The
+      threshold cannot fall below the current baseline; if it does, an
+      automatic rollback.
     on_fail: reject_and_rollback
 
   - name: cost
     order: 70
     blocking: false
     kind: accounting
-    owner: finans/butce
+    owner: finance/budget
     signal: cost_usd
     threshold: 6.00
     description: >
-      Birleşen PR başına maliyet. Bloklamaz, uyarır: tavan aşılırsa
-      ertesi vardiyada model yönlendirmesi düşürülür.
+      Cost per merged PR. It does not block, it warns: if the ceiling is
+      exceeded, model steering drops a tier in the next shift.
     on_fail: warn_and_throttle
 
-# Kapıların ürettiği kanıt nereye gider
+# Where the evidence the gates produce goes
 evidence:
   ledger: loop/ledger.jsonl
   lessons: loop/lessons.jsonl
   skills: loop/skills.proposed.jsonl
   night_report: reports/sabah-{date}.md
 
-# Eşik değişikliği kuralı (C3): eşiği düşürmek yasak, yükseltmek insan onayı.
+# The threshold-change rule (C3): lowering is forbidden, raising needs human approval.
 threshold_policy:
   lowering: forbidden
   raising: human_required

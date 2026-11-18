@@ -31,7 +31,7 @@ These are not claims; they are reproducible with a command.
 | Test suite | `python tests\test_runner.py` | **22/22 passed**, 0.09 s |
 | End-to-end dry run | `python demo.py` | 4 tasks → 2 accepted, 2 human gates, 1 revision |
 | Ledger integrity | `Ledger(...).verify()` | `(True, 5, '')` — the chain is sound |
-| Contract loading | `Spec.load('.')` | `kovan-gece-vardiyasi-v1`, 8 gates, a 2.4M token ceiling |
+| Contract loading | `Spec.load('.')` | `kovan-night-shift-v1`, 8 gates, a 2.4M token ceiling |
 | Tamper detection | `test_tampering_is_detected` | The modified record was caught |
 | Budget ceiling | `test_budget_exhaustion_stops` | The task exceeding the ceiling did not start |
 | The C3 gate | `test_c3_change_requires_human` | Stopped on the first attempt, did not insist |

@@ -1,0 +1,37 @@
+# KOVAN — night scanning queue
+#
+# tur: file → local markdown (inside the repo root, the isolation boundary)
+# tur: url   → an external source; skipped in DRY mode, needs a live model
+#
+# Note: URLs may only come from the hosts allowed in goal.yaml
+# (constraint: allowed_hosts). Dry mode does not touch them, the report
+# marks them.
+#
+# Sources are chosen from inside the repo so it also runs on a fresh clone;
+# the research syntheses are carried in the RESEARCH.md summary.
+
+kaynaklar:
+  - tur: dosya
+    yol: fabrika/README.md
+    konu: the İ1–İ6 principles and the file map
+  - tur: dosya
+    yol: fabrika/SYSTEM.md
+    konu: the v2 system definition (3 lines, components)
+  - tur: dosya
+    yol: fabrika/ADR.md
+    konu: architecture decisions (F01–F13)
+  - tur: dosya
+    yol: fabrika/PRD.md
+    konu: acceptance criteria
+  - tur: dosya
+    yol: fabrika/QUALITY.md
+    konu: quality norms and measurements
+  - tur: dosya
+    yol: fabrika/EVIDENCE-UPDATE.md
+    konu: evidence lessons (§1–§18)
+  - tur: url
+    url: https://metr.org/blog/2026-02-24-uplift-update
+    konu: the METR measurement update
+  - tur: url
+    url: https://openai.com/index/why-we-no-longer-evaluate-swe-bench-verified/
+    konu: benchmark retirement

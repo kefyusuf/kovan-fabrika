@@ -1,8 +1,8 @@
 """KOVAN — tek giriş noktalı mini fabrika.
 
 Üç komut:
-    python kovan.py plan   --backlog ornek-backlog.yaml --saat 3
-    python kovan.py run    --backlog ornek-backlog.yaml --saat 3
+    python kovan.py plan   --backlog sample-backlog.yaml --saat 3
+    python kovan.py run    --backlog sample-backlog.yaml --saat 3
     python kovan.py verify --run runs/<id>
 
 `run` şunları yapar:
@@ -59,7 +59,7 @@ SINIFLAR = {"C0": ChangeClass.C0, "C1": ChangeClass.C1, "C2": ChangeClass.C2, "C
 
 
 def canli_kapilar_yukle(path: Path) -> list[GateSpec]:
-    """gates-canli.yaml -> kapı listesi (S2 geçici profili)."""
+    """gates-live.yaml -> kapı listesi (S2 geçici profili)."""
     veri = yaml.safe_load(Path(path).read_text(encoding="utf-8")) or {}
     kapilar: list[GateSpec] = []
     for i, satir in enumerate(veri.get("gates", []), start=1):
@@ -292,7 +292,7 @@ def cmd_run(args: argparse.Namespace) -> int:
     spec = Spec.load(BURASI)
     canli = args.adapter == "http"
     if canli:
-        spec.gates = canli_kapilar_yukle(BURASI / "gates-canli.yaml")
+        spec.gates = canli_kapilar_yukle(BURASI / "gates-live.yaml")
         anahtar = _anahtar_oku(args.anahtar_dosya)
         if not anahtar:
             print("HATA: anahtar yok — --anahtar-dosya veya KOVAN_API_KEY ortam değişkeni")
@@ -311,7 +311,7 @@ def cmd_run(args: argparse.Namespace) -> int:
                 return 2
             incelemeci = Incelemeci(args.inceleme_url, i_anahtar, args.inceleme_model)
             # Bağımsız incelemeci devrede: review kapısı bloklayıcıya yükselir
-            # (gates-canli.yaml'daki geçici uyarıcı durum bu koşuda kapanır).
+            # (gates-live.yaml'daki geçici uyarıcı durum bu koşuda kapanır).
             spec.gates = [
                 GateSpec(g.name, True, g.threshold, g.signal, g.order) if g.name == "review" else g
                 for g in spec.gates
@@ -542,7 +542,7 @@ def _rapor_yaz(isler, karar, rapor, ok, kayit, run_id, saat, run_dir: Path, c3=N
         "",
         (
             "- Bu koşu **canlı**: diff gerçek modelden, `tests` sinyali gerçek test "
-            "koşumundan. review/eval S3'te bloklayıcı olacak (gates-canli.yaml)."
+            "koşumundan. review/eval S3'te bloklayıcı olacak (gates-live.yaml)."
             if canli
             else "- Bu koşu **kuru koşu**: model çağrılmadı, sinyaller deterministik "
             "senaryodan geldi."
@@ -564,18 +564,18 @@ def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="KOVAN mini fabrika")
     parser.add_argument(
         "--yapilandirma",
-        default=str(BURASI / "kullanici.yaml"),
+        default=str(BURASI / "user.yaml"),
         help="kullanıcı yapılandırması (yoksa yok sayılır)",
     )
     sub = parser.add_subparsers(dest="komut", required=True)
 
     p = sub.add_parser("plan", help="kapasiteye göre kabul listesi")
-    p.add_argument("--backlog", default=str(BURASI / "ornek-backlog.yaml"))
+    p.add_argument("--backlog", default=str(BURASI / "sample-backlog.yaml"))
     p.add_argument("--saat", type=float, default=3.0)
     p.set_defaults(func=cmd_plan)
 
     r = sub.add_parser("run", help="kabul et ve çalıştır")
-    r.add_argument("--backlog", default=str(BURASI / "ornek-backlog.yaml"))
+    r.add_argument("--backlog", default=str(BURASI / "sample-backlog.yaml"))
     r.add_argument("--saat", type=float, default=3.0)
     r.add_argument("--seed", type=int, default=0)
     r.add_argument("--max-tur", type=int, default=20)
@@ -589,7 +589,7 @@ def main(argv: list[str] | None = None) -> int:
     r.add_argument("--anahtar-dosya", default="")
     r.add_argument("--repo", default="", help="gerçek test koşumu için git deposu")
     r.add_argument("--eval-set", default="", help="dondurulmuş vaka seti (JSONL); verilirse eval bloklayıcı")
-    r.add_argument("--uyum-izinli", default=str(BURASI / "uyum-izinli.yaml"), help="izinli üçüncü taraf import listesi")
+    r.add_argument("--uyum-izinli", default=str(BURASI / "compliance-allowlist.yaml"), help="izinli üçüncü taraf import listesi")
     r.add_argument("--egress-log", default="", help="dış çağrı denetim dosyası (JSONL)")
     r.add_argument("--inceleme-url", default="", help="bağımsız incelemeci uç noktası")
     r.add_argument("--inceleme-model", default="")
@@ -617,7 +617,7 @@ def main(argv: list[str] | None = None) -> int:
     # Kullanıcı yapılandırması → alt ayrıştırıcı varsayılanları (CLI ezer).
     yapilandirma_yolu = next(
         (Path(argv[i + 1]) for i, a in enumerate(argv) if a == "--yapilandirma" and i + 1 < len(argv)),
-        BURASI / "kullanici.yaml",
+        BURASI / "user.yaml",
     )
     if yapilandirma_yolu.exists():
         try:

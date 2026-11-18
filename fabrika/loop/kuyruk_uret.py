@@ -1,12 +1,12 @@
 """KOVAN — kanıtlı iş önerisi üreticisi (kuyruk kendi kendini besler).
 
 Kural: fabrika kendi kendine İŞ ÜRETMEZ; kanıtla ÖNERİ üretir. Öneriler
-`backlog-onerileri.yaml` dosyasına yazılır ve insan onayı bekler (C1/C2).
+`backlog-proposals.yaml` dosyasına yazılır ve insan onayı bekler (C1/C2).
 Onaylanmadan üretim kuyruğuna girmez.
 
 Girdi: defterler (tekrar eden dersler, doluluk), son vardiya raporu
 (kırılma senaryoları), beceri durumu.
-Çıktı: backlog-onerileri.yaml + oneri-raporu.md (her öneri kanıtlı).
+Çıktı: backlog-proposals.yaml + oneri-raporu.md (her öneri kanıtlı).
 
 Kullanim:
     python kuyruk_uret.py --runs runs --vardiya-runs vardiya-runs --out .
@@ -128,7 +128,7 @@ def oneriler(runs: Path, vardiya_runs: Path) -> list[dict]:
 
 def yaz(oneriler_liste: list[dict], out: Path) -> tuple[Path, Path]:
     out.mkdir(parents=True, exist_ok=True)
-    yaml_dosya = out / "backlog-onerileri.yaml"
+    yaml_dosya = out / "backlog-proposals.yaml"
     isler = [
         {
             "id": o["id"],

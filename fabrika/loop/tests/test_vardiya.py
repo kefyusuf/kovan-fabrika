@@ -15,7 +15,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 import vardiya  # noqa: E402
 from runner import Ledger  # noqa: E402
 
-KAYNAK = Path(__file__).resolve().parent.parent / "kaynak-kuyrugu.yaml"
+KAYNAK = Path(__file__).resolve().parent.parent / "source-queue.yaml"
 
 
 def calistir(*argv: str) -> tuple[int, str]:

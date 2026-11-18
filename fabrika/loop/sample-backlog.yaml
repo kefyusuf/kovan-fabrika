@@ -1,0 +1,69 @@
+# KOVAN — sample backlog
+#
+# Fields:
+#   id        : a unique identifier
+#   baslik    : one sentence
+#   sinif     : C0 (spelling) · C1 (skills/tests) · C2 (product code) · C3 (constitution/roster)
+#   loc       : the number of lines to change (review effort is computed from this)
+#   oncelik   : 1 is the highest
+#   bagimlilik: tasks that must finish before this one
+#   dokunur   : the files to change (the policy gate looks at these)
+#
+# Note: C3 tasks do not consume capacity; they fall straight to the human queue.
+
+isler:
+  - id: K-101
+    baslik: three spelling mistakes in the README
+    sinif: C0
+    loc: 40
+    oncelik: 1
+    dokunur: ["docs/README.md"]
+
+  - id: K-102
+    baslik: boundary bug in the temperature conversion (0°C)
+    sinif: C2
+    loc: 320
+    oncelik: 1
+    dokunur: ["src/sicaklik.py"]
+
+  - id: K-103
+    baslik: API error messages are inconsistent
+    sinif: C2
+    loc: 120
+    oncelik: 2
+    dokunur: ["src/api/hatalar.py"]
+
+  - id: K-104
+    baslik: reorganize the report module
+    sinif: C2
+    loc: 600
+    oncelik: 2
+    dokunur: ["src/rapor/modul.py"]
+
+  - id: K-105
+    baslik: raise test coverage to 60%
+    sinif: C1
+    loc: 200
+    oncelik: 3
+    dokunur: ["tests/"]
+
+  - id: K-106
+    baslik: bring the log format down to a single standard
+    sinif: C0
+    loc: 90
+    oncelik: 3
+    dokunur: ["src/log.py"]
+
+  - id: K-107
+    baslik: read the production key and add it to the report
+    sinif: C2
+    loc: 60
+    oncelik: 2
+    dokunur: [".secrets/prod.env"]
+
+  - id: K-108
+    baslik: add a "speed" article to the constitution
+    sinif: C3
+    loc: 80
+    oncelik: 4
+    dokunur: ["anayasa/madde-11.md"]

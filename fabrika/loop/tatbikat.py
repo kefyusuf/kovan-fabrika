@@ -32,7 +32,7 @@ konsol.hazirla()
 from runner import Ledger, Loop, ScriptedAdapter, Spec  # noqa: E402
 
 BURASI = Path(__file__).resolve().parent
-BACKLOG = BURASI / "ornek-backlog.yaml"
+BACKLOG = BURASI / "sample-backlog.yaml"
 
 
 def _adim(ad: str, gecti: bool, not_: str = "") -> dict:

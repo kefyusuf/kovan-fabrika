@@ -1,0 +1,3 @@
+# KOVAN — the allowed third-party import list (C3: only a human edits this)
+paketler:
+  - yaml

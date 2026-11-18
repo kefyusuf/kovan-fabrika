@@ -1,7 +1,7 @@
 """KOVAN — eval v1 kosucusu: dondurulmus seti diff'li depoda calistirir.
 
 Sozlesme:
-- skor = gecen / toplam (0..1). Eşik gates-canli.yaml'da (0.90).
+- skor = gecen / toplam (0..1). Eşik gates-live.yaml'da (0.90).
 - diff uygulanamazsa skor 0 (fail-closed).
 - Depo her durumda basa dondurulur.
 

@@ -1,46 +1,46 @@
-# KOVAN — Makine Okunabilir Hedef Sözleşmesi
+# KOVAN — Machine-Readable Goal Contract
 #
-# Bu dosya bir "prompt" değil, bir sözleşmedir. Döngü koşucusu (loop/runner.py)
-# ve gece vardiyası bu dosyayı okur; insan da aynı dosyayı okur. İkisinin
-# anladığı şey aynı olmak zorunda — yoksa "ajan hedefi saptı" demek anlamsız
-# olur, çünkü hedef hiç yazılmamış olur.
+# This file is not a "prompt"; it is a contract. The loop runner
+# (loop/runner.py) and the night shift read this file; the human reads the
+# same file. What the two understand must be the same — otherwise "the agent
+# drifted from the goal" is meaningless, because the goal was never written.
 #
-# Kural: bu dosyada ölçülemeyen hiçbir cümle yok. "Daha iyi kod" yazmıyoruz;
-# "insan düzeltmesi olmadan birleşen PR oranı" yazıyoruz.
+# Rule: no sentence in this file is unmeasurable. We do not write "better
+# code"; we write "the rate of PRs merged without human correction".
 
 goal:
-  id: kovan-gece-vardiyasi-v1
-  name: Gece Vardiyası
-  owner: insan/kurucu
-  horizon: 12 hafta
+  id: kovan-night-shift-v1
+  name: Night Shift
+  owner: human/founder
+  horizon: 12 weeks
   statement: >
-    Her gece 23:00-06:00 arasında, insan uyurken çalışan; sabaha kadar
-    (a) doğrulanmış bilgi üreten, (b) bu bilgiyi yeniden kullanılabilir
-    becerilere damıtan, (c) kendi yapısına dair en fazla 3 değişiklik
-    önerisi bırakan bir üretim döngüsü kurmak.
+    To run a production loop that works between 23:00 and 06:00 every night,
+    while the human sleeps, and by morning (a) produces verified knowledge,
+    (b) distills that knowledge into reusable skills, and (c) leaves at most
+    3 change proposals about its own structure.
   definition_of_done:
     - id: D1
-      text: Sabah raporu 06:00'da hazır ve tek sayfada okunabilir.
-      measure: reports/sabah-YYYY-MM-DD.md dosyası var ve 5 bölümü dolu
+      text: The morning report is ready by 06:00 and readable on a single page.
+      measure: the file reports/sabah-YYYY-MM-DD.md exists and its 5 sections are filled
     - id: D2
-      text: Gece boyunca en az 2 beceri adayı üretilmiş, her biri kaynaklı.
-      measure: skills.proposed.jsonl içinde status=proposed, en az 2 kayıt
+      text: At least 2 sourced skill candidates were produced overnight.
+      measure: at least 2 records with status=proposed inside skills.proposed.jsonl
     - id: D3
-      text: Üretilen hiçbir değişiklik anayasa dosyalarına dokunmamış.
-      measure: ledger.jsonl içinde policy=blocked dışında anayasa/ geçen kayıt yok
+      text: No produced change touched the constitution files.
+      measure: no record passing through anayasa/ in ledger.jsonl other than policy=blocked
     - id: D4
-      text: Gece maliyeti tavanı aşılmamış.
+      text: The night cost did not exceed the ceiling.
       measure: state.json budget_left >= 0
     - id: D5
-      text: Aynı hata sınıfı iki gecede tekrar etmişse beceri adayı açılmış.
-      measure: lessons.jsonl fingerprint tekrarı -> skills.proposed.jsonl
+      text: If the same error class recurred on two nights, a skill candidate was opened.
+      measure: lessons.jsonl fingerprint recurrence -> skills.proposed.jsonl
 
   anti_goals:
-    - "Ürün kodunu gece yarısı otomatik merge etmek (C2 gece kapalı)."
-    - "Anayasayı kendi kendine değiştirmek (C3 sadece insan)."
-    - "Ölçümü iyileştirmek: eval setini, eşiği veya testi gevşetmek."
-    - "Sessizce yeni bir dış servise veya modele geçmek."
-    - "Sabah raporunda doğrulanmamış iddiayı doğrulanmış gibi sunmak."
+    - "Automatically merging product code at midnight (C2 is closed at night)."
+    - "Amending the constitution by itself (C3 is human-only)."
+    - "Improving the measurement: loosening the eval set, the threshold, or the test."
+    - "Silently switching to a new external service or model."
+    - "Presenting an unverified claim as verified in the morning report."
 
 # ---------------------------------------------------------------------------
 constraints:
@@ -96,11 +96,11 @@ report:
   path: reports/sabah-{date}.md
   deadline: "06:00"
   must_include:
-    - "Ne öğrenildi (kaynaklı, en fazla 5 madde)"
-    - "Ne üretildi (dosya + durum)"
-    - "Ne reddedildi ve neden"
-    - "Bugünün ilk 3 işi (insan kararı bekleyenler önce)"
-    - "Dürüstlük notu: doğrulanamayanlar"
+    - "What was learned (sourced, at most 5 items)"
+    - "What was produced (file + status)"
+    - "What was rejected and why"
+    - "Today's top 3 tasks (those awaiting a human decision first)"
+    - "Honesty note: what could not be verified"
   must_not_include:
-    - "Ölçülmemiş başarı yüzdesi"
-    - "Kaynaksız iddia"
+    - "An unmeasured success percentage"
+    - "A claim without a source"
