@@ -10,7 +10,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from verify import repo_gecerli_mi, sinyaller, uygula  # noqa: E402
+from verify import repo_is_valid, measure_tests, apply_patch  # noqa: E402
 
 REPO = Path(__file__).resolve().parent.parent / "ornek-repo"
 KOMUT = "python -m unittest discover -s tests -t ."
@@ -46,35 +46,35 @@ KIRMIZI = """--- a/tests/test_kirik.py
 """
 
 
-class DogrulaTest(unittest.TestCase):
-    def test_repo_gecerli(self):
-        self.assertTrue(repo_gecerli_mi(REPO))
+class VerifyTest(unittest.TestCase):
+    def test_repo_valid(self):
+        self.assertTrue(repo_is_valid(REPO))
 
-    def test_yesil_yama_tests_true(self):
-        s = sinyaller(REPO, YESIL, KOMUT)
+    def test_green_patch_tests_true(self):
+        s = measure_tests(REPO, YESIL, KOMUT)
         self.assertTrue(s["tests"], s.get("not", ""))
 
-    def test_kirmizi_yama_tests_false(self):
-        s = sinyaller(REPO, KIRMIZI, KOMUT)
+    def test_red_patch_tests_false(self):
+        s = measure_tests(REPO, KIRMIZI, KOMUT)
         self.assertFalse(s["tests"])
 
-    def test_uygulanamaz_yama_tests_false(self):
-        s = sinyaller(REPO, "--- a/yok/olmayan.py\n+++ b/yok/olmayan.py\n@@ -1 +1 @@\n-x\n+y\n", KOMUT)
+    def test_inapplicable_patch_tests_false(self):
+        s = measure_tests(REPO, "--- a/yok/olmayan.py\n+++ b/yok/olmayan.py\n@@ -1 +1 @@\n-x\n+y\n", KOMUT)
         self.assertFalse(s["tests"])
         self.assertIn("uygulanamaz", s["not"])
 
-    def test_bos_diff_fail_closed(self):
-        s = sinyaller(REPO, "", KOMUT)
+    def test_empty_diff_fail_closed(self):
+        s = measure_tests(REPO, "", KOMUT)
         self.assertFalse(s["tests"])
 
-    def test_depo_geri_alinmis(self):
+    def test_repo_reset(self):
         kod = subprocess.run(
             ["git", "-C", str(REPO), "status", "--porcelain"],
             capture_output=True, text=True,
         ).stdout.strip()
         self.assertEqual(kod, "")
 
-    def test_geri_al_cli(self):
+    def test_rollback_cli(self):
         kod = subprocess.run(
             [sys.executable, "verify.py", "--repo", str(REPO), "--rollback"],
             capture_output=True, text=True, cwd=str(REPO.parent),
@@ -82,7 +82,7 @@ class DogrulaTest(unittest.TestCase):
         self.assertEqual(kod.returncode, 0)
         self.assertIn("temiz", kod.stdout)
 
-    def test_kirli_agac_uygulama_reddedilir(self):
+    def test_dirty_tree_apply_rejected(self):
         """Yayın güvenliği: commitlenmemiş işi olan ağaçta yama denenmez."""
         with tempfile.TemporaryDirectory() as tmp:
             klon = Path(tmp) / "r"
@@ -95,7 +95,7 @@ class DogrulaTest(unittest.TestCase):
                 sicaklik.read_text(encoding="utf-8") + "\n# kullanici isini kaybetmemeli\n",
                 encoding="utf-8",
             )
-            ok, neden = uygula(klon, "--- a/x.py\n+++ b/x.py\n@@ -1 +1 @@\n-a\n+b\n")
+            ok, neden = apply_patch(klon, "--- a/x.py\n+++ b/x.py\n@@ -1 +1 @@\n-a\n+b\n")
             self.assertFalse(ok)
             self.assertIn("kirli", neden)
             # İçerik korunmuş olmalı: kullanıcının işi yerinde.

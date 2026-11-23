@@ -24,7 +24,7 @@ import console
 
 console.hazirla()
 
-from verify import geri_al, repo_gecerli_mi, uygula  # noqa: E402
+from verify import reset_repo, repo_is_valid, apply_patch  # noqa: E402
 
 KOMUT_TIMEOUT = 180
 KOSONUC_ONEK = "KOSONUC="
@@ -34,7 +34,7 @@ BURASI = Path(__file__).resolve().parent
 def kos(repo: str | Path, set_dosyasi: str | Path, diff: str | None = None) -> dict:
     repo_p = Path(repo)
     set_p = Path(set_dosyasi)
-    if not repo_gecerli_mi(repo_p):
+    if not repo_is_valid(repo_p):
         return {"skor": 0.0, "gecen": 0, "toplam": 0, "hata": "repo geçersiz veya git deposu değil"}
 
     satirlar = [
@@ -45,9 +45,9 @@ def kos(repo: str | Path, set_dosyasi: str | Path, diff: str | None = None) -> d
         return {"skor": 0.0, "gecen": 0, "toplam": 0, "hata": "set boş"}
 
     if diff is not None:
-        ok, not_ = uygula(repo_p, diff)
+        ok, not_ = apply_patch(repo_p, diff)
         if not ok:
-            geri_al(repo_p)
+            reset_repo(repo_p)
             return {"skor": 0.0, "gecen": 0, "toplam": toplam, "hata": f"diff uygulanamadı: {not_}"}
 
     try:

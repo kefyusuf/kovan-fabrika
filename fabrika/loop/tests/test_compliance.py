@@ -10,7 +10,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from compliance import bagimlilik_cikar, dosya_degisimi_var, kopya_blok_tara, sinyal  # noqa: E402
+from compliance import extract_dependencies, has_dependency_change, scan_copy_blocks, signal  # noqa: E402
 
 REPO = Path(__file__).resolve().parent.parent / "ornek-repo"
 
@@ -31,78 +31,78 @@ REQ_DIFF = (
 )
 
 
-class CikarimTest(unittest.TestCase):
-    def test_import_kokleri(self):
-        self.assertEqual(bagimlilik_cikar(STDLIB_DIFF), {"json", "pathlib"})
-        self.assertEqual(bagimlilik_cikar(UCUNCU_DIFF), {"requests"})
+class ExtractionTest(unittest.TestCase):
+    def test_import_roots(self):
+        self.assertEqual(extract_dependencies(STDLIB_DIFF), {"json", "pathlib"})
+        self.assertEqual(extract_dependencies(UCUNCU_DIFF), {"requests"})
 
-    def test_silinen_satir_sayilmaz(self):
-        self.assertEqual(bagimlilik_cikar("--- a/x\n+++ b/x\n@@ -1 +1 @@\n-import os\n"), set())
+    def test_deleted_lines_not_counted(self):
+        self.assertEqual(extract_dependencies("--- a/x\n+++ b/x\n@@ -1 +1 @@\n-import os\n"), set())
 
-    def test_bagimlilik_dosyasi_tespiti(self):
-        self.assertTrue(dosya_degisimi_var(REQ_DIFF))
-        self.assertFalse(dosya_degisimi_var(STDLIB_DIFF))
+    def test_dependency_file_detected(self):
+        self.assertTrue(has_dependency_change(REQ_DIFF))
+        self.assertFalse(has_dependency_change(STDLIB_DIFF))
 
 
-class SinyalTest(unittest.TestCase):
-    def test_stdlib_serbest(self):
-        s = sinyal(STDLIB_DIFF)
+class SignalTest(unittest.TestCase):
+    def test_stdlib_free(self):
+        s = signal(STDLIB_DIFF)
         self.assertTrue(s["provenance"])
         self.assertIn("json", s["paketler"])
 
-    def test_ucuncu_taraf_izinsiz_reddedilir(self):
-        s = sinyal(UCUNCU_DIFF)
+    def test_unauthorized_third_party_rejected(self):
+        s = signal(UCUNCU_DIFF)
         self.assertFalse(s["provenance"])
         self.assertIn("requests", s["paketler"])
 
-    def test_izin_listesiyle_serbest(self):
-        with tempfile_dosya("paketler:\n  - requests\n") as yol:
-            s = sinyal(UCUNCU_DIFF, yol)
+    def test_allowlisted_free(self):
+        with temp_text_file("paketler:\n  - requests\n") as yol:
+            s = signal(UCUNCU_DIFF, yol)
         self.assertTrue(s["provenance"])
 
-    def test_bagimlilik_dosyasi_reddedilir(self):
-        s = sinyal(REQ_DIFF)
+    def test_dependency_file_rejected(self):
+        s = signal(REQ_DIFF)
         self.assertFalse(s["provenance"])
         self.assertIn("C3", s["not"])
 
-    def test_yinelenen_fonksiyon_tespit_edilir(self):
+    def test_duplicate_function_detected(self):
         diff = (
             "--- a/src/sicaklik.py\n+++ b/src/sicaklik.py\n@@ -4,2 +4,4 @@\n"
             "+def celsius_fahrenheit(c):\n+    return 0\n"
         )
-        s = sinyal(diff, repo=REPO)
+        s = signal(diff, repo=REPO)
         self.assertIn("celsius_fahrenheit", s["yinelenen_fonksiyon"])
 
-    def test_yeni_fonksiyon_yinelenmez(self):
+    def test_new_function_not_flagged(self):
         diff = "--- a/src/yeni.py\n+++ b/src/yeni.py\n@@ -0,0 +1,2 @@\n+def tamamen_yeni():\n+    return 1\n"
-        s = sinyal(diff, repo=REPO)
+        s = signal(diff, repo=REPO)
         self.assertEqual(s["yinelenen_fonksiyon"], [])
 
-    def test_kopya_suphesi_telif_basligi(self):
+    def test_copy_suspicion_copyright_header(self):
         diff = (
             "--- a/src/kopya.py\n+++ b/src/kopya.py\n@@ -0,0 +1,3 @@\n"
             "+# Copyright (c) 2026 Baskasi\n+def x():\n+    return 1\n"
         )
-        s = sinyal(diff)
+        s = signal(diff)
         self.assertFalse(s["provenance"])
         self.assertIn("kopya", s["not"])
 
-    def test_spdx_basligi_reddedilir(self):
+    def test_spdx_header_rejected(self):
         diff = (
             "--- a/src/kopya.py\n+++ b/src/kopya.py\n@@ -0,0 +1,3 @@\n"
             "+// SPDX-License-Identifier: MIT\n+def x():\n+    return 1\n"
         )
-        s = sinyal(diff)
+        s = signal(diff)
         self.assertFalse(s["provenance"])
 
-    def test_temiz_diff_kopya_suphesi_uyarilmaz(self):
-        self.assertFalse(sinyal(STDLIB_DIFF)["provenance"] is False and "kopya" in sinyal(STDLIB_DIFF)["not"])
+    def test_clean_diff_no_copy_suspicion(self):
+        self.assertFalse(signal(STDLIB_DIFF)["provenance"] is False and "kopya" in signal(STDLIB_DIFF)["not"])
 
-    def test_bos_diff_serbest(self):
-        self.assertTrue(sinyal("")["provenance"])
+    def test_empty_diff_free(self):
+        self.assertTrue(signal("")["provenance"])
 
 
-class tempfile_dosya:
+class temp_text_file:
     """Küçük içerikli geçici dosya (with ile)."""
 
     def __init__(self, icerik: str):
@@ -173,7 +173,7 @@ def _diff_eski_yeni(eski_metin, yeni_metin, yol="a/x.py", yol2="b/x.py"):
     )
 
 
-class KopyaBlokTest(unittest.TestCase):
+class CopyBlockTest(unittest.TestCase):
     def setUp(self):
         self._t = tempfile.TemporaryDirectory()
         self.repo = _git_repo(Path(self._t.name) / "r", {"uzun.py": UZUN_FN})
@@ -181,16 +181,16 @@ class KopyaBlokTest(unittest.TestCase):
     def tearDown(self):
         self._t.cleanup()
 
-    def test_yeniden_adlandirilmis_kopya_reddedilir(self):
+    def test_renamed_copy_rejected(self):
         kopya = UZUN_FN.replace("def hesapla", "def hesapla_v2").replace("sirali", "dizi")
         diff = _diff_eski_yeni(UZUN_FN, kopya, "a/uzun.py", "b/uzun.py")
-        s = sinyal(diff, repo=self.repo)
+        s = signal(diff, repo=self.repo)
         self.assertFalse(s["provenance"])
         self.assertTrue(s["kopya_blok"])
         self.assertEqual(s["kopya_blok"][0]["fonksiyon"], "hesapla_v2")
         self.assertGreaterEqual(s["kopya_blok"][0]["skor"], 0.90)
 
-    def test_kopya_varyantlarinin_hepsi_yakalanir(self):
+    def test_all_copy_variants_caught(self):
         """Dedektör sağlamlığı: kozmetik varyantlar kopyayı gizleyemez.
 
         Ad değişimi, yorum ekleme, format değişimi, metin sabiti değişimi
@@ -214,18 +214,18 @@ class KopyaBlokTest(unittest.TestCase):
         ]
         for varyant in varyantlar:
             diff = _diff_eski_yeni(UZUN_FN, varyant, "a/uzun.py", "b/uzun.py")
-            bulgular = kopya_blok_tara(self.repo, diff)
+            bulgular = scan_copy_blocks(self.repo, diff)
             self.assertTrue(bulgular, "varyant yakalanmadı")
             self.assertGreaterEqual(bulgular[0]["skor"], 0.90)
 
-    def test_kisa_benzer_fonksiyon_bilgi_duzeyinde(self):
+    def test_short_similar_function_info_level(self):
         kopya = UZUN_FN.splitlines()[0] + "\n    return 1\n"
         diff = "--- a/kisa.py\n+++ b/kisa.py\n@@ -0,0 +1,2 @@\n+def kisa(a):\n+    return a\n"
-        s = sinyal(diff, repo=self.repo)
+        s = signal(diff, repo=self.repo)
         self.assertTrue(s["provenance"])
         self.assertEqual(s["kopya_blok"], [])
 
-    def test_ilgisiz_yeni_fonksiyon_temiz(self):
+    def test_unrelated_new_function_clean(self):
         ilgisiz = UZUN_FN.replace("hesapla", "bambaska").replace("+", "x")  # yer tutucu
         yeni = (
             "def bambaska(veriler):\n"
@@ -241,13 +241,13 @@ class KopyaBlokTest(unittest.TestCase):
         diff = "--- a/yeni.py\n+++ b/yeni.py\n@@ -0,0 +1,9 @@\n" + "".join(
             "+" + s for s in yeni.splitlines(keepends=True)
         )
-        s = sinyal(diff, repo=self.repo)
+        s = signal(diff, repo=self.repo)
         self.assertTrue(s["provenance"], s["not"])
         self.assertEqual(s["kopya_blok"], [])
 
-    def test_degismemis_fonksiyon_yeniden_raporlanmaz(self):
+    def test_unchanged_function_not_reported(self):
         diff = "--- a/uzun.py\n+++ b/uzun.py\n@@ -1,2 +1,3 @@\n def hesapla(liste):\n+    pass\n"
-        s = sinyal(diff, repo=self.repo)
+        s = signal(diff, repo=self.repo)
         self.assertEqual(s["kopya_blok"], [])
 
 if __name__ == "__main__":

@@ -38,10 +38,10 @@ import yaml
 
 from adapter_http import AdapterError, HttpAdapter  # noqa: E402
 import skill  # noqa: E402
-from verify import sinyaller  # noqa: E402
+from verify import measure_tests  # noqa: E402
 from eval_run import kos as eval_kos  # noqa: E402
 from reviewer import Incelemeci, IncelemeciError  # noqa: E402
-from compliance import sinyal as uyum_sinyali  # noqa: E402
+from compliance import signal as uyum_sinyali  # noqa: E402
 from capacity import WorkItem, review_hours, accept  # noqa: E402
 from runner import (  # noqa: E402
     Candidate,
@@ -109,7 +109,7 @@ class _DogrulayanAdapter:
                 diff="",
                 signals={"tests": False, "not": f"adapter hatası: {e}"},
             )
-        sinyal = sinyaller(self.repo, cand.diff, self.test_komutu)
+        sinyal = measure_tests(self.repo, cand.diff, self.test_komutu)
         birlesik = dict(cand.signals)
         birlesik.update(sinyal)
         # Beceri: tests-kapisi-tekrar-dusmesi — yalnızca ACTIVE ise yürütür

@@ -32,7 +32,7 @@ import console
 
 console.hazirla()
 
-from verify import test_calistir  # noqa: E402
+from verify import run_test_command  # noqa: E402
 from eval_run import kos as eval_kos  # noqa: E402
 
 BURASI = Path(__file__).resolve().parent
@@ -117,7 +117,7 @@ def kos(repo: Path, set_dosyasi: Path, test_komutu: str, maks: int = 12) -> dict
             _commit(klon)
             ev = eval_kos(klon, set_dosyasi)
             try:
-                testler, _ = test_calistir(klon, test_komutu)
+                testler, _ = run_test_command(klon, test_komutu)
             except Exception:  # noqa: BLE001
                 testler = False
             oldu = ev["skor"] < 1.0 or not testler

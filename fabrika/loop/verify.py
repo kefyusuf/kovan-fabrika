@@ -1,15 +1,16 @@
-"""KOVAN — gerçek doğrulama katmanı.
+"""KOVAN — the real verification layer.
 
-Sinyali model söylemez; bilgisayar ölçer. Bu modül:
-1. modelin ürettiği diff'i gerçek bir git deposuna uygular (--check ile),
-2. depoda gerçek test komutunu çalıştırır,
-3. sonucu `tests` sinyali olarak döndürür ve depoyu geri alır.
+The model never declares the signal; the computer measures it. This module:
+1. applies the model-produced diff to a real git repository (--check first),
+2. runs the real test command inside the repo,
+3. returns the outcome as the `tests` signal and resets the repo.
 
-Sözleşme:
-- uygulanamayan diff = tests: False (fail-closed).
-- sinyal sözlüğünde "tests" yoksa kapı geçmez (runner zaten böyle).
+Contract:
+- an inapplicable diff = tests: False (fail-closed).
+- if the signal dict has no "tests" key, the gate does not pass (the runner
+  already behaves this way).
 
-Kullanim:
+Usage:
     python verify.py --repo ornek-repo --diff-file yama.diff \
         --command "python -m unittest discover -s tests -t ."
 """
@@ -26,15 +27,15 @@ import console
 
 console.hazirla()
 
-KOMUT_TIMEOUT = 180
+COMMAND_TIMEOUT = 180
 
 
-class DogrulaError(RuntimeError):
+class VerifyError(RuntimeError):
     pass
 
 
 def _git(repo: Path, *args: str) -> tuple[int, str]:
-    sonuc = subprocess.run(
+    result = subprocess.run(
         ["git", "-C", str(repo), *args],
         capture_output=True,
         text=True,
@@ -42,29 +43,29 @@ def _git(repo: Path, *args: str) -> tuple[int, str]:
         errors="replace",
         timeout=60,
     )
-    return sonuc.returncode, (sonuc.stdout + sonuc.stderr).strip()
+    return result.returncode, (result.stdout + result.stderr).strip()
 
 
-def repo_gecerli_mi(repo: Path) -> bool:
+def repo_is_valid(repo: Path) -> bool:
     if not repo.is_dir():
         return False
-    kod, _ = _git(repo, "rev-parse", "--is-inside-work-tree")
-    return kod == 0
+    code, _ = _git(repo, "rev-parse", "--is-inside-work-tree")
+    return code == 0
 
 
-def uygula(repo: Path, diff: str) -> tuple[bool, str]:
-    """Diff'i depoya uygular. Başarısızsa depo dokunulmaz (--check).
+def apply_patch(repo: Path, diff: str) -> tuple[bool, str]:
+    """Applies the diff to the repo. On failure the repo is untouched (--check).
 
-    Güvenlik: çalışma ağacı KİRLİ ise uygulama REDDEDİLİR — sonraki
-    `geri_al` (reset --hard) kullanıcının commitlenmemiş işini silebilir.
-    Kural: yama yalnızca temiz ağaçta denenir (fail-closed).
+    Safety: if the working tree is DIRTY, applying is REFUSED — a later
+    `reset_repo` (reset --hard) could wipe the user's uncommitted work.
+    Rule: a patch is only tried on a clean tree (fail-closed).
     """
     if not diff.strip():
         return False, "diff boş"
-    kod, durum = _git(repo, "status", "--porcelain")
-    if kod != 0:
-        return False, f"git durumu okunamadı: {durum[:200]}"
-    if durum:
+    code, status = _git(repo, "status", "--porcelain")
+    if code != 0:
+        return False, f"git durumu okunamadı: {status[:200]}"
+    if status:
         return False, (
             "çalışma ağacı kirli — commit/stash edin; yama yalnızca temiz "
             "ağaçta denenir (reset --hard koruması)"
@@ -73,23 +74,23 @@ def uygula(repo: Path, diff: str) -> tuple[bool, str]:
         "w", suffix=".diff", delete=False, encoding="utf-8", newline="\n"
     ) as fh:
         fh.write(diff if diff.endswith("\n") else diff + "\n")
-        yama = fh.name
-    kod, cikti = _git(repo, "apply", "--check", yama)
-    if kod != 0:
-        return False, f"uygulanamaz: {cikti[:300]}"
-    kod, cikti = _git(repo, "apply", yama)
-    return (kod == 0), cikti[:300]
+        patch_file = fh.name
+    code, output = _git(repo, "apply", "--check", patch_file)
+    if code != 0:
+        return False, f"uygulanamaz: {output[:300]}"
+    code, output = _git(repo, "apply", patch_file)
+    return (code == 0), output[:300]
 
 
-def geri_al(repo: Path) -> None:
-    """Takip edilen değişiklikleri başa döndürür; yeni dosyaları temizler."""
+def reset_repo(repo: Path) -> None:
+    """Resets tracked changes back to HEAD; removes untracked files."""
     _git(repo, "reset", "--hard", "HEAD")
     _git(repo, "clean", "-fd")
 
 
-def test_calistir(repo: Path, komut: str, timeout: int = KOMUT_TIMEOUT) -> tuple[bool, str]:
-    sonuc = subprocess.run(
-        komut,
+def run_test_command(repo: Path, command: str, timeout: int = COMMAND_TIMEOUT) -> tuple[bool, str]:
+    result = subprocess.run(
+        command,
         cwd=str(repo),
         capture_output=True,
         text=True,
@@ -98,29 +99,29 @@ def test_calistir(repo: Path, komut: str, timeout: int = KOMUT_TIMEOUT) -> tuple
         timeout=timeout,
         shell=True,
     )
-    cikti = (sonuc.stdout + sonuc.stderr).strip()
-    kuyruk = cikti[-400:] if cikti else ""
-    return sonuc.returncode == 0, kuyruk
+    output = (result.stdout + result.stderr).strip()
+    tail = output[-400:] if output else ""
+    return result.returncode == 0, tail
 
 
-def sinyaller(repo: Path, diff: str, test_komutu: str) -> dict:
-    """tests sinyalini ölçer; depoyu her durumda başa döndürür."""
-    if not repo_gecerli_mi(repo):
+def measure_tests(repo: Path, diff: str, test_command: str) -> dict:
+    """Measures the tests signal; resets the repo in every case."""
+    if not repo_is_valid(repo):
         return {"tests": False, "not": "repo geçersiz veya git deposu değil"}
-    ok, not_ = uygula(repo, diff)
+    ok, note = apply_patch(repo, diff)
     if not ok:
-        geri_al(repo)
-        return {"tests": False, "not": not_}
+        reset_repo(repo)
+        return {"tests": False, "not": note}
     try:
-        gecti, cikti = test_calistir(repo, test_komutu)
+        passed, output = run_test_command(repo, test_command)
     except subprocess.TimeoutExpired:
-        gecti, cikti = False, "test komutu zaman aşımına uğradı"
+        passed, output = False, "test komutu zaman aşımına uğradı"
     finally:
-        geri_al(repo)
-    return {"tests": gecti, "not": cikti}
+        reset_repo(repo)
+    return {"tests": passed, "not": output}
 
 
-def ana(argv: list[str] | None = None) -> int:
+def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="KOVAN doğrulama katmanı")
     parser.add_argument("--repo", required=True)
     parser.add_argument("--rollback", action="store_true", help="depoyu HEAD'e döndürür (diff koşmaz)")
@@ -130,18 +131,18 @@ def ana(argv: list[str] | None = None) -> int:
 
     repo = Path(args.repo)
     if args.rollback:
-        geri_al(repo)
-        temiz = not repo_gecerli_mi(repo) or not _git(repo, "status", "--porcelain")[1]
-        print("depo başa döndürüldü; çalışma ağacı " + ("temiz" if temiz else "HÂLÂ kirli"))
-        return 0 if temiz else 1
+        reset_repo(repo)
+        clean = not repo_is_valid(repo) or not _git(repo, "status", "--porcelain")[1]
+        print("depo başa döndürüldü; çalışma ağacı " + ("temiz" if clean else "HÂLÂ kirli"))
+        return 0 if clean else 1
 
     if not args.diff_file or not args.command:
         parser.error("--diff-file ve --command gerekli (ya da --rollback)")
     diff = Path(args.diff_file).read_text(encoding="utf-8")
-    sonuc = sinyaller(repo, diff, args.command)
-    print(json.dumps(sonuc, ensure_ascii=False, indent=2))
-    return 0 if sonuc.get("tests") else 1
+    result = measure_tests(repo, diff, args.command)
+    print(json.dumps(result, ensure_ascii=False, indent=2))
+    return 0 if result.get("tests") else 1
 
 
 if __name__ == "__main__":
-    raise SystemExit(ana())
+    raise SystemExit(main())

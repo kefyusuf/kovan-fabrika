@@ -1,17 +1,17 @@
-"""KOVAN — uyum katmanı: provenance sinyali (SBOM tohumu).
+"""KOVAN — compliance layer: the provenance signal (SBOM seed).
 
-Ölçülen şey: diff'te YENİ import edilen modüller ve bağımlılık dosyası
-değişimi. Kural:
-- standart kütüphane import'u → serbest;
-- üçüncü taraf import → yalnızca `compliance-allowlist.yaml` listesindeyse serbest;
-- requirements/pyproject/package.json/Cargo.toml değişimi → REDDET (C3:
-  yeni bağımlılık insan kararıdır);
-- ölçülemeyen durum → False (fail-closed).
+What is measured: modules NEWLY imported in the diff and dependency-file
+changes. Rules:
+- standard-library imports → free;
+- third-party imports → free only if listed in `compliance-allowlist.yaml`;
+- a requirements/pyproject/package.json/Cargo.toml change → REJECT (C3:
+  a new dependency is a human decision);
+- an unmeasurable state → False (fail-closed).
 
-Bu, "kaynağı gösterilemeyen kod birleşmez" kuralının bugünkü ölçülebilir
-hâlidir. Kopya kod tespiti ve tam SBOM (SPDX) S4'te eklenir.
+This is today's measurable form of the rule "code whose source cannot be
+shown does not merge". Copy detection and the full SBOM (SPDX) join in S4.
 
-Kullanim:
+Usage:
     python compliance.py --diff-file yama.diff [--allowlist compliance-allowlist.yaml]
 """
 
@@ -35,45 +35,45 @@ import console
 
 console.hazirla()
 
-from verify import geri_al, repo_gecerli_mi, uygula  # noqa: E402
+from verify import reset_repo, repo_is_valid, apply_patch  # noqa: E402
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 
-BAGIMLILIK_DOSYALARI = (
+DEPENDENCY_FILES = (
     "requirements",
     "pyproject.toml",
     "package.json",
     "Cargo.toml",
     "Pipfile",
 )
-ATLANAN_DIZINLER = {
+SKIPPED_DIRS = {
     ".git", "__pycache__", ".venv", "venv", "node_modules", "target",
     "runs", "vardiya-runs", ".secrets",
 }
-IMPORT_SATIRI = re.compile(r"^\+\s*(?:import\s+([A-Za-z_][\w.]*)|from\s+([A-Za-z_][\w.]*)\s+import)", re.M)
+IMPORT_LINE_RE = re.compile(r"^\+\s*(?:import\s+([A-Za-z_][\w.]*)|from\s+([A-Za-z_][\w.]*)\s+import)", re.M)
 
 
-def _kok(modul: str) -> str:
-    return modul.split(".")[0]
+def _root(module: str) -> str:
+    return module.split(".")[0]
 
 
-def bagimlilik_cikar(diff: str) -> set[str]:
-    """Diff'in eklenen satırlarındaki kök modülleri çıkarır."""
+def extract_dependencies(diff: str) -> set[str]:
+    """Extracts the root modules from the diff's added lines."""
     return {
-        _kok(m)
+        _root(m)
         for m in (
             a or b
-            for a, b in IMPORT_SATIRI.findall(diff or "")
+            for a, b in IMPORT_LINE_RE.findall(diff or "")
         )
         if m
     }
 
 
-def dosya_degisimi_var(diff: str) -> bool:
-    return any(d in (diff or "") for d in BAGIMLILIK_DOSYALARI)
+def has_dependency_change(diff: str) -> bool:
+    return any(d in (diff or "") for d in DEPENDENCY_FILES)
 
 
-def izinli_oku(path: str | Path | None) -> set[str]:
+def read_allowlist(path: str | Path | None) -> set[str]:
     if not path:
         return set()
     p = Path(path)
@@ -81,247 +81,250 @@ def izinli_oku(path: str | Path | None) -> set[str]:
         return set()
     import yaml
 
-    veri = yaml.safe_load(p.read_text(encoding="utf-8")) or {}
-    return {str(x).strip() for x in veri.get("paketler", []) if str(x).strip()}
+    data = yaml.safe_load(p.read_text(encoding="utf-8")) or {}
+    return {str(x).strip() for x in data.get("paketler", []) if str(x).strip()}
 
 
-def kopya_suphesi(diff: str) -> bool:
-    """Eklenen satırlarda dış kaynak göstergesi arar (tohum düzeyi).
+def copy_suspicion(diff: str) -> bool:
+    """Searches the added lines for external-origin markers (seed level).
 
-    Copyright/SPDX başlığı, telif notu veya yükleyici satırı — bu bir
-    telif kararı değildir, İNSAN KARARI içindir (fail-closed).
+    A Copyright/SPDX header, a copyright notice, or an installer line — this
+    is not a copyright decision, it exists to force a HUMAN decision
+    (fail-closed).
     """
-    desen = re.compile(
+    pattern = re.compile(
         r"^\+.*(Copyright \(c\)|Copyright ©|SPDX-License-Identifier|All rights reserved)",
         re.M | re.I,
     )
-    return bool(desen.search(diff or ""))
+    return bool(pattern.search(diff or ""))
 
 
-def _eklenen_kod(diff: str) -> str:
+def _added_code(diff: str) -> str:
     return "\n".join(
         s[1:] for s in (diff or "").splitlines() if s.startswith("+") and not s.startswith("+++")
     )
 
 
-def _def_isimleri(kod: str) -> set[str]:
+def _def_names(code: str) -> set[str]:
     try:
-        agac = ast.parse(kod)
+        tree = ast.parse(code)
     except (SyntaxError, ValueError):
         return set()
-    return {d.name for d in ast.walk(agac) if isinstance(d, (ast.FunctionDef, ast.AsyncFunctionDef))}
+    return {d.name for d in ast.walk(tree) if isinstance(d, (ast.FunctionDef, ast.AsyncFunctionDef))}
 
 
-def _yapi_imzasi(kod: str) -> list[str]:
-    """Kodun yapısını tokenize eder: tanımlayıcı/sayı/metin değerleri maskelenir.
+def _structure_signature(code: str) -> list[str]:
+    """Tokenizes the code's structure: identifiers/numbers/strings are masked.
 
-    Amaç: değişken yeniden adlandırma ile gizlenen kopyayı da görmek.
-    Sonuç: token tipi dizisi (['def','N','(',...]).
+    Purpose: to also see a copy hidden by variable renaming. Result: a
+    sequence of token types (['def','N','(',...]).
     """
     import keyword
 
-    maskeler = {"NAME": "N", "NUMBER": "#", "STRING": "S"}
-    atla = {"COMMENT", "NL", "NEWLINE", "ENCODING", "ENDMARKER"}
-    imza: list[str] = []
+    masks = {"NAME": "N", "NUMBER": "#", "STRING": "S"}
+    skip = {"COMMENT", "NL", "NEWLINE", "ENCODING", "ENDMARKER"}
+    signature: list[str] = []
     try:
-        for tok in tokenize.generate_tokens(io.StringIO(kod).readline):
+        for tok in tokenize.generate_tokens(io.StringIO(code).readline):
             if tok.type == tokenize.NAME:
-                imza.append("N" if tok.string not in keyword.kwlist else tok.string)
+                signature.append("N" if tok.string not in keyword.kwlist else tok.string)
             elif tok.type == tokenize.NUMBER:
-                imza.append("#")
+                signature.append("#")
             elif tok.type == tokenize.STRING:
-                imza.append("S")
+                signature.append("S")
             elif tok.type == tokenize.OP:
-                imza.append(tok.string)
+                signature.append(tok.string)
             elif tok.type in (tokenize.INDENT, tokenize.DEDENT):
-                imza.append(tok.type)
+                signature.append(tok.type)
     except (tokenize.TokenError, IndentationError, SyntaxError):
-        return imza  # kısmi imza ile devam (parça kod olabilir)
-    return [x for x in imza if x not in {"NEWLINE"}]
+        return signature  # continue with a partial signature (fragment code possible)
+    return [x for x in signature if x not in {"NEWLINE"}]
 
 
-def yinelenen_fonksiyon(repo: Path, diff: str) -> list[str]:
-    """Diff'in eklediği fonksiyon adları ile depodaki mevcut adların kesişimi.
+def duplicate_functions(repo: Path, diff: str) -> list[str]:
+    """The intersection of the diff's added function names with existing names in the repo.
 
-    Yeniden tanımlama, büyük olasılıkla çakışmadır: bilgi olarak raporlanır,
-    provenance kararını tek başına değiştirmez (review kapısına sinyal).
+    A redefinition is most likely a collision: reported as information; it
+    does not by itself change the provenance decision (a signal to the review
+    gate).
     """
-    yeni = _def_isimleri(_eklenen_kod(diff))
-    if not yeni or not repo.is_dir():
+    added = _def_names(_added_code(diff))
+    if not added or not repo.is_dir():
         return []
-    mevcut: set[str] = set()
-    for dosya in repo.rglob("*.py"):
-        if any(par in ATLANAN_DIZINLER for par in dosya.parts):
+    existing: set[str] = set()
+    for file in repo.rglob("*.py"):
+        if any(part in SKIPPED_DIRS for part in file.parts):
             continue
         try:
-            agac = ast.parse(dosya.read_text(encoding="utf-8", errors="replace"))
+            tree = ast.parse(file.read_text(encoding="utf-8", errors="replace"))
         except (SyntaxError, ValueError):
             continue
-        mevcut |= {d.name for d in ast.walk(agac) if isinstance(d, (ast.FunctionDef, ast.AsyncFunctionDef))}
-    return sorted(yeni & mevcut)
+        existing |= {d.name for d in ast.walk(tree) if isinstance(d, (ast.FunctionDef, ast.AsyncFunctionDef))}
+    return sorted(added & existing)
 
 
-MIN_KOPYA_SATIR = 12
-MIN_KOPYA_SKOR = 0.90
+MIN_COPY_LINES = 12
+MIN_COPY_SCORE = 0.90
 
 
-def _norm_satirlar(metin: str) -> list[str]:
-    cikti = []
-    for s in metin.splitlines():
+def _normalized_lines(text: str) -> list[str]:
+    out = []
+    for s in text.splitlines():
         s = re.sub(r"\s+", " ", s.strip())
         if s and not s.startswith("#"):
-            cikti.append(s)
-    return cikti
+            out.append(s)
+    return out
 
 
-def _fonksiyonlar(repo: Path) -> list[tuple[str, str, int, list[str]]]:
-    cikti = []
-    for dosya in repo.rglob("*.py"):
-        if any(par in ATLANAN_DIZINLER for par in dosya.parts):
+def _functions(repo: Path) -> list[tuple[str, str, int, list[str]]]:
+    out = []
+    for file in repo.rglob("*.py"):
+        if any(part in SKIPPED_DIRS for part in file.parts):
             continue
         try:
-            src = dosya.read_text(encoding="utf-8", errors="replace")
-            agac = ast.parse(src)
+            src = file.read_text(encoding="utf-8", errors="replace")
+            tree = ast.parse(src)
         except (SyntaxError, ValueError):
             continue
-        rel = str(dosya.relative_to(repo))
-        for dugum in ast.walk(agac):
-            if isinstance(dugum, (ast.FunctionDef, ast.AsyncFunctionDef)):
-                parca = ast.get_source_segment(src, dugum) or ""
-                satirlar = _norm_satirlar(parca)
-                if len(satirlar) >= MIN_KOPYA_SATIR:
-                    cikti.append((dugum.name, rel, len(satirlar), _yapi_imzasi(parca)))
-    return cikti
+        rel = str(file.relative_to(repo))
+        for node in ast.walk(tree):
+            if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef)):
+                segment = ast.get_source_segment(src, node) or ""
+                lines = _normalized_lines(segment)
+                if len(lines) >= MIN_COPY_LINES:
+                    out.append((node.name, rel, len(lines), _structure_signature(segment)))
+    return out
 
 
-def kopya_blok_tara(repo: Path, diff: str) -> list[dict]:
-    """Diff'i geçici klon'a uygulayıp yeni/eski fonksiyon gövdelerini karşılaştırır.
+def scan_copy_blocks(repo: Path, diff: str) -> list[dict]:
+    """Applies the diff to a temporary clone and compares new/old function bodies.
 
-    Eşik: ≥ 12 normalize satır ve benzerlik ≥ 0.90, aynı fonksiyonun kendi
-    eski hali hariç. Gerçek repo HİÇ değişmez; tarama klon üzerinde yapılır.
+    Threshold: ≥ 12 normalized lines and similarity ≥ 0.90, excluding the
+    function's own former self. The real repo NEVER changes; the scan runs
+    on the clone.
     """
     import difflib
 
     if not repo.is_dir():
         return []
-    yeni_kod = _eklenen_kod(diff)
-    if not yeni_kod.strip():
+    added_code = _added_code(diff)
+    if not added_code.strip():
         return []
     try:
-        ast.parse(yeni_kod)  # hızlı ön kontrol: tamamen bozuk diff'i eleme
+        ast.parse(added_code)  # quick pre-check: discard a fully broken diff
     except (SyntaxError, ValueError):
-        pass  # parçalı diff olabilir; klon uygulaması karar verir
+        pass  # a partial diff is possible; the clone application decides
 
     tmp = Path(tempfile.mkdtemp(prefix="kovan-kopya-"))
     try:
-        klon = subprocess.run(
+        clone_run = subprocess.run(
             ["git", "clone", "--quiet", str(repo.resolve()), str(tmp / "r")],
             capture_output=True, text=True, timeout=120,
         )
-        if klon.returncode != 0:
+        if clone_run.returncode != 0:
             return []
-        klon_repo = tmp / "r"
-        ok, _ = uygula(klon_repo, diff)
+        clone_repo = tmp / "r"
+        ok, _ = apply_patch(clone_repo, diff)
         if not ok:
             return []
 
-        yeni_fn = _fonksiyonlar(klon_repo)
-        eski_fn = _fonksiyonlar(repo)
-        eski_harita = {(ad, rel): (satir, imza) for ad, rel, satir, imza in eski_fn}
+        new_functions = _functions(clone_repo)
+        old_functions = _functions(repo)
+        old_map = {(name, rel): (lines, signature) for name, rel, lines, signature in old_functions}
 
-        bulgular: list[dict] = []
-        for ad, rel, satir_sayisi, imza in yeni_fn:
-            if satir_sayisi < MIN_KOPYA_SATIR:
+        findings: list[dict] = []
+        for name, rel, line_count, signature in new_functions:
+            if line_count < MIN_COPY_LINES:
                 continue
-            eski = eski_harita.get((ad, rel))
-            if eski is not None and eski[1] == imza:
-                continue  # değişmemiş fonksiyon
-            en_iyi, en_iyi_yer, en_iyi_skor = None, None, 0.0
-            for ad2, rel2, satir2, imza2 in eski_fn:
-                if (ad2, rel2) == (ad, rel):
-                    continue  # kendi eski hali: kopya değil, düzenleme
-                r = difflib.SequenceMatcher(None, imza, imza2).ratio()
-                if r > en_iyi_skor:
-                    en_iyi, en_iyi_yer, en_iyi_skor = ad2, rel2, r
-            if en_iyi and en_iyi_skor >= MIN_KOPYA_SKOR:
-                bulgular.append(
+            old = old_map.get((name, rel))
+            if old is not None and old[1] == signature:
+                continue  # unchanged function
+            best, best_where, best_score = None, None, 0.0
+            for name2, rel2, lines2, signature2 in old_functions:
+                if (name2, rel2) == (name, rel):
+                    continue  # its own former self: not a copy, an edit
+                r = difflib.SequenceMatcher(None, signature, signature2).ratio()
+                if r > best_score:
+                    best, best_where, best_score = name2, rel2, r
+            if best and best_score >= MIN_COPY_SCORE:
+                findings.append(
                     {
-                        "fonksiyon": ad,
+                        "fonksiyon": name,
                         "dosya": rel,
-                        "satir": satir_sayisi,
-                        "benzer": f"{en_iyi} ({en_iyi_yer})",
-                        "skor": round(en_iyi_skor, 3),
+                        "satir": line_count,
+                        "benzer": f"{best} ({best_where})",
+                        "skor": round(best_score, 3),
                     }
                 )
-        return bulgular
+        return findings
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
 
 
-def sinyal(diff: str, izinli_dosya: str | Path | None = None, repo: Path | None = None) -> dict:
-    yinelenen = yinelenen_fonksiyon(repo, diff) if repo is not None else []
-    kopya = kopya_blok_tara(repo, diff) if repo is not None else []
-    kopya_not = (
+def signal(diff: str, allowlist_file: str | Path | None = None, repo: Path | None = None) -> dict:
+    duplicated = duplicate_functions(repo, diff) if repo is not None else []
+    copy_blocks = scan_copy_blocks(repo, diff) if repo is not None else []
+    copy_note = (
         "; kopya kod şüphesi: "
         + ", ".join(
-            f"{b['fonksiyon']}≈{b['benzer']} (%{round(b['skor'] * 100)})" for b in kopya
+            f"{b['fonksiyon']}≈{b['benzer']} (%{round(b['skor'] * 100)})" for b in copy_blocks
         )
-        if kopya
+        if copy_blocks
         else ""
     )
-    if kopya_suphesi(diff):
+    if copy_suspicion(diff):
         return {
             "provenance": False,
-            "not": "dış kopya şüphesi (telif/SPDX başlığı) — insan kararı" + kopya_not,
+            "not": "dış kopya şüphesi (telif/SPDX başlığı) — insan kararı" + copy_note,
             "paketler": [],
-            "yinelenen_fonksiyon": yinelenen,
-            "kopya_blok": kopya,
+            "yinelenen_fonksiyon": duplicated,
+            "kopya_blok": copy_blocks,
         }
-    if dosya_degisimi_var(diff):
+    if has_dependency_change(diff):
         return {
             "provenance": False,
-            "not": "bağımlılık dosyası değişti — yeni bağımlılık C3 (insan kararı)" + kopya_not,
+            "not": "bağımlılık dosyası değişti — yeni bağımlılık C3 (insan kararı)" + copy_note,
             "paketler": [],
-            "yinelenen_fonksiyon": yinelenen,
-            "kopya_blok": kopya,
+            "yinelenen_fonksiyon": duplicated,
+            "kopya_blok": copy_blocks,
         }
-    importlar = bagimlilik_cikar(diff)
-    if not importlar:
-        sonuc = {"provenance": True, "not": "yeni import yok", "paketler": [], "yinelenen_fonksiyon": yinelenen}
+    imports = extract_dependencies(diff)
+    if not imports:
+        result = {"provenance": True, "not": "yeni import yok", "paketler": [], "yinelenen_fonksiyon": duplicated}
     else:
-        izinli = izinli_oku(izinli_dosya)
-        yabanci = sorted(m for m in importlar if m not in sys.stdlib_module_names and m not in izinli)
-        if yabanci:
-            sonuc = {
+        allowlisted = read_allowlist(allowlist_file)
+        foreign = sorted(m for m in imports if m not in sys.stdlib_module_names and m not in allowlisted)
+        if foreign:
+            result = {
                 "provenance": False,
-                "not": f"izin listesinde olmayan üçüncü taraf import: {', '.join(yabanci)}",
-                "paketler": yabanci,
+                "not": f"izin listesinde olmayan üçüncü taraf import: {', '.join(foreign)}",
+                "paketler": foreign,
             }
         else:
-            sonuc = {
+            result = {
                 "provenance": True,
-                "not": f"tüm importlar serbest ({', '.join(sorted(importlar))})",
-                "paketler": sorted(importlar),
+                "not": f"tüm importlar serbest ({', '.join(sorted(imports))})",
+                "paketler": sorted(imports),
             }
-    sonuc["yinelenen_fonksiyon"] = yinelenen
-    sonuc["kopya_blok"] = kopya
-    if kopya and sonuc["provenance"]:
-        sonuc["provenance"] = False
-        sonuc["not"] = sonuc["not"] + kopya_not
-    return sonuc
+    result["yinelenen_fonksiyon"] = duplicated
+    result["kopya_blok"] = copy_blocks
+    if copy_blocks and result["provenance"]:
+        result["provenance"] = False
+        result["not"] = result["not"] + copy_note
+    return result
 
 
-def ana(argv: list[str] | None = None) -> int:
+def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="KOVAN uyum katmanı (provenance sinyali)")
     parser.add_argument("--diff-file", required=True)
     parser.add_argument("--allowlist", default=str(Path(__file__).resolve().parent / "compliance-allowlist.yaml"))
     args = parser.parse_args(argv)
 
     diff = Path(args.diff_file).read_text(encoding="utf-8")
-    sonuc = sinyal(diff, args.allowlist)
-    print(json.dumps(sonuc, ensure_ascii=False, indent=2))
-    return 0 if sonuc["provenance"] else 1
+    result = signal(diff, args.allowlist)
+    print(json.dumps(result, ensure_ascii=False, indent=2))
+    return 0 if result["provenance"] else 1
 
 
 if __name__ == "__main__":
-    raise SystemExit(ana())
+    raise SystemExit(main())
