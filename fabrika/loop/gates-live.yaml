@@ -35,7 +35,7 @@ gates:
 
   - name: review
     order: 50
-    blocking: false   # 2026-11-04: kovan.py escalates this to blocking only when --inceleme-url is given
+    blocking: false   # 2026-11-04: kovan.py escalates this to blocking only when --review-url is given
     signal: review
 
   - name: eval

@@ -1,21 +1,21 @@
 # KOVAN user configuration
-# Usage: python kovan.py --yapilandirma user.yaml plan
-# CLI flags override the configuration: python kovan.py plan --saat 1.5
+# Usage: python kovan.py --config user.yaml plan
+# CLI flags override the configuration: python kovan.py plan --hours 1.5
 #
 # This file is C0: freely editable (it is not the constitution/gates).
 
-saat: 3.0                # your daily focused review hours (the system's ceiling)
+hours: 3.0               # your daily focused review hours (the system's ceiling)
 backlog: sample-backlog.yaml
-hedef_repo: ornek-repo
-test_komut: "python -m unittest discover -s tests -t ."
+target_repo: ornek-repo
+test_command: "python -m unittest discover -s tests -t ."
 
 # Live model (empty = dry mode):
 base_url: https://api.openai.com/v1
 model: gpt-4o-mini
-anahtar_dosya: ""        # a file whose content is the API key (do not commit it!)
+key_file: ""             # a file whose content is the API key (do not commit it!)
 eval_set: ""             # e.g. eval_set/sicaklik-v1.jsonl (specific to the target repo)
-inceleme_url: ""         # a DIFFERENT endpoint for the independent reviewer
-uyum_izinli: compliance-allowlist.yaml
+review_url: ""           # a DIFFERENT endpoint for the independent reviewer
+compliance_allowlist: compliance-allowlist.yaml
 egress_log: ""           # e.g. egress.jsonl
 
-kanarya: 0               # N>0: only the first N accepted tasks run
+canary: 0                # N>0: only the first N accepted tasks run

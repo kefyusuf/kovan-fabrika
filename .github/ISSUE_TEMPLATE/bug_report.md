@@ -15,7 +15,7 @@ labels: bug
 # Evidence
 
 <!-- A run log (state/gece-durum.log line, runs/<id>/ozet.json) or the
-     output of `python retro.py --log-saglik`. Never paste keys anywhere
+     output of `python retro.py --log-health`. Never paste keys anywhere
      public. -->
 
 # Environment

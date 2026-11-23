@@ -9,7 +9,7 @@ Girdi: defterler (tekrar eden dersler, doluluk), son vardiya raporu
 Çıktı: backlog-proposals.yaml + oneri-raporu.md (her öneri kanıtlı).
 
 Kullanim:
-    python queue_build.py --runs runs --vardiya-runs vardiya-runs --out .
+    python queue_build.py --runs runs --shift-runs vardiya-runs --out .
 """
 
 from __future__ import annotations
@@ -165,12 +165,12 @@ def yaz(oneriler_liste: list[dict], out: Path) -> tuple[Path, Path]:
 def ana(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="KOVAN kanıtlı iş önerisi üreticisi")
     parser.add_argument("--runs", default=str(BURASI / "runs"))
-    parser.add_argument("--vardiya-runs", default=str(BURASI / "vardiya-runs"))
+    parser.add_argument("--shift-runs", default=str(BURASI / "vardiya-runs"))
     parser.add_argument("--out", default=str(BURASI))
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args(argv)
 
-    liste = oneriler(Path(args.runs), Path(args.vardiya_runs))
+    liste = oneriler(Path(args.runs), Path(args.shift_runs))
     yaml_dosya, rapor = yaz(liste, Path(args.out))
     if args.json:
         print(json.dumps({"oneriler": liste, "yaml": str(yaml_dosya)}, ensure_ascii=False, indent=2))

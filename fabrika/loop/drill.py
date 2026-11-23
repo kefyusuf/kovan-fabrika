@@ -155,7 +155,7 @@ def tatbikat(repo: Path | None = None) -> dict:
                 )
                 buf = io.StringIO()
                 with contextlib.redirect_stdout(buf):
-                    kod = verify.ana(["--repo", str(klon), "--geri-al"])
+                    kod = verify.ana(["--repo", str(klon), "--rollback"])
                 temiz = _porcelain(klon) == ""
                 kirlik_gitti = "# tatbikat kirliği" not in sicaklik.read_text(encoding="utf-8")
                 adimlar.append(

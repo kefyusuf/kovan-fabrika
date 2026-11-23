@@ -167,7 +167,7 @@ python tests\test_runner.py     # 23 tests
 python kovan.py plan            # acceptance list under capacity
 python kovan.py run             # end-to-end run + report
 python shift.py run            # night line: distillation + breakage + ADR draft
-python kovan.py durum           # cross-run metrics
+python kovan.py metrics           # cross-run metrics
 python drill.py                # S1 runbook drill (steps PASS/FAIL)
 powershell -File task-register.ps1   # install the night task (23:00, local) — remove: task-remove.ps1
 ```

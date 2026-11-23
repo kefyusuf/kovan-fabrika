@@ -7,7 +7,7 @@ Sozlesme:
 
 Kullanim:
     python eval_run.py --repo ornek-repo --set eval_set/sicaklik-v1.jsonl \
-        [--diff-dosya yama.diff]
+        [--diff-file yama.diff]
 """
 
 from __future__ import annotations
@@ -89,10 +89,10 @@ def ana(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="KOVAN eval v1 koşucusu")
     parser.add_argument("--repo", required=True)
     parser.add_argument("--set", required=True)
-    parser.add_argument("--diff-dosya", default="")
+    parser.add_argument("--diff-file", default="")
     args = parser.parse_args(argv)
 
-    diff = Path(args.diff_dosya).read_text(encoding="utf-8") if args.diff_dosya else None
+    diff = Path(args.diff_file).read_text(encoding="utf-8") if args.diff_file else None
     sonuc = kos(args.repo, args.set, diff)
     print(json.dumps(sonuc, ensure_ascii=False, indent=2))
     return 0 if sonuc.get("skor", 0.0) >= 0.9 else 1

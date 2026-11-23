@@ -76,7 +76,7 @@ class DogrulaTest(unittest.TestCase):
 
     def test_geri_al_cli(self):
         kod = subprocess.run(
-            [sys.executable, "verify.py", "--repo", str(REPO), "--geri-al"],
+            [sys.executable, "verify.py", "--repo", str(REPO), "--rollback"],
             capture_output=True, text=True, cwd=str(REPO.parent),
         )
         self.assertEqual(kod.returncode, 0)

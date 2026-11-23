@@ -12,9 +12,9 @@
    - insan onay notu (m.2: üreten ≠ onaylayan — onay alanı zorunlu).
 
 Kullanim:
-    python skill.py liste
-    python skill.py aktiflestir --ad tests-kapisi-tekrar-dusmesi --onay "kurucu"
-    python skill.py rapor
+    python skill.py list
+    python skill.py activate --name tests-kapisi-tekrar-dusmesi --approval "kurucu"
+    python skill.py report
 """
 
 from __future__ import annotations
@@ -225,23 +225,23 @@ def rapor(skills_dir: Path = SKILLS, simdi: datetime | None = None) -> dict:
 
 def ana(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="KOVAN beceri yaşam döngüsü")
-    sub = parser.add_subparsers(dest="komut", required=True)
-    sub.add_parser("liste")
-    a = sub.add_parser("aktiflestir")
-    a.add_argument("--ad", required=True)
-    a.add_argument("--onay", required=True)
-    sub.add_parser("rapor")
+    sub = parser.add_subparsers(dest="command", required=True)
+    sub.add_parser("list")
+    a = sub.add_parser("activate")
+    a.add_argument("--name", required=True)
+    a.add_argument("--approval", required=True)
+    sub.add_parser("report")
     args = parser.parse_args(argv)
 
-    if args.komut == "liste":
+    if args.command == "list":
         for b in skills_tara():
             print(f"{b['ad']:34} {b.get('durum', '?'):10} kanıt={len(b.get('evidence_liste', []))}")
         return 0
-    if args.komut == "aktiflestir":
-        ok, gerekce = aktiflestir(args.ad, args.onay)
+    if args.command == "activate":
+        ok, gerekce = aktiflestir(args.name, args.approval)
         print(("AKTİF: " if ok else "RED: ") + gerekce)
         return 0 if ok else 1
-    if args.komut == "rapor":
+    if args.command == "report":
         print(json.dumps(rapor(), ensure_ascii=False, indent=2))
         return 0
     return 1

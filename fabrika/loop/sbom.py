@@ -9,7 +9,7 @@ Sınır: sürüm dosyadan değil, kurulu ortamdan okunur. S4'te lock dosyası
 (requirements/pyproject lock) bağlanacak.
 
 Kullanim:
-    python sbom.py --repo ornek-repo [--cikti sbom.json]
+    python sbom.py --repo ornek-repo [--output sbom.json]
 """
 
 from __future__ import annotations
@@ -204,14 +204,14 @@ def spdx_uret(repo: Path) -> dict:
 def ana(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="KOVAN SBOM tohumu (SPDX 2.3)")
     parser.add_argument("--repo", required=True)
-    parser.add_argument("--cikti", default="")
+    parser.add_argument("--output", default="")
     args = parser.parse_args(argv)
 
     dokuman = spdx_uret(Path(args.repo))
     cikti = json.dumps(dokuman, ensure_ascii=False, indent=2)
-    if args.cikti:
-        Path(args.cikti).write_text(cikti, encoding="utf-8")
-        print(f"SBOM yazıldı: {args.cikti} ({len(dokuman['packages'])} paket)")
+    if args.output:
+        Path(args.output).write_text(cikti, encoding="utf-8")
+        print(f"SBOM yazıldı: {args.output} ({len(dokuman['packages'])} paket)")
     else:
         print(cikti)
     return 0

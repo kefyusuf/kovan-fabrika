@@ -1,0 +1,50 @@
+# KOVAN — canlı profil kapıları (GEÇİCİ)
+#
+# Bu profil, S2'de (gerçek model + gerçek test koşumu) kullanılır.
+# Saptama: review ve eval kapıları henüz ölçüm üretemediği için BLOKLAMAZ,
+# yalnızca uyarır. Bu, anayasaya aykırı DEĞİLDİR çünkü kapı kaldırılmıyor:
+# sinyal üretilen anda bloklayıcıya dönecek (S3, eval v1).
+#
+# Kural: bu dosyada bir kapıyı bloklayıcıdan çıkarırken gerekçe ve tarih
+# yazılmak ZORUNDA. Gerekçesiz gevşetme = C3 ihlali.
+
+gates:
+  - name: policy
+    order: 10
+    blocking: true
+
+  - name: tests
+    order: 40
+    blocking: true
+    signal: tests
+
+  - name: provenance
+    order: 45
+    blocking: true
+
+  - name: lint
+    order: 20
+    blocking: false   # 2026-11-04: henüz ölçülmüyor; S3'te ruff bağlanacak
+    signal: lint
+
+  - name: types
+    order: 30
+    blocking: false   # 2026-11-04: henüz ölçülmüyor; S3'te mypy bağlanacak
+    signal: types
+
+  - name: review
+    order: 50
+    blocking: false   # 2026-11-04: yalnız --inceleme-url verilince kovan.py bunu bloklayıcıya yükseltir
+    signal: review
+
+  - name: eval
+    order: 60
+    blocking: true    # 2026-11-04: eval v1 devrede — 90 vakalık dondurulmuş set (sicaklik-v1.jsonl)
+    signal: eval
+    threshold: 0.90
+
+  - name: cost
+    order: 70
+    blocking: false
+    signal: cost_usd
+    threshold: 6.0

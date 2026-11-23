@@ -69,10 +69,10 @@ would, the line stops and writes a report.
 | # | Component | File | Responsibility | Status |
 |---|---|---|---|---|
 | 0 | **CLI** | `loop/kovan.py` | plan / run / verify / status; end-to-end run | **Running**, 13 tests |
-| 1 | **Capacity valve + queue** | `loop/capacity.py` + `kovan.py --tamamlanan` | LOC→hours, M/M/1, Little's law, task acceptance; **completed tasks accumulate, the queue progresses** (blocked ones are never recorded) | **Running**, 18+3 tests |
+| 1 | **Capacity valve + queue** | `loop/capacity.py` + `kovan.py --completed` | LOC→hours, M/M/1, Little's law, task acceptance; **completed tasks accumulate, the queue progresses** (blocked ones are never recorded) | **Running**, 18+3 tests |
 | 2 | **Line runner** | `loop/runner.py` | Task loop, gate order, budget, circuit breaker | **Running**, 23 tests |
 | 2b | **Model adapter** | `loop/adapter_http.py` | OpenAI-compatible call; produces NO signals, only diffs; **egress log** (JSONL) | **Running**, 5 tests |
-| 2c | **Verification** | `loop/verify.py` | Applies the diff to a real git repo, runs real tests, produces the `tests` signal; `--geri-al` resets the repo | **Running**, 8 tests |
+| 2c | **Verification** | `loop/verify.py` | Applies the diff to a real git repo, runs real tests, produces the `tests` signal; `--rollback` resets the repo | **Running**, 8 tests |
 | 2c2 | **Compliance** | `loop/compliance.py` + `compliance-allowlist.yaml` | import inference, allowlist, dependency-file detection, copy suspicion, duplicate functions, **duplicate block (structural signature, 6-variant robustness-tested)** → `provenance` signal | **Running**, 18 tests |
 | 2h | **SBOM seed** | `loop/sbom.py` | Scans the repo with `ast`; SPDX 2.3 JSON; **root package + supplier field (NTIA)**; versions from lock files (module→distribution via `packages_distributions`) | **Running**, 8 tests |
 | 2d | **Live profile** | `loop/gates-live.yaml` | S2/S3: eval **blocking** (90 cases), review conditionally blocking | Active |
@@ -88,8 +88,8 @@ would, the line stops and writes a report.
 | 7 | **Night line** | `loop/shift.py` + `loop/source-queue.yaml` | Scan (**source rotation: read ones are skipped**) → distillation (idempotent) → red team → ADR draft → morning report; C2 closed | **Running**, 11 tests |
 | 8 | **Scheduler** | `loop/night-run.ps1` + `task-register.ps1` / `task-remove.ps1` | Nightly 23:00 local python (dry mode, zero tokens) | **Installed** (KOVAN-Night; first real night Nov 4) |
 | 10 | **S1 drill** | `loop/drill.py` | Executes and audits the runbook's **5 steps** (run, ledger, STOP, **chaos/resume**, rollback) — **Friday task installed as KOVAN-Week** | **Running**, 3 tests |
-| 13 | **Weekly retro** | `loop/retro.py` | GPK proxy + gate trend + mechanical checks (runnable commands); **log integrity scan** (`--log-saglik`, UTF-8/UTF-16 BOM aware) | **Running**, 11 tests |
-| 9 | **Status board** | `kovan.py durum` | Cross-run metrics for all runs; data source for the weekly retro | **Running**, 3 tests |
+| 13 | **Weekly retro** | `loop/retro.py` | GPK proxy + gate trend + mechanical checks (runnable commands); **log integrity scan** (`--log-health`, UTF-8/UTF-16 BOM aware) | **Running**, 11 tests |
+| 9 | **Status board** | `kovan.py metrics` | Cross-run metrics for all runs; data source for the weekly retro | **Running**, 3 tests |
 | 11 | **Configuration** | `loop/user.yaml` | User defaults (hours, repo, model…); CLI overrides | **Running**, 3 tests |
 | 12 | **Packaging** | `fabrika/pyproject.toml` | `pip install -e fabrika` → `kovan/shift/drill/skill` commands | **Proven** (entry points from repo root) |
 | 13 | **Eval set template** | `loop/eval_set/TEMPLATE.md` | Rules for public users to build their own frozen set | Published |
@@ -253,19 +253,19 @@ python kovan.py verify --run runs\ornek-01
 
 python shift.py run          # night line: source → distill → breakage → ADR → morning report
 python sbom.py --repo ornek-repo    # SPDX 2.3 SBOM (stdlib/local/third-party split)
-python mutation.py --maks 6      # gate kill score (6/6 killed)
+python mutation.py --max 6      # gate kill score (6/6 killed)
 python retro.py                  # weekly retro: GPK proxy + mechanical checks
 python drill.py                 # S1 runbook drill (5 steps PASS/FAIL)
-python kovan.py durum        # cross-run metrics for all runs
+python kovan.py metrics        # cross-run metrics for all runs
 powershell -File task-register.ps1  # install the night task (23:00, local, zero tokens) — remove: task-remove.ps1
 
 # eval v1 (frozen 90 cases), with a broken diff:
-python eval_run.py --repo ornek-repo --set eval_set\sicaklik-v1.jsonl --diff-dosya yama-kirik.diff
+python eval_run.py --repo ornek-repo --set eval_set\sicaklik-v1.jsonl --diff-file yama-kirik.diff
 
 # live mode (needs a key + target repo):
 python kovan.py run --adapter http --base-url https://api.openai.com/v1 \
-    --model gpt-4o-mini --anahtar-dosya .anahtar --repo ..\ornek-repo \
-    --test-komut "python -m unittest discover -s tests -t ."
+    --model gpt-4o-mini --key-file .anahtar --repo ..\ornek-repo \
+    --test-command "python -m unittest discover -s tests -t ."
 
 python capacity.py            # 3.0 hours -> ~2.9 PRs/day (400 LOC)
 python seedtest.py            # full set 100%, without tests 83.3%

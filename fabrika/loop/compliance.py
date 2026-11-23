@@ -12,7 +12,7 @@ Bu, "kaynağı gösterilemeyen kod birleşmez" kuralının bugünkü ölçülebi
 hâlidir. Kopya kod tespiti ve tam SBOM (SPDX) S4'te eklenir.
 
 Kullanim:
-    python compliance.py --diff-dosya yama.diff [--izinli compliance-allowlist.yaml]
+    python compliance.py --diff-file yama.diff [--allowlist compliance-allowlist.yaml]
 """
 
 from __future__ import annotations
@@ -313,12 +313,12 @@ def sinyal(diff: str, izinli_dosya: str | Path | None = None, repo: Path | None 
 
 def ana(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="KOVAN uyum katmanı (provenance sinyali)")
-    parser.add_argument("--diff-dosya", required=True)
-    parser.add_argument("--izinli", default=str(Path(__file__).resolve().parent / "compliance-allowlist.yaml"))
+    parser.add_argument("--diff-file", required=True)
+    parser.add_argument("--allowlist", default=str(Path(__file__).resolve().parent / "compliance-allowlist.yaml"))
     args = parser.parse_args(argv)
 
-    diff = Path(args.diff_dosya).read_text(encoding="utf-8")
-    sonuc = sinyal(diff, args.izinli)
+    diff = Path(args.diff_file).read_text(encoding="utf-8")
+    sonuc = sinyal(diff, args.allowlist)
     print(json.dumps(sonuc, ensure_ascii=False, indent=2))
     return 0 if sonuc["provenance"] else 1
 

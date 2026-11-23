@@ -33,7 +33,7 @@ class DurumTest(unittest.TestCase):
     def calistir(self, tmp, *ek: str) -> str:
         buf = io.StringIO()
         with contextlib.redirect_stdout(buf):
-            kovan.main(["durum", "--runs", str(Path(tmp) / "runs"), "--vardiya-runs", str(Path(tmp) / "v"), *ek])
+            kovan.main(["metrics", "--runs", str(Path(tmp) / "runs"), "--shift-runs", str(Path(tmp) / "v"), *ek])
         return buf.getvalue()
 
     def test_bos_runs_sifir(self):

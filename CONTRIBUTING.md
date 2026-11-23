@@ -32,7 +32,7 @@ git -C fabrika/loop/ornek-repo commit -m "ornek-repo initial state"
 - New behavior → test first. Changes touching gate logic must keep the
   gate-sequence tests in `tests/test_runner.py` intact.
 - Determinism: `kuru_senaryo(isler, seed)` — same seed → same decisions.
-- The weekly retro runs `--log-saglik`; log cleanliness is a PR norm.
+- The weekly retro runs `--log-health`; log cleanliness is a PR norm.
 
 ## Rules for touching the gate sequence
 

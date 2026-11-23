@@ -118,7 +118,7 @@ class SbomTest(unittest.TestCase):
 def sbom_ana(cikti: Path) -> int:
     from sbom import ana
 
-    return ana(["--repo", str(REPO), "--cikti", str(cikti)])
+    return ana(["--repo", str(REPO), "--output", str(cikti)])
 
 
 if __name__ == "__main__":

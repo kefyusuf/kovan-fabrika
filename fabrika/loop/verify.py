@@ -10,8 +10,8 @@ Sözleşme:
 - sinyal sözlüğünde "tests" yoksa kapı geçmez (runner zaten böyle).
 
 Kullanim:
-    python verify.py --repo ornek-repo --diff-dosya yama.diff \
-        --komut "python -m unittest discover -s tests -t ."
+    python verify.py --repo ornek-repo --diff-file yama.diff \
+        --command "python -m unittest discover -s tests -t ."
 """
 
 from __future__ import annotations
@@ -123,22 +123,22 @@ def sinyaller(repo: Path, diff: str, test_komutu: str) -> dict:
 def ana(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="KOVAN doğrulama katmanı")
     parser.add_argument("--repo", required=True)
-    parser.add_argument("--geri-al", action="store_true", help="depoyu HEAD'e döndürür (diff koşmaz)")
-    parser.add_argument("--diff-dosya", default="")
-    parser.add_argument("--komut", default="")
+    parser.add_argument("--rollback", action="store_true", help="depoyu HEAD'e döndürür (diff koşmaz)")
+    parser.add_argument("--diff-file", default="")
+    parser.add_argument("--command", default="")
     args = parser.parse_args(argv)
 
     repo = Path(args.repo)
-    if args.geri_al:
+    if args.rollback:
         geri_al(repo)
         temiz = not repo_gecerli_mi(repo) or not _git(repo, "status", "--porcelain")[1]
         print("depo başa döndürüldü; çalışma ağacı " + ("temiz" if temiz else "HÂLÂ kirli"))
         return 0 if temiz else 1
 
-    if not args.diff_dosya or not args.komut:
-        parser.error("--diff-dosya ve --komut gerekli (ya da --geri-al)")
-    diff = Path(args.diff_dosya).read_text(encoding="utf-8")
-    sonuc = sinyaller(repo, diff, args.komut)
+    if not args.diff_file or not args.command:
+        parser.error("--diff-file ve --command gerekli (ya da --rollback)")
+    diff = Path(args.diff_file).read_text(encoding="utf-8")
+    sonuc = sinyaller(repo, diff, args.command)
     print(json.dumps(sonuc, ensure_ascii=False, indent=2))
     return 0 if sonuc.get("tests") else 1
 

@@ -137,17 +137,17 @@ class LogSaglikTest(unittest.TestCase):
             out = tmp_path / "out"
             sonuc = retro.uret(runs, tmp_path / "vr", out, bugun=datetime(2026, 11, 16, tzinfo=timezone.utc))
             self.assertEqual(sonuc["istatik"]["log_bozuk"], 1)
-            checkler = [c for c in sonuc["checkler"] if "--log-saglik" in c["komut"]]
-            self.assertTrue(checkler, "bozuk log varken --log-saglik checki uretilmedi")
+            checkler = [c for c in sonuc["checkler"] if "--log-health" in c["komut"]]
+            self.assertTrue(checkler, "bozuk log varken --log-health checki uretilmedi")
 
     def test_cli_log_saglik_cikis_kodu(self):
         with tempfile.TemporaryDirectory() as tmp:
             tmp_path = Path(tmp)
             runs = tmp_path / "runs"
             runs.mkdir()
-            self.assertEqual(retro.ana(["--log-saglik", "--runs", str(runs), "--out", str(tmp_path)]), 0)
+            self.assertEqual(retro.ana(["--log-health", "--runs", str(runs), "--out", str(tmp_path)]), 0)
             (runs / "bozuk.log").write_text("Traceback: x\n", encoding="utf-8")
-            self.assertEqual(retro.ana(["--log-saglik", "--runs", str(runs), "--out", str(tmp_path)]), 1)
+            self.assertEqual(retro.ana(["--log-health", "--runs", str(runs), "--out", str(tmp_path)]), 1)
 
 
 if __name__ == "__main__":

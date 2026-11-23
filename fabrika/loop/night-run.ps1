@@ -2,7 +2,7 @@
 # Outputs are written under runs/ and vardiya-runs/; the log is UTF-8.
 # EVIDENCE §15: artifacts exist ≠ the run succeeded — the exit code and log
 # integrity are recorded into state\gece-durum.log; the weekly retro scans
-# it with --log-saglik.
+# it with --log-health.
 $ErrorActionPreference = "Continue"
 $env:PYTHONIOENCODING = "utf-8"
 $kok = Split-Path -Parent $PSScriptRoot
@@ -15,7 +15,7 @@ $kovanLog = Join-Path $loop "runs\gece-$id.log"
 $vardiyaLog = Join-Path $loop "vardiya-runs\vardiya-$id.log"
 
 python kovan.py run --run-id "gece-$id" --out runs `
-    --tamamlanan (Join-Path $loop "state\tamamlanan.jsonl") 2>&1 |
+    --completed (Join-Path $loop "state\tamamlanan.jsonl") 2>&1 |
     Out-File -FilePath $kovanLog -Encoding utf8
 $kovanKod = $LASTEXITCODE
 

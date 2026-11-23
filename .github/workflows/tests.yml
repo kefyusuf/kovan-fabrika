@@ -41,7 +41,7 @@ jobs:
         run: python retro.py --runs runs --out reports --json > /dev/null
       - name: Log integrity scan
         working-directory: fabrika/loop
-        run: python retro.py --log-saglik --runs runs
+        run: python retro.py --log-health --runs runs
       - name: S1 runbook drill
         working-directory: fabrika/loop
         run: python drill.py

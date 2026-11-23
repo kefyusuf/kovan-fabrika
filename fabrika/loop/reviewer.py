@@ -6,7 +6,7 @@ Sözleşme (anayasa m.2 — üreten ≠ onaylayan):
   "bulgular": [...]}. "LGTM" geçersiz: gerekce boşsa onay geçersizdir.
 - İncelemeci kodu DÜZELTMEZ; onay/ret + gerekçe üretir.
 
-KOVAN bu sınıfı --inceleme-url verildiğinde devreye alır ve review
+KOVAN bu sınıfı --review-url verildiğinde devreye alır ve review
 kapısını programatik olarak bloklayıcıya yükseltir (rapora işlenir).
 """
 

@@ -23,7 +23,7 @@ class SimulasyonTest(unittest.TestCase):
         buf = io.StringIO()
         with contextlib.redirect_stdout(buf):
             kod = simulation.ana(
-                ["--gun", str(gun), "--seed", str(seed), "--saat", str(saat), "--out", str(sim)]
+                ["--days", str(gun), "--seed", str(seed), "--hours", str(saat), "--out", str(sim)]
             )
         self.assertEqual(kod, 0)
         return json.loads((sim / "simulasyon-ozeti.json").read_text(encoding="utf-8")), sim

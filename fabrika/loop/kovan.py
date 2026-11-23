@@ -1,8 +1,8 @@
 """KOVAN — tek giriş noktalı mini fabrika.
 
 Üç komut:
-    python kovan.py plan   --backlog sample-backlog.yaml --saat 3
-    python kovan.py run    --backlog sample-backlog.yaml --saat 3
+    python kovan.py plan   --backlog sample-backlog.yaml --hours 3
+    python kovan.py run    --backlog sample-backlog.yaml --hours 3
     python kovan.py verify --run runs/<id>
 
 `run` şunları yapar:
@@ -248,8 +248,8 @@ def cmd_plan(args: argparse.Namespace) -> int:
     isler = backlog_oku(args.backlog)
     c3 = [i for i in isler if i.sinif is ChangeClass.C3]
     adaylar = [i for i in isler if i.sinif is not ChangeClass.C3]
-    karar = _kapasite_ozeti(adaylar, args.saat)
-    print(f"Kapasite: {args.saat:.1f} saat")
+    karar = _kapasite_ozeti(adaylar, args.hours)
+    print(f"Kapasite: {args.hours:.1f} saat")
     print(f"Kabul   : {', '.join(g.id for g in karar.kabul) or '-'}")
     print(f"Ertelenen: {', '.join(g.id for g in karar.ertelenen) or '-'}")
     print(f"İnsan kuyruğu (C3): {', '.join(i.id for i in c3) or '-'}")
@@ -264,7 +264,7 @@ def cmd_run(args: argparse.Namespace) -> int:
 
     # Completion-aware kuyruk: tamamlanan işler backlog'tan çıkar.
     atlanan_tamamlanan = 0
-    tamamlanan_dosya = Path(args.tamamlanan) if args.tamamlanan else None
+    tamamlanan_dosya = Path(args.completed) if args.completed else None
     tamamlanan_id = set()
     if tamamlanan_dosya and tamamlanan_dosya.exists():
         for satir in tamamlanan_dosya.read_text(encoding="utf-8").splitlines():
@@ -274,14 +274,14 @@ def cmd_run(args: argparse.Namespace) -> int:
         adaylar = [i for i in adaylar if i.id not in tamamlanan_id]
         atlanan_tamamlanan = onceki - len(adaylar)
 
-    karar = _kapasite_ozeti(adaylar, args.saat)
+    karar = _kapasite_ozeti(adaylar, args.hours)
     kabul_id = {g.id for g in karar.kabul}
     kabul_edilen = [i for i in adaylar if i.id in kabul_id]
-    if args.kanarya and len(kabul_edilen) > args.kanarya:
+    if args.canary and len(kabul_edilen) > args.canary:
         # Kanarya: yalnızca ilk N iş; kalan kapasite harcanmış sayılır
         # (dürüst muhasebe) ama koşulmaz.
-        karar.ertelenen.extend(g for g in karar.kabul[args.kanarya:])
-        karar.kabul = karar.kabul[: args.kanarya]
+        karar.ertelenen.extend(g for g in karar.kabul[args.canary:])
+        karar.kabul = karar.kabul[: args.canary]
         kabul_id = {g.id for g in karar.kabul}
         kabul_edilen = [i for i in kabul_edilen if i.id in kabul_id]
 
@@ -293,9 +293,9 @@ def cmd_run(args: argparse.Namespace) -> int:
     canli = args.adapter == "http"
     if canli:
         spec.gates = canli_kapilar_yukle(BURASI / "gates-live.yaml")
-        anahtar = _anahtar_oku(args.anahtar_dosya)
+        anahtar = _anahtar_oku(args.key_file)
         if not anahtar:
-            print("HATA: anahtar yok — --anahtar-dosya veya KOVAN_API_KEY ortam değişkeni")
+            print("HATA: anahtar yok — --key-file veya KOVAN_API_KEY ortam değişkeni")
             return 2
         ic_adapter = HttpAdapter(
             args.base_url,
@@ -304,12 +304,12 @@ def cmd_run(args: argparse.Namespace) -> int:
             egress_log=Path(args.egress_log) if args.egress_log else None,
         )
         incelemeci = None
-        if args.inceleme_url:
-            i_anahtar = _anahtar_oku(args.inceleme_anahtar_dosya)
+        if args.review_url:
+            i_anahtar = _anahtar_oku(args.review_key_file)
             if not i_anahtar:
-                print("HATA: incelemeci anahtarı yok — --inceleme-anahtar-dosya veya KOVAN_API_KEY")
+                print("HATA: incelemeci anahtarı yok — --review-key-file veya KOVAN_API_KEY")
                 return 2
-            incelemeci = Incelemeci(args.inceleme_url, i_anahtar, args.inceleme_model)
+            incelemeci = Incelemeci(args.review_url, i_anahtar, args.review_model)
             # Bağımsız incelemeci devrede: review kapısı bloklayıcıya yükselir
             # (gates-live.yaml'daki geçici uyarıcı durum bu koşuda kapanır).
             spec.gates = [
@@ -320,10 +320,10 @@ def cmd_run(args: argparse.Namespace) -> int:
             ic_adapter = _DogrulayanAdapter(
                 ic_adapter,
                 Path(args.repo),
-                args.test_komut,
+                args.test_command,
                 eval_set=Path(args.eval_set) if args.eval_set else None,
                 incelemeci=incelemeci,
-                uyum_izinli=Path(args.uyum_izinli) if args.uyum_izinli else None,
+                uyum_izinli=Path(args.compliance_allowlist) if args.compliance_allowlist else None,
             )
         adapter = ic_adapter
     else:
@@ -334,16 +334,16 @@ def cmd_run(args: argparse.Namespace) -> int:
         workdir=run_dir,
         backlog=[i.task() for i in kabul_edilen],
     )
-    rapor = loop.run(max_rounds=args.max_tur)
+    rapor = loop.run(max_rounds=args.max_turns)
     ok, kayit, neden = loop.ledger.verify()
 
     ozet = rapor.summary()
     ozet.update(
         {
             "run_id": run_id,
-            "kanarya": args.kanarya or None,
+            "kanarya": args.canary or None,
             "tamamlanan_atlandi": atlanan_tamamlanan,
-            "kapasite_saat": args.saat,
+            "kapasite_saat": args.hours,
             "kabul": [g.id for g in karar.kabul],
             "ertelenen": [g.id for g in karar.ertelenen],
             "insan_kuyrugu": [i.id for i in c3],
@@ -362,12 +362,12 @@ def cmd_run(args: argparse.Namespace) -> int:
             ok,
             kayit,
             run_id,
-            args.saat,
+            args.hours,
             run_dir,
             c3,
             canli,
             inceleme=getattr(adapter, "inceleme_kayitlari", None),
-            kanarya=args.kanarya,
+            kanarya=args.canary,
         ),
         encoding="utf-8",
     )
@@ -411,7 +411,7 @@ def cmd_status(args: argparse.Namespace) -> int:
 def cmd_durum(args: argparse.Namespace) -> int:
     """Tum kosularin capraz metrikleri — haftalık retrospektifin verisi."""
     runs_kok = Path(args.runs)
-    vardiya_kok = Path(args.vardiya_runs)
+    vardiya_kok = Path(args.shift_runs)
 
     kosular: list[dict] = []
     for ozet_dosya in sorted(runs_kok.glob("*/ozet.json")):
@@ -563,39 +563,39 @@ def main(argv: list[str] | None = None) -> int:
     argv = list(sys.argv[1:]) if argv is None else list(argv)
     parser = argparse.ArgumentParser(description="KOVAN mini fabrika")
     parser.add_argument(
-        "--yapilandirma",
+        "--config",
         default=str(BURASI / "user.yaml"),
         help="kullanıcı yapılandırması (yoksa yok sayılır)",
     )
-    sub = parser.add_subparsers(dest="komut", required=True)
+    sub = parser.add_subparsers(dest="command", required=True)
 
     p = sub.add_parser("plan", help="kapasiteye göre kabul listesi")
     p.add_argument("--backlog", default=str(BURASI / "sample-backlog.yaml"))
-    p.add_argument("--saat", type=float, default=3.0)
+    p.add_argument("--hours", type=float, default=3.0)
     p.set_defaults(func=cmd_plan)
 
     r = sub.add_parser("run", help="kabul et ve çalıştır")
     r.add_argument("--backlog", default=str(BURASI / "sample-backlog.yaml"))
-    r.add_argument("--saat", type=float, default=3.0)
+    r.add_argument("--hours", type=float, default=3.0)
     r.add_argument("--seed", type=int, default=0)
-    r.add_argument("--max-tur", type=int, default=20)
+    r.add_argument("--max-turns", type=int, default=20)
     r.add_argument("--out", default="")
     r.add_argument("--run-id", default="")
-    r.add_argument("--kanarya", type=int, default=0, help="yalnızca ilk N kabul edilen iş koşulur (0=kapalı)")
-    r.add_argument("--tamamlanan", default="", help="tamamlanan iş kaydı (JSONL); verilirse kuyruk ilerler")
-    r.add_argument("--adapter", choices=["kuru", "http"], default="kuru")
+    r.add_argument("--canary", type=int, default=0, help="yalnızca ilk N kabul edilen iş koşulur (0=kapalı)")
+    r.add_argument("--completed", default="", help="tamamlanan iş kaydı (JSONL); verilirse kuyruk ilerler")
+    r.add_argument("--adapter", choices=["dry", "http"], default="dry")
     r.add_argument("--base-url", default="https://api.openai.com/v1")
     r.add_argument("--model", default="gpt-4o-mini")
-    r.add_argument("--anahtar-dosya", default="")
+    r.add_argument("--key-file", default="")
     r.add_argument("--repo", default="", help="gerçek test koşumu için git deposu")
     r.add_argument("--eval-set", default="", help="dondurulmuş vaka seti (JSONL); verilirse eval bloklayıcı")
-    r.add_argument("--uyum-izinli", default=str(BURASI / "compliance-allowlist.yaml"), help="izinli üçüncü taraf import listesi")
+    r.add_argument("--compliance-allowlist", default=str(BURASI / "compliance-allowlist.yaml"), help="izinli üçüncü taraf import listesi")
     r.add_argument("--egress-log", default="", help="dış çağrı denetim dosyası (JSONL)")
-    r.add_argument("--inceleme-url", default="", help="bağımsız incelemeci uç noktası")
-    r.add_argument("--inceleme-model", default="")
-    r.add_argument("--inceleme-anahtar-dosya", default="")
+    r.add_argument("--review-url", default="", help="bağımsız incelemeci uç noktası")
+    r.add_argument("--review-model", default="")
+    r.add_argument("--review-key-file", default="")
     r.add_argument(
-        "--test-komut",
+        "--test-command",
         default="python -m unittest discover -s tests -t .",
     )
     r.set_defaults(func=cmd_run)
@@ -608,33 +608,33 @@ def main(argv: list[str] | None = None) -> int:
     s.add_argument("--run", required=True)
     s.set_defaults(func=cmd_status)
 
-    d = sub.add_parser("durum", help="tüm koşuların çapraz metrikleri")
+    d = sub.add_parser("metrics", help="tüm koşuların çapraz metrikleri")
     d.add_argument("--runs", default=str(BURASI / "runs"))
-    d.add_argument("--vardiya-runs", default=str(BURASI / "vardiya-runs"))
+    d.add_argument("--shift-runs", default=str(BURASI / "vardiya-runs"))
     d.add_argument("--json", action="store_true")
     d.set_defaults(func=cmd_durum)
 
     # Kullanıcı yapılandırması → alt ayrıştırıcı varsayılanları (CLI ezer).
-    yapilandirma_yolu = next(
-        (Path(argv[i + 1]) for i, a in enumerate(argv) if a == "--yapilandirma" and i + 1 < len(argv)),
+    config_path = next(
+        (Path(argv[i + 1]) for i, a in enumerate(argv) if a == "--config" and i + 1 < len(argv)),
         BURASI / "user.yaml",
     )
-    if yapilandirma_yolu.exists():
+    if config_path.exists():
         try:
-            veri = yaml.safe_load(yapilandirma_yolu.read_text(encoding="utf-8")) or {}
+            veri = yaml.safe_load(config_path.read_text(encoding="utf-8")) or {}
             anahtarlar = {
-                "saat": float,
+                "hours": float,
                 "backlog": str,
                 "repo": str,
-                "test_komut": str,
+                "test_command": str,
                 "model": str,
                 "base_url": str,
-                "anahtar_dosya": str,
+                "key_file": str,
                 "eval_set": str,
-                "inceleme_url": str,
-                "uyum_izinli": str,
+                "review_url": str,
+                "compliance_allowlist": str,
                 "egress_log": str,
-                "kanarya": int,
+                "canary": int,
             }
             degerler = {
                 k: tip(veri[k])

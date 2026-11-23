@@ -106,7 +106,7 @@ def mekanik_checkler(istatik: dict, dersler: dict, beceriler: list[dict]) -> lis
         checkler.append(
             {
                 "tetik": f"{istatik['ertelenen_is']} iş ertelendi (kapasite)",
-                "komut": "python kovan.py plan --saat 3.0",
+                "komut": "python kovan.py plan --hours 3.0",
                 "neden": "ertelenenler için ayrı kapasite günü planla",
             }
         )
@@ -116,7 +116,7 @@ def mekanik_checkler(istatik: dict, dersler: dict, beceriler: list[dict]) -> lis
         checkler.append(
             {
                 "tetik": f"{len(aday)} beceri adayı insan onayı bekliyor",
-                "komut": "python skill.py liste",
+                "komut": "python skill.py list",
                 "neden": "C1 insan kapısı: onaylanmayan öğrenme birikir",
             }
         )
@@ -132,7 +132,7 @@ def mekanik_checkler(istatik: dict, dersler: dict, beceriler: list[dict]) -> lis
         checkler.append(
             {
                 "tetik": f"{istatik['log_bozuk']} koşum logu çöküm imzası içeriyor",
-                "komut": "python retro.py --log-saglik",
+                "komut": "python retro.py --log-health",
                 "neden": "artefakt var ≠ koşu başarılı: exit kodu ve log bütünlüğü izlenmeli",
             }
         )
@@ -140,7 +140,7 @@ def mekanik_checkler(istatik: dict, dersler: dict, beceriler: list[dict]) -> lis
         checkler.append(
             {
                 "tetik": "tüm göstergeler normal",
-                "komut": "python kovan.py durum --json",
+                "komut": "python kovan.py metrics --json",
                 "neden": "haftalık sayıları tazele (rutin bakım)",
             }
         )
@@ -240,22 +240,22 @@ def uret(runs: Path, vardiya_runs: Path, out: Path, bugun: datetime | None = Non
 def ana(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="KOVAN haftalık retrospektif")
     parser.add_argument("--runs", default=str(BURASI / "runs"))
-    parser.add_argument("--vardiya-runs", default=str(BURASI / "vardiya-runs"))
+    parser.add_argument("--shift-runs", default=str(BURASI / "vardiya-runs"))
     parser.add_argument("--out", default=str(BURASI / "reports"))
     parser.add_argument("--json", action="store_true")
     parser.add_argument(
-        "--log-saglik",
+        "--log-health",
         action="store_true",
         help="rapor üretme; yalnız log bütünlüğü taraması yap (bozuk varsa çıkış 1)",
     )
     args = parser.parse_args(argv)
 
-    if args.log_saglik:
+    if args.log_health:
         saglik = log_saglik(Path(args.runs))
         print(json.dumps(saglik, ensure_ascii=False))
         return 1 if saglik["bozuk"] else 0
 
-    sonuc = uret(Path(args.runs), Path(args.vardiya_runs), Path(args.out))
+    sonuc = uret(Path(args.runs), Path(args.shift_runs), Path(args.out))
     if args.json:
         print(json.dumps(sonuc, ensure_ascii=False, indent=2))
     else:

@@ -221,10 +221,10 @@ def defter_istatigi(runs_dir: Path) -> dict:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="KOVAN gece vardiyasi")
-    sub = parser.add_subparsers(dest="komut", required=True)
+    sub = parser.add_subparsers(dest="command", required=True)
     r = sub.add_parser("run")
     r.add_argument("--id", default=datetime.now().strftime("vardiya-%Y%m%d-%H%M"))
-    r.add_argument("--kaynak", default=str(BURASI / "source-queue.yaml"))
+    r.add_argument("--source", default=str(BURASI / "source-queue.yaml"))
     r.add_argument("--runs", default=str(BURASI / "runs"))
     r.add_argument("--out", default=str(BURASI / "vardiya-runs"))
     args = parser.parse_args(argv)
@@ -253,7 +253,7 @@ def kos_vardiyasi(args) -> int:
 
     # 2. Tarama (rotasyon: önceden okunanlar atlanır)
     kaynaklar = []
-    kuyruk_dosya = Path(args.kaynak)
+    kuyruk_dosya = Path(args.source)
     if kuyruk_dosya.exists():
         veri = yaml.safe_load(kuyruk_dosya.read_text(encoding="utf-8")) or {}
         kaynaklar = veri.get("kaynaklar", [])

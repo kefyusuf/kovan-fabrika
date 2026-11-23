@@ -11,7 +11,7 @@ SİMÜLE olan parça (dürüstlük notunda da yazar):
 - token/maliyet: gerçek fatura değil, muhasebe alıştırması
 
 Kullanim:
-    python simulation.py --gun 5 --saat 3.0 --seed 7
+    python simulation.py --days 5 --hours 3.0 --seed 7
 """
 
 from __future__ import annotations
@@ -107,7 +107,7 @@ def _gun_kos(gun: int, saat: float, seed: int, sim_kok: Path) -> dict:
             [
                 "run",
                 "--backlog", str(backlog_dosya),
-                "--saat", str(saat),
+                "--hours", str(saat),
                 "--seed", str(seed + gun),
                 "--out", str(sim_kok / "kovan"),
                 "--run-id", f"gun-{gun}",
@@ -155,7 +155,7 @@ def _retro_kos(sim_kok: Path) -> dict:
         retro.ana(
             [
                 "--runs", str(sim_kok / "kovan"),
-                "--vardiya-runs", str(sim_kok / "vardiya"),
+                "--shift-runs", str(sim_kok / "vardiya"),
                 "--out", str(sim_kok / "reports"),
                 "--json",
             ]
@@ -276,15 +276,15 @@ def _rapor_yaz(sonuc: dict, sim_kok: Path) -> str:
 
 def ana(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="KOVAN operasyon simülasyonu")
-    parser.add_argument("--gun", type=int, default=5)
-    parser.add_argument("--saat", type=float, default=3.0)
+    parser.add_argument("--days", type=int, default=5)
+    parser.add_argument("--hours", type=float, default=3.0)
     parser.add_argument("--seed", type=int, default=7)
     parser.add_argument("--out", default=str(BURASI / "simulasyon-runs"))
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args(argv)
 
     sim_kok = Path(args.out)
-    sonuc = kos(args.gun, args.saat, args.seed, sim_kok)
+    sonuc = kos(args.days, args.hours, args.seed, sim_kok)
     sonuc["istatik_kullanildi"] = {"vardiya_raporu": sum(
         1 for _ in (sim_kok / "vardiya").glob("*/sabah-raporu.md")
     ) if (sim_kok / "vardiya").exists() else 0}

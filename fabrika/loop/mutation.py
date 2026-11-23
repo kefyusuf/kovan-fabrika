@@ -11,7 +11,7 @@ Mutant "öldü" = en az bir kapı yakaladı. Mutasyon skoru = ölen / toplam.
 
 Kullanim:
     python mutation.py --repo ornek-repo --set eval_set/sicaklik-v1.jsonl \
-        --test-komut "python -m unittest discover -s tests -t ." --maks 12
+        --test-command "python -m unittest discover -s tests -t ." --max 12
 """
 
 from __future__ import annotations
@@ -150,12 +150,12 @@ def ana(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="KOVAN mutasyon testi")
     parser.add_argument("--repo", default=str(BURASI / "ornek-repo"))
     parser.add_argument("--set", default=str(BURASI / "eval_set" / "sicaklik-v1.jsonl"))
-    parser.add_argument("--test-komut", default="python -m unittest discover -s tests -t .")
-    parser.add_argument("--maks", type=int, default=12)
+    parser.add_argument("--test-command", default="python -m unittest discover -s tests -t .")
+    parser.add_argument("--max", type=int, default=12)
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args(argv)
 
-    sonuc = kos(Path(args.repo), Path(args.set), args.test_komut, args.maks)
+    sonuc = kos(Path(args.repo), Path(args.set), args.test_command, args.max)
     if args.json:
         print(json.dumps(sonuc, ensure_ascii=False, indent=2))
     else:

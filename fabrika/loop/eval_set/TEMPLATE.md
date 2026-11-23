@@ -69,7 +69,7 @@ note of "why it retired".
 cd fabrika/loop
 python eval_run.py --repo /path/to/your-repo --set eval_set/your-v1.jsonl
 # with a diff (to measure the model's patch):
-python eval_run.py --repo ... --set ... --diff-dosya yama.diff
+python eval_run.py --repo ... --set ... --diff-file yama.diff
 ```
 
 `kovan.py run --adapter http --eval-set eval_set/your-v1.jsonl ...` makes

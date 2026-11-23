@@ -19,7 +19,7 @@ Not: M/M/1'de kuyruk *uzunluğu* (rho/(1-rho)) ile kuyruk *süresi*
 (rho/(mu-lam)) karıştırılmamalı. Bu modül süreyi saat olarak verir.
 
 Kullanim:
-    python capacity.py --inceleyici 2 --saat 3
+    python capacity.py --reviewers 2 --hours 3
     python capacity.py --lam 9 --mu 10
 """
 
@@ -179,22 +179,22 @@ def _ornek_backlog() -> list[Gorev]:
 
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="KOVAN kapasite valfi")
-    parser.add_argument("--inceleyici", type=int, default=1)
-    parser.add_argument("--saat", type=float, default=3.0)
+    parser.add_argument("--reviewers", type=int, default=1)
+    parser.add_argument("--hours", type=float, default=3.0)
     parser.add_argument("--lam", type=float, default=8.0, help="günlük PR gelişi")
     parser.add_argument("--mu", type=float, default=10.0, help="günlük inceleme kapasitesi (PR)")
-    parser.add_argument("--hedef-gun", type=float, default=1.0)
+    parser.add_argument("--target-days", type=float, default=1.0)
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args(argv)
 
     rapor = kapasite_raporu(
-        inceleyici=args.inceleyici,
-        odakli_saat=args.saat,
+        inceleyici=args.reviewers,
+        odakli_saat=args.hours,
         lam=args.lam,
         mu=args.mu,
-        hedef_gun=args.hedef_gun,
+        hedef_gun=args.target_days,
     )
-    karar = kabul_et(_ornek_backlog(), kapasite_saat(args.inceleyici, args.saat))
+    karar = kabul_et(_ornek_backlog(), kapasite_saat(args.reviewers, args.hours))
     rapor["ornek_kabul"] = karar.ozet()
 
     if args.json:

@@ -27,7 +27,7 @@ def calistir(*argv: str) -> tuple[int, str]:
 
 class PlanTest(unittest.TestCase):
     def test_kapasiteye_gore_kabul(self):
-        kod, cikti = calistir("plan", "--backlog", str(BACKLOG), "--saat", "3")
+        kod, cikti = calistir("plan", "--backlog", str(BACKLOG), "--hours", "3")
         self.assertEqual(kod, 0)
         self.assertIn("K-101", cikti)
         self.assertIn("K-104", cikti)  # ertelenen
@@ -35,8 +35,8 @@ class PlanTest(unittest.TestCase):
         self.assertIn("ertelenen", cikti.lower())
 
     def test_dusuk_kapasite_az_is_alir(self):
-        _, tam = calistir("plan", "--backlog", str(BACKLOG), "--saat", "3")
-        _, az = calistir("plan", "--backlog", str(BACKLOG), "--saat", "0.5")
+        _, tam = calistir("plan", "--backlog", str(BACKLOG), "--hours", "3")
+        _, az = calistir("plan", "--backlog", str(BACKLOG), "--hours", "0.5")
         self.assertNotEqual(tam, az)
 
 
@@ -65,7 +65,7 @@ class RunTest(unittest.TestCase):
     def test_kanarya_yalnizca_n_is_kosturur(self):
         with tempfile.TemporaryDirectory() as tmp:
             kod, _ = calistir(
-                "run", "--backlog", str(BACKLOG), "--out", tmp, "--run-id", "k1", "--kanarya", "2"
+                "run", "--backlog", str(BACKLOG), "--out", tmp, "--run-id", "k1", "--canary", "2"
             )
             self.assertEqual(kod, 0)
             ozet = json.loads((Path(tmp) / "k1" / "ozet.json").read_text(encoding="utf-8"))
@@ -77,11 +77,11 @@ class RunTest(unittest.TestCase):
     def test_yapilandirma_saat_uygulanir(self):
         with tempfile.TemporaryDirectory() as tmp:
             yol = Path(tmp) / "user.yaml"
-            yol.write_text("saat: 1.5\n", encoding="utf-8")
+            yol.write_text("hours: 1.5\n", encoding="utf-8")
             buf = io.StringIO()
             with contextlib.redirect_stdout(buf):
                 kod = kovan.main(
-                    ["--yapilandirma", str(yol), "plan", "--backlog", str(BACKLOG)]
+                    ["--config", str(yol), "plan", "--backlog", str(BACKLOG)]
                 )
             self.assertEqual(kod, 0)
             self.assertIn("1.5 saat", buf.getvalue())
@@ -89,13 +89,13 @@ class RunTest(unittest.TestCase):
     def test_cli_yapilandirmayi_ezer(self):
         with tempfile.TemporaryDirectory() as tmp:
             yol = Path(tmp) / "user.yaml"
-            yol.write_text("saat: 1.5\n", encoding="utf-8")
+            yol.write_text("hours: 1.5\n", encoding="utf-8")
             buf = io.StringIO()
             with contextlib.redirect_stdout(buf):
                 kovan.main(
                     [
-                        "--yapilandirma", str(yol), "plan",
-                        "--backlog", str(BACKLOG), "--saat", "3.0",
+                        "--config", str(yol), "plan",
+                        "--backlog", str(BACKLOG), "--hours", "3.0",
                     ]
                 )
             self.assertIn("3.0 saat", buf.getvalue())
@@ -103,11 +103,11 @@ class RunTest(unittest.TestCase):
     def test_bozuk_yapilandirma_uyari_verir_ve_devam_eder(self):
         with tempfile.TemporaryDirectory() as tmp:
             yol = Path(tmp) / "user.yaml"
-            yol.write_text("saat: [bozuk", encoding="utf-8")
+            yol.write_text("hours: [bozuk", encoding="utf-8")
             buf = io.StringIO()
             with contextlib.redirect_stdout(buf):
                 kod = kovan.main(
-                    ["--yapilandirma", str(yol), "plan", "--backlog", str(BACKLOG)]
+                    ["--config", str(yol), "plan", "--backlog", str(BACKLOG)]
                 )
             self.assertEqual(kod, 0)
             self.assertIn("UYARI", buf.getvalue())
@@ -119,7 +119,7 @@ class RunTest(unittest.TestCase):
             durum.write_text(json.dumps({"id": "K-101"}) + "\n", encoding="utf-8")
             kod, _ = calistir(
                 "run", "--backlog", str(BACKLOG), "--out", tmp,
-                "--run-id", "t1", "--tamamlanan", str(durum),
+                "--run-id", "t1", "--completed", str(durum),
             )
             self.assertEqual(kod, 0)
             ozet = json.loads((Path(tmp) / "t1" / "ozet.json").read_text(encoding="utf-8"))
@@ -134,7 +134,7 @@ class RunTest(unittest.TestCase):
             durum = Path(tmp) / "tamamlanan.jsonl"
             kod, _ = calistir(
                 "run", "--backlog", str(BACKLOG), "--out", tmp,
-                "--run-id", "t2", "--tamamlanan", str(durum),
+                "--run-id", "t2", "--completed", str(durum),
             )
             self.assertEqual(kod, 0)
             kayitlar = {json.loads(s)["id"] for s in durum.read_text(encoding="utf-8").splitlines() if s}
@@ -151,7 +151,7 @@ class RunTest(unittest.TestCase):
             )
             kod, _ = calistir(
                 "run", "--backlog", str(BACKLOG), "--out", tmp,
-                "--run-id", "t3", "--tamamlanan", str(durum),
+                "--run-id", "t3", "--completed", str(durum),
             )
             self.assertEqual(kod, 0)
             ozet = json.loads((Path(tmp) / "t3" / "ozet.json").read_text(encoding="utf-8"))
