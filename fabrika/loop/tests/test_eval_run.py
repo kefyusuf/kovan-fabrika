@@ -11,7 +11,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from eval_run import kos  # noqa: E402
+from eval_run import run_eval  # noqa: E402
 
 REPO = Path(__file__).resolve().parent.parent / "ornek-repo"
 HEDEF = REPO / "sicaklik.py"  # diff üretimi için salt-okunur kaynak (testler KLON üzerinde koşar)
@@ -42,7 +42,7 @@ KIRIK = _diff(
 )
 
 
-class EvalKosTest(unittest.TestCase):
+class EvalRunTest(unittest.TestCase):
     def setUp(self):
         # Gerçek ornek-repo'ya dokunma: her test geçici KLON üzerinde koşar.
         self._t = tempfile.TemporaryDirectory()
@@ -56,24 +56,24 @@ class EvalKosTest(unittest.TestCase):
     def tearDown(self):
         self._t.cleanup()
 
-    def test_baseline_tam_puan(self):
-        s = kos(self.REPO, SET)
+    def test_baseline_full_score(self):
+        s = run_eval(self.REPO, SET)
         self.assertEqual(s["skor"], 1.0)
         self.assertEqual(s["toplam"], 90)
 
-    def test_yesil_diff_etki_etmez(self):
+    def test_green_diff_no_effect(self):
         # Geçerli unified diff: dosyanın sonuna yalnızca bir gözlem satırı.
         mevcut = (self.REPO / "sicaklik.py").read_text(encoding="utf-8")
-        s = kos(self.REPO, SET, _diff(mevcut + "# gozlem: eval v1\n"))
+        s = run_eval(self.REPO, SET, _diff(mevcut + "# gozlem: eval v1\n"))
         self.assertEqual(s["skor"], 1.0)
 
-    def test_kirik_diff_eeldigini_dusturur(self):
-        s = kos(self.REPO, SET, KIRIK)
+    def test_broken_diff_drops_score(self):
+        s = run_eval(self.REPO, SET, KIRIK)
         self.assertLess(s["skor"], 0.9)
         self.assertGreater(len(s["hatalar"]), 0)
 
-    def test_uygulanamaz_diff_sifir(self):
-        s = kos(self.REPO, SET, "--- a/yok/olmayan.py\n+++ b/yok/olmayan.py\n@@ -1 +1 @@\n-x\n+y\n")
+    def test_inapplicable_diff_zero(self):
+        s = run_eval(self.REPO, SET, "--- a/yok/olmayan.py\n+++ b/yok/olmayan.py\n@@ -1 +1 @@\n-x\n+y\n")
         self.assertEqual(s["skor"], 0.0)
         self.assertIn("uygulanamaz", s.get("hata", ""))
 

@@ -39,8 +39,8 @@ import yaml
 from adapter_http import AdapterError, HttpAdapter  # noqa: E402
 import skill  # noqa: E402
 from verify import measure_tests  # noqa: E402
-from eval_run import kos as eval_kos  # noqa: E402
-from reviewer import Incelemeci, IncelemeciError  # noqa: E402
+from eval_run import run_eval as eval_run_fn  # noqa: E402
+from reviewer import Reviewer, ReviewerError  # noqa: E402
 from compliance import signal as uyum_sinyali  # noqa: E402
 from capacity import WorkItem, review_hours, accept  # noqa: E402
 from runner import (  # noqa: E402
@@ -128,7 +128,7 @@ class _DogrulayanAdapter:
         birlesik["provenance"] = bool(prov["provenance"])
         birlesik["uyum_not"] = str(prov["not"])
         if self.eval_set is not None:
-            ev = eval_kos(self.repo, self.eval_set, cand.diff)
+            ev = eval_run_fn(self.repo, self.eval_set, cand.diff)
             birlesik["eval"] = ev["skor"]
             if ev.get("hatalar"):
                 birlesik["eval_not"] = "; ".join(
@@ -136,13 +136,13 @@ class _DogrulayanAdapter:
                 )
         if self.incelemeci is not None:
             try:
-                karar = self.incelemeci.incele(
+                karar = self.incelemeci.review(
                     task.title, task.change_class.value, cand.diff, bool(sinyal.get("tests"))
                 )
                 birlesik["review"] = bool(karar["onay"])
                 birlesik["inceleme_gerekce"] = karar["gerekce"][:300]
                 self.inceleme_kayitlari[task.id] = karar
-            except IncelemeciError as e:
+            except ReviewerError as e:
                 birlesik["review"] = False
                 birlesik["inceleme_gerekce"] = f"incelemeci hatası (fail-closed): {e}"
                 self.inceleme_kayitlari[task.id] = {
@@ -309,7 +309,7 @@ def cmd_run(args: argparse.Namespace) -> int:
             if not i_anahtar:
                 print("HATA: incelemeci anahtarı yok — --review-key-file veya KOVAN_API_KEY")
                 return 2
-            incelemeci = Incelemeci(args.review_url, i_anahtar, args.review_model)
+            incelemeci = Reviewer(args.review_url, i_anahtar, args.review_model)
             # Bağımsız incelemeci devrede: review kapısı bloklayıcıya yükselir
             # (gates-live.yaml'daki geçici uyarıcı durum bu koşuda kapanır).
             spec.gates = [

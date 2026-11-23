@@ -39,7 +39,7 @@ def sahte_runs(tmp: str) -> Path:
     return d.parent
 
 
-class VardiyaTest(unittest.TestCase):
+class ShiftTest(unittest.TestCase):
     def setUp(self):
         self._tmp = tempfile.TemporaryDirectory()
         self.tmp = self._tmp.name
@@ -53,19 +53,19 @@ class VardiyaTest(unittest.TestCase):
         self.assertEqual(kod, 0)
         return Path(self.tmp) / run_id
 
-    def test_uctan_uca_artefakt_uretir(self):
+    def test_end_to_end_artifacts(self):
         run = self._kos("v1")
         for ad in ("plan.md", "notlar.md", "kirilma.md", "sabah-raporu.md", "ledger.jsonl"):
             self.assertTrue((run / ad).exists(), ad)
         self.assertTrue((run / "oneri" / "ADR-taslagi.md").exists())
 
-    def test_defter_dogrulanir(self):
+    def test_ledger_verified(self):
         run = self._kos("v2")
         ok, kayit, neden = Ledger(run / "ledger.jsonl").verify()
         self.assertTrue(ok, neden)
         self.assertGreaterEqual(kayit, 6)
 
-    def test_tekrar_eden_dersten_beceri_adaayi(self):
+    def test_recurring_lesson_emits_skill_candidate(self):
         run = self._kos("v3")
         adaylar = list((Path(self.tmp) / "beceri-adaylari").glob("*.md"))
         self.assertEqual(len(adaylar), 1)
@@ -73,7 +73,7 @@ class VardiyaTest(unittest.TestCase):
         self.assertIn("status: proposed", icerik)
         self.assertIn("K-9", icerik)
 
-    def test_idempotent_ikinci_kosum_yeniden_uretmez(self):
+    def test_idempotent_second_run_no_reemit(self):
         self._kos("v8a")
         ilk = list((Path(self.tmp) / "beceri-adaylari").glob("*.md"))
         run2 = self._kos("v8b")
@@ -82,30 +82,30 @@ class VardiyaTest(unittest.TestCase):
         rapor = (run2 / "sabah-raporu.md").read_text(encoding="utf-8")
         self.assertIn("Zaten adaydı", rapor)
 
-    def test_url_kaynak_kuru_modda_atlanir(self):
+    def test_url_source_skipped_in_dry_mode(self):
         run = self._kos("v4")
         rapor = (run / "sabah-raporu.md").read_text(encoding="utf-8")
         self.assertIn("model gerekli", rapor)
         self.assertIn("metr.org", rapor)
 
-    def test_kirmizi_takim_canli_profil_kirilmasini_bulur(self):
+    def test_red_team_finds_live_profile_breaks(self):
         run = self._kos("v5")
         kirilma = (run / "kirilma.md").read_text(encoding="utf-8")
         self.assertIn("tasarim_hatasi", kirilma)
 
-    def test_adr_olcum_plani_zorunlu(self):
+    def test_adr_measurement_plan_required(self):
         run = self._kos("v6")
         oneri = (run / "oneri" / "ADR-taslagi.md").read_text(encoding="utf-8")
         self.assertIn("Ölçüm planı", oneri)
         self.assertIn("C3", oneri)
 
-    def test_rapor_bes_bolumlu(self):
+    def test_report_five_sections(self):
         run = self._kos("v7")
         rapor = (run / "sabah-raporu.md").read_text(encoding="utf-8")
         for baslik in ("Ne öğrenildi", "Ne üretildi", "Ne reddedildi", "Bugünün ilk üç işi", "Dürüstlük notu"):
             self.assertIn(baslik, rapor)
 
-    def test_rotasyon_harcanan_atlanir(self):
+    def test_rotation_skips_consumed(self):
         """Kısmi tüketim: okunmuş kaynak atlanır, okunmamış taranır."""
         kok = Path(tempfile.mkdtemp())
         (kok / "eski.md").write_text("bak: https://ornek.one/a\n", encoding="utf-8")
@@ -114,13 +114,13 @@ class VardiyaTest(unittest.TestCase):
             {"tur": "dosya", "yol": "eski.md", "konu": "eski"},
             {"tur": "dosya", "yol": "yeni.md", "konu": "yeni"},
         ]
-        eski_kok = shift.KOK
-        shift.KOK = kok
+        eski_kok = shift.ROOT
+        shift.ROOT = kok
         try:
             harcanan = frozenset({str((kok / "eski.md").resolve())})
-            okunan, atlanan = shift.kaynak_tara(kaynaklar, harcanan)
+            okunan, atlanan = shift.scan_sources(kaynaklar, harcanan)
         finally:
-            shift.KOK = eski_kok
+            shift.ROOT = eski_kok
 
         atlanan_yollar = {
             a.get("yol") for a in atlanan if a.get("neden") == "önceden okundu (rotasyon)"
@@ -129,23 +129,23 @@ class VardiyaTest(unittest.TestCase):
         okunan_kaynaklar = {n["kaynak_dosya"] for n in okunan}
         self.assertTrue(all("yeni.md" in k for k in okunan_kaynaklar))
 
-    def test_tumu_tukendiyse_tekrar_isaretli(self):
+    def test_all_consumed_marked_rescan(self):
         kok = Path(tempfile.mkdtemp())
         (kok / "eski.md").write_text("bak: https://ornek.three/c\n", encoding="utf-8")
         kaynaklar = [{"tur": "dosya", "yol": "eski.md", "konu": "k"}]
-        eski_kok = shift.KOK
-        shift.KOK = kok
+        eski_kok = shift.ROOT
+        shift.ROOT = kok
         try:
             harcanan = frozenset({str((kok / "eski.md").resolve())})
-            okunan, atlanan = shift.kaynak_tara(kaynaklar, harcanan)
+            okunan, atlanan = shift.scan_sources(kaynaklar, harcanan)
         finally:
-            shift.KOK = eski_kok
+            shift.ROOT = eski_kok
         self.assertGreater(len(okunan), 0)
         self.assertTrue(okunan[0]["tekrar_tarama"])
         self.assertEqual(atlanan, [])
 
-    def test_kok_disi_kaynak_reddedilir(self):
-        okunan, atlanan = shift.kaynak_tara(
+    def test_outside_root_source_rejected(self):
+        okunan, atlanan = shift.scan_sources(
             [{"tur": "dosya", "yol": "C:/Windows/win.ini", "konu": "disari"}]
         )
         self.assertEqual(okunan, [])

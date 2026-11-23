@@ -1,4 +1,4 @@
-"""Incelemeci adapter testleri — yerel sahte sunucu ile."""
+"""Reviewer adapter tests — with a local fake server."""
 
 from __future__ import annotations
 
@@ -11,7 +11,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent.parent))
 
-from reviewer import Incelemeci, IncelemeciError  # noqa: E402
+from reviewer import Reviewer, ReviewerError  # noqa: E402
 
 
 class _Sunucu(BaseHTTPRequestHandler):
@@ -34,7 +34,7 @@ class _Sunucu(BaseHTTPRequestHandler):
         pass
 
 
-class IncelemeciTest(unittest.TestCase):
+class ReviewerTest(unittest.TestCase):
     @classmethod
     def setUpClass(cls):
         cls.sunucu = HTTPServer(("127.0.0.1", 0), _Sunucu)
@@ -46,30 +46,30 @@ class IncelemeciTest(unittest.TestCase):
         cls.sunucu.shutdown()
 
     def _a(self):
-        return Incelemeci(self.url, "anahtar", "m", timeout=5)
+        return Reviewer(self.url, "anahtar", "m", timeout=5)
 
-    def test_onay_gerekceyle(self):
-        k = self._a().incele("gorev", "C2", "--- a/x.py", True)
+    def test_approval_with_rationale(self):
+        k = self._a().review("gorev", "C2", "--- a/x.py", True)
         self.assertTrue(k["onay"])
         self.assertTrue(k["gerekce"])
 
-    def test_gerekcesiz_onay_gecersiz(self):
+    def test_approval_without_rationale_invalid(self):
         _Sunucu.mod = "gerekcesiz"
-        k = self._a().incele("gorev", "C2", "--- a/x.py", True)
+        k = self._a().review("gorev", "C2", "--- a/x.py", True)
         self.assertFalse(k["onay"])
         _Sunucu.mod = "onay"
 
-    def test_ret_bulgularla(self):
+    def test_rejection_with_findings(self):
         _Sunucu.mod = "ret"
-        k = self._a().incele("gorev", "C2", "--- a/x.py", True)
+        k = self._a().review("gorev", "C2", "--- a/x.py", True)
         self.assertFalse(k["onay"])
         self.assertEqual(k["bulgular"], ["x.py"])
         _Sunucu.mod = "onay"
 
-    def test_json_olmayan_yanit(self):
+    def test_non_json_response(self):
         _Sunucu.mod = "bozuk"
-        with self.assertRaises(IncelemeciError):
-            self._a().incele("gorev", "C2", "--- a/x.py", True)
+        with self.assertRaises(ReviewerError):
+            self._a().review("gorev", "C2", "--- a/x.py", True)
         _Sunucu.mod = "onay"
 
 

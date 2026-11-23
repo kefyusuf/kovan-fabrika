@@ -26,66 +26,66 @@ console.hazirla()
 
 from verify import reset_repo, repo_is_valid, apply_patch  # noqa: E402
 
-KOMUT_TIMEOUT = 180
-KOSONUC_ONEK = "KOSONUC="
+COMMAND_TIMEOUT = 180
+RESULT_PREFIX = "KOSONUC="
 BURASI = Path(__file__).resolve().parent
 
 
-def kos(repo: str | Path, set_dosyasi: str | Path, diff: str | None = None) -> dict:
+def run_eval(repo: str | Path, set_dosyasi: str | Path, diff: str | None = None) -> dict:
     repo_p = Path(repo)
     set_p = Path(set_dosyasi)
     if not repo_is_valid(repo_p):
         return {"skor": 0.0, "gecen": 0, "toplam": 0, "hata": "repo geçersiz veya git deposu değil"}
 
-    satirlar = [
+    lines = [
         s for s in set_p.read_text(encoding="utf-8").splitlines() if s.strip()
     ]
-    toplam = len(satirlar)
-    if toplam == 0:
+    total = len(lines)
+    if total == 0:
         return {"skor": 0.0, "gecen": 0, "toplam": 0, "hata": "set boş"}
 
     if diff is not None:
-        ok, not_ = apply_patch(repo_p, diff)
+        ok, note = apply_patch(repo_p, diff)
         if not ok:
             reset_repo(repo_p)
-            return {"skor": 0.0, "gecen": 0, "toplam": toplam, "hata": f"diff uygulanamadı: {not_}"}
+            return {"skor": 0.0, "gecen": 0, "toplam": total, "hata": f"diff uygulanamadı: {note}"}
 
     try:
-        son = subprocess.run(
+        proc = subprocess.run(
             [sys.executable, str(BURASI / "eval_set" / "runner.py"), str(set_p.resolve())],
             cwd=str(repo_p),
             capture_output=True,
             text=True,
             encoding="utf-8",
             errors="replace",
-            timeout=KOMUT_TIMEOUT,
+            timeout=COMMAND_TIMEOUT,
         )
     except subprocess.TimeoutExpired:
-        return {"skor": 0.0, "gecen": 0, "toplam": toplam, "hata": "eval zaman aşımı"}
+        return {"skor": 0.0, "gecen": 0, "toplam": total, "hata": "eval zaman aşımı"}
 
-    veri = None
-    for satir in reversed((son.stdout or "").splitlines()):
-        if satir.startswith(KOSONUC_ONEK):
+    data = None
+    for line in reversed((proc.stdout or "").splitlines()):
+        if line.startswith(RESULT_PREFIX):
             try:
-                veri = json.loads(satir[len(KOSONUC_ONEK):])
+                data = json.loads(line[len(RESULT_PREFIX):])
             except json.JSONDecodeError:
-                veri = None
+                data = None
             break
-    if veri is None:
-        return {"skor": 0.0, "gecen": 0, "toplam": toplam, "hata": "koşucu çıktı vermedi"}
+    if data is None:
+        return {"skor": 0.0, "gecen": 0, "toplam": total, "hata": "koşucu çıktı vermedi"}
 
-    gecen = int(veri.get("gecen", 0))
-    toplam_set = int(veri.get("toplam", toplam))
-    skor = round(gecen / toplam_set, 4) if toplam_set else 0.0
+    passed = int(data.get("gecen", 0))
+    total_set = int(data.get("toplam", total))
+    skor = round(passed / total_set, 4) if total_set else 0.0
     return {
         "skor": skor,
-        "gecen": gecen,
-        "toplam": toplam_set,
-        "hatalar": veri.get("hatalar", []),
+        "gecen": passed,
+        "toplam": total_set,
+        "hatalar": data.get("hatalar", []),
     }
 
 
-def ana(argv: list[str] | None = None) -> int:
+def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(description="KOVAN eval v1 koşucusu")
     parser.add_argument("--repo", required=True)
     parser.add_argument("--set", required=True)
@@ -93,10 +93,10 @@ def ana(argv: list[str] | None = None) -> int:
     args = parser.parse_args(argv)
 
     diff = Path(args.diff_file).read_text(encoding="utf-8") if args.diff_file else None
-    sonuc = kos(args.repo, args.set, diff)
+    sonuc = run_eval(args.repo, args.set, diff)
     print(json.dumps(sonuc, ensure_ascii=False, indent=2))
     return 0 if sonuc.get("skor", 0.0) >= 0.9 else 1
 
 
 if __name__ == "__main__":
-    raise SystemExit(ana())
+    raise SystemExit(main())

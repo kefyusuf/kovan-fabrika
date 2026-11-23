@@ -29,7 +29,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 import yaml
 
 from runner import ChangeClass, Ledger, Loop, ScriptedAdapter, Spec, Task
-from shift import kos_vardiyasi as vardiya_kos
+from shift import run_shift
 
 BURASI = Path(__file__).resolve().parent
 HAVUZ = [

@@ -19,7 +19,7 @@ import urllib.request
 from adapter_http import _json_cikar
 
 DEFAULT_TIMEOUT = 60.0
-SISTEM = (
+SYSTEM_PROMPT = (
     "Sen KOVAN fabrikasinin bagimsiz incelemecisisin. Sana bir unified diff "
     "ve test sonucu verilir. Gorevin: kapsam sapmasi, tasarim hatasi, "
     "gereksiz soyutlama ve guvenlik riski aramak. Kodu duzeltmezsin. "
@@ -29,35 +29,35 @@ SISTEM = (
 )
 
 
-class IncelemeciError(RuntimeError):
+class ReviewerError(RuntimeError):
     pass
 
 
-class Incelemeci:
+class Reviewer:
     def __init__(self, base_url: str, api_key: str, model: str, timeout: float = DEFAULT_TIMEOUT):
         self.base_url = base_url.rstrip("/")
         self.api_key = api_key
         self.model = model
         self.timeout = timeout
 
-    def incele(self, task_baslik: str, sinif: str, diff: str, tests_gecti: bool) -> dict:
-        kullanici = "\n".join(
+    def review(self, task_title: str, change_class: str, diff: str, tests_passed: bool) -> dict:
+        user_message = "\n".join(
             [
-                f"Görev: {task_baslik}",
-                f"Sınıf: {sinif}",
-                f"Test koşumu: {'GEÇTİ' if tests_gecti else 'DÜŞTÜ'}",
+                f"Görev: {task_title}",
+                f"Sınıf: {change_class}",
+                f"Test koşumu: {'GEÇTİ' if tests_passed else 'DÜŞTÜ'}",
                 "Diff:",
                 diff[:6000],
             ]
         )
-        istek = urllib.request.Request(
+        request = urllib.request.Request(
             f"{self.base_url}/chat/completions",
             data=json.dumps(
                 {
                     "model": self.model,
                     "messages": [
-                        {"role": "system", "content": SISTEM},
-                        {"role": "user", "content": kullanici},
+                        {"role": "system", "content": SYSTEM_PROMPT},
+                        {"role": "user", "content": user_message},
                     ],
                     "temperature": 0.1,
                     "max_tokens": 800,
@@ -70,25 +70,25 @@ class Incelemeci:
             method="POST",
         )
         try:
-            with urllib.request.urlopen(istek, timeout=self.timeout) as yanit:
-                veri = json.loads(yanit.read().decode("utf-8"))
-            icerik = veri["choices"][0]["message"]["content"]
+            with urllib.request.urlopen(request, timeout=self.timeout) as response:
+                data = json.loads(response.read().decode("utf-8"))
+            content = data["choices"][0]["message"]["content"]
         except urllib.error.HTTPError as e:
-            raise IncelemeciError(f"HTTP {e.code}")
+            raise ReviewerError(f"HTTP {e.code}")
         except (urllib.error.URLError, TimeoutError, json.JSONDecodeError, KeyError, IndexError) as e:
-            raise IncelemeciError(f"incelemeci çağrısı başarısız: {e}")
+            raise ReviewerError(f"incelemeci çağrısı başarısız: {e}")
 
-        karar = _json_cikar(icerik)
-        if karar is None or "onay" not in karar:
-            raise IncelemeciError("incelemeci yanıtı karar JSON'u değil")
-        onay = bool(karar.get("onay"))
-        gerekce = str(karar.get("gerekce", "")).strip()
-        if onay and not gerekce:
+        decision = _json_cikar(content)
+        if decision is None or "onay" not in decision:
+            raise ReviewerError("incelemeci yanıtı karar JSON'u değil")
+        approved = bool(decision.get("onay"))
+        rationale = str(decision.get("gerekce", "")).strip()
+        if approved and not rationale:
             # Gerekçesiz onay geçersizdir (anayasa m.2).
-            onay = False
-            gerekce = "gerekçesiz onay reddedildi"
+            approved = False
+            rationale = "gerekçesiz onay reddedildi"
         return {
-            "onay": onay,
-            "gerekce": gerekce,
-            "bulgular": [str(b) for b in karar.get("bulgular", [])][:10],
+            "onay": approved,
+            "gerekce": rationale,
+            "bulgular": [str(b) for b in decision.get("bulgular", [])][:10],
         }

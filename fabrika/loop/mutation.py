@@ -33,7 +33,7 @@ import console
 console.hazirla()
 
 from verify import run_test_command  # noqa: E402
-from eval_run import kos as eval_kos  # noqa: E402
+from eval_run import run_eval as eval_run_fn  # noqa: E402
 
 BURASI = Path(__file__).resolve().parent
 BINOP = {ast.Add: ast.Sub, ast.Sub: ast.Add, ast.Mult: ast.Div, ast.Div: ast.Mult, ast.Mod: ast.Mult}
@@ -115,7 +115,7 @@ def kos(repo: Path, set_dosyasi: Path, test_komutu: str, maks: int = 12) -> dict
                 continue
             (klon / "sicaklik.py").write_text(yeni_kaynak, encoding="utf-8", newline="\n")
             _commit(klon)
-            ev = eval_kos(klon, set_dosyasi)
+            ev = eval_run_fn(klon, set_dosyasi)
             try:
                 testler, _ = run_test_command(klon, test_komutu)
             except Exception:  # noqa: BLE001

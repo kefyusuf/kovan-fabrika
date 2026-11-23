@@ -34,20 +34,20 @@ from runner import Ledger  # noqa: E402
 from seedtest import kos as seedtest_kos, varsayilan_hatalar, varsayilan_kapilar  # noqa: E402
 
 BURASI = Path(__file__).resolve().parent
-KOK = BURASI.parent.parent  # calisma alani koku (izolasyon siniri)
+ROOT = BURASI.parent.parent  # calisma alani koku (izolasyon siniri)
 
 
-def _jsonl(path: Path) -> list[dict]:
+def read_jsonl(path: Path) -> list[dict]:
     if not path.exists():
         return []
     return [json.loads(s) for s in path.read_text(encoding="utf-8").splitlines() if s.strip()]
 
 
-def topla_dersler(runs_dir: Path) -> dict[str, dict]:
+def collect_lessons(runs_dir: Path) -> dict[str, dict]:
     """Butun kovan kosularinin derslerini parmak izine gore toplar."""
     toplam: dict[str, dict] = {}
     for lessons in sorted(runs_dir.glob("*/lessons.jsonl")):
-        for kayit in _jsonl(lessons):
+        for kayit in read_jsonl(lessons):
             fp = kayit.get("fingerprint")
             if not fp:
                 continue
@@ -64,19 +64,19 @@ def topla_dersler(runs_dir: Path) -> dict[str, dict]:
     return toplam
 
 
-def _kaynak_gecmisi(vardiya_runs: Path) -> set[str]:
+def _source_history(vardiya_runs: Path) -> set[str]:
     """Önceki vardiyalarda okunan kaynak yolları (rotasyon için)."""
     gecmis = vardiya_runs / "kaynak-gecmisi.jsonl"
     if not gecmis.exists():
         return set()
     return {
         kayit.get("kaynak", "")
-        for kayit in _jsonl(gecmis)
+        for kayit in read_jsonl(gecmis)
         if kayit.get("kaynak")
     }
 
 
-def kaynak_tara(kaynaklar: list[dict], harcanan: frozenset[str] = frozenset()) -> tuple[list[dict], list[dict]]:
+def scan_sources(kaynaklar: list[dict], harcanan: frozenset[str] = frozenset()) -> tuple[list[dict], list[dict]]:
     """Dosya kaynaklarindan URL tasiyan satirlari toplar; URL kaynaklarini
     kuru modda atlar (model gerekli).
 
@@ -96,7 +96,7 @@ def kaynak_tara(kaynaklar: list[dict], harcanan: frozenset[str] = frozenset()) -
             continue
         yol = Path(str(kaynak.get("yol", "")))
         if not yol.is_absolute():
-            yol = (KOK / yol).resolve()
+            yol = (ROOT / yol).resolve()
         else:
             yol = yol.resolve()
         dosya_yollari.append(str(yol))
@@ -108,7 +108,7 @@ def kaynak_tara(kaynaklar: list[dict], harcanan: frozenset[str] = frozenset()) -
             atlanan.append({**kaynak, "neden": "kuru mod: URL kaynagi model gerekli"})
             continue
         yol = cozumlu.get(str(kaynak.get("yol", "")), Path(str(kaynak.get("yol", ""))))
-        if not str(yol).startswith(str(KOK)) or not yol.is_file():
+        if not str(yol).startswith(str(ROOT)) or not yol.is_file():
             atlanan.append({**kaynak, "neden": "izinli kok disi veya yok"})
             continue
         if str(yol) in harcanan and not tumu_tukendi:
@@ -128,7 +128,7 @@ def kaynak_tara(kaynaklar: list[dict], harcanan: frozenset[str] = frozenset()) -
             okunan.append(
                 {
                     "konu": kaynak.get("konu", yol.name),
-                    "kaynak_dosya": str(yol.relative_to(KOK)),
+                    "kaynak_dosya": str(yol.relative_to(ROOT)),
                     "url": desen.search(satir).group(0)[:120],
                     "baglam": satir[:180],
                     "tekrar_tarama": tekrar,
@@ -137,7 +137,7 @@ def kaynak_tara(kaynaklar: list[dict], harcanan: frozenset[str] = frozenset()) -
     return okunan, atlanan
 
 
-def beceri_adayi_uret(dersler: dict[str, dict], aday_dizini: Path, en_cok: int = 3) -> tuple[list[Path], list[str]]:
+def emit_skill_candidates(dersler: dict[str, dict], aday_dizini: Path, en_cok: int = 3) -> tuple[list[Path], list[str]]:
     """seen >= 2 olan derslerden SKILL.md adayi uretir (status: proposed).
 
     Idempotent: ayni ad daha once yazildiysa DOSYA YAZILMAZ, 'zaten aday'
@@ -184,7 +184,7 @@ def beceri_adayi_uret(dersler: dict[str, dict], aday_dizini: Path, en_cok: int =
     return yazilan, zaten_var
 
 
-def kirmizi_takim() -> dict:
+def red_team() -> dict:
     hatalar = varsayilan_hatalar()
     tam = seedtest_kos(hatalar, varsayilan_kapilar())
     canli_kapilar = [k for k in varsayilan_kapilar() if k.ad != "review"]
@@ -200,11 +200,11 @@ def kirmizi_takim() -> dict:
     }
 
 
-def defter_istatigi(runs_dir: Path) -> dict:
+def ledger_stats(runs_dir: Path) -> dict:
     karar = Counter()
     kapı_hatalari: Counter = Counter()
     for ledger in sorted(runs_dir.glob("*/ledger.jsonl")):
-        for kayit in _jsonl(ledger):
+        for kayit in read_jsonl(ledger):
             p = kayit.get("payload", {})
             if p.get("type") != "decision":
                 continue
@@ -228,10 +228,10 @@ def main(argv: list[str] | None = None) -> int:
     r.add_argument("--runs", default=str(BURASI / "runs"))
     r.add_argument("--out", default=str(BURASI / "vardiya-runs"))
     args = parser.parse_args(argv)
-    return kos_vardiyasi(args)
+    return run_shift(args)
 
 
-def kos_vardiyasi(args) -> int:
+def run_shift(args) -> int:
     cikti = Path(args.out) / args.id
     cikti.mkdir(parents=True, exist_ok=True)
     ledger = Ledger(cikti / "ledger.jsonl")
@@ -257,15 +257,15 @@ def kos_vardiyasi(args) -> int:
     if kuyruk_dosya.exists():
         veri = yaml.safe_load(kuyruk_dosya.read_text(encoding="utf-8")) or {}
         kaynaklar = veri.get("kaynaklar", [])
-    harcanan = _kaynak_gecmisi(Path(args.out))
-    okunan, atlanan = kaynak_tara(kaynaklar, harcanan)
+    harcanan = _source_history(Path(args.out))
+    okunan, atlanan = scan_sources(kaynaklar, harcanan)
     gecmis_dosya = Path(args.out) / "kaynak-gecmisi.jsonl"
     for n in okunan:
         with gecmis_dosya.open("a", encoding="utf-8") as fh:
             fh.write(
                 json.dumps(
                     {
-                        "kaynak": str((KOK / n["kaynak_dosya"]).resolve()),
+                        "kaynak": str((ROOT / n["kaynak_dosya"]).resolve()),
                         "ts": datetime.now(timezone.utc).isoformat(),
                         "tekrar_tarama": bool(n.get("tekrar_tarama")),
                     },
@@ -292,18 +292,18 @@ def kos_vardiyasi(args) -> int:
         ledger.append({"type": "kaynak_okundu", "url": n["url"], "konu": n["konu"]})
 
     # 3. Damıtma
-    dersler = topla_dersler(Path(args.runs))
+    dersler = collect_lessons(Path(args.runs))
     # Beceri adayları paylaşılan dizine yazılır: her gece aynı adayı
     # yeniden üretmek, tekrar eden ders için 'yeni öğrenme' izlenimi verir.
     aday_dizini = cikti.parent / "beceri-adaylari"
-    adaylar, aday_zaten = beceri_adayi_uret(dersler, aday_dizini)
+    adaylar, aday_zaten = emit_skill_candidates(dersler, aday_dizini)
     for a in adaylar:
         ledger.append({"type": "beceri_adayi", "dosya": a.name})
     for ad in aday_zaten:
         ledger.append({"type": "beceri_adayi_zaten_var", "dosya": ad})
 
     # 4. Kırmızı takım
-    kirilma = kirmizi_takim()
+    kirilma = red_team()
     (cikti / "kirilma.md").write_text(
         "# Kırmızı Takım — kapı kapsamı\n\n"
         f"- Tam set yakalama: **{kirilma['tam_kapsam']:.0%}**\n"
@@ -315,7 +315,7 @@ def kos_vardiyasi(args) -> int:
     ledger.append({"type": "kirilma_raporu", "veri": kirilma})
 
     # 5. Yapı önerisi
-    istatik = defter_istatigi(Path(args.runs))
+    istatik = ledger_stats(Path(args.runs))
     en_cok = istatik["en_cok_dusen_kapi"][0][0] if istatik["en_cok_dusen_kapi"] else "yok"
     oneri = (
         "# ADR Taslağı (otomatik öneri — C3, insan onayı bekler)\n\n"
