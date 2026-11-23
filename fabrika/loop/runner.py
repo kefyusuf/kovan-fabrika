@@ -1,22 +1,23 @@
-"""KOVAN dongu kosucusu - referans implementasyon.
+"""KOVAN loop runner — reference implementation.
 
-Tasarim ilkesi: "kendini gelistiren sistem" bir sihir degil, bir durum
-makinesidir. Her tur su sirayla isler:
+Design principle: a "self-improving system" is not magic; it is a state
+machine. Each turn proceeds in this order:
 
-    OBSERVE -> SELECT -> PROPOSE -> VERIFY (kapilar) -> DECIDE -> RECORD -> LEARN
+    OBSERVE -> SELECT -> PROPOSE -> VERIFY (gates) -> DECIDE -> RECORD -> LEARN
 
-Bu dosya, fabrikanin iddia ettigi davranislari *olcebilir* hale getirir:
-- kapi sirasi ve fail-fast
-- butce muhasebesi (token)
-- devre kesici (ust uste basarisizlik)
-- plato algilama (ilerleme yok)
-- degisiklik sinifi (C0-C3) ve insan onayi
-- hash-zincirli defter (tahrif tespiti)
-- tekrar eden hatadan beceri adayi cikarma
+This file makes the factory's claimed behaviors *measurable*:
+- gate order and fail-fast
+- budget accounting (tokens)
+- circuit breaker (consecutive failures)
+- plateau detection (no progress)
+- change classes (C0-C3) and human approval
+- hash-chained ledger (tamper detection)
+- recurring failure -> skill candidate extraction
 
-Kosucu aga cikmaz ve LLM cagirmaz. Model cagrisi `Adapter` arayuzundedir;
-testler `ScriptedAdapter` ile deterministik calisir. Bu, "once iskeleti
-dogrula, sonra modeli bagla" kararinin (ADR-F02) kod karsiligidir.
+The runner never touches the network and never calls an LLM. The model call
+lives behind the `Adapter` interface; tests run deterministically with
+`ScriptedAdapter`. This is the code counterpart of the "verify the skeleton
+first, connect the model later" decision (ADR-F02).
 """
 
 from __future__ import annotations
@@ -32,17 +33,17 @@ from typing import Any, Iterable, Protocol, Sequence
 
 
 # --------------------------------------------------------------------------
-# Degisiklik siniflari (ADR-F08)
+# Change classes (ADR-F08)
 # --------------------------------------------------------------------------
 
 
 class ChangeClass(str, Enum):
-    """Bir degisikligin ne kadar "yapi" oldugu.
+    """How much "structure" a change carries.
 
-    C0: yazim/yorum/konfigurasyon - kapilar yeterli.
-    C1: beceri, prompt, dokuman - eval + inceleme.
-    C2: urun kodu - tum kapilar.
-    C3: anayasa, politika, model, kadro - insan onayi olmadan mumkun degil.
+    C0: spelling/comments/configuration - gates suffice.
+    C1: skills, prompts, docs - eval + review.
+    C2: product code - all gates.
+    C3: constitution, policy, model, roster - impossible without human approval.
     """
 
     C0 = "C0"
@@ -55,7 +56,7 @@ HUMAN_REQUIRED = {ChangeClass.C3}
 
 
 # --------------------------------------------------------------------------
-# Veri modelleri
+# Data models
 # --------------------------------------------------------------------------
 
 
@@ -64,7 +65,7 @@ class Task:
     id: str
     title: str
     change_class: ChangeClass = ChangeClass.C2
-    priority: int = 2  # 1 = en yuksek
+    priority: int = 2  # 1 = highest
     estimate_tokens: int = 10_000
     touches: tuple[str, ...] = ()
 
@@ -74,7 +75,7 @@ class Task:
 
 @dataclass
 class Candidate:
-    """Adapter'in urettigi aday degisiklik."""
+    """The candidate change produced by the Adapter."""
 
     task_id: str
     tokens: int
@@ -125,7 +126,7 @@ class RunReport:
 
 
 # --------------------------------------------------------------------------
-# Sozlesme (spec) yukleme
+# Contract (spec) loading
 # --------------------------------------------------------------------------
 
 
@@ -139,7 +140,7 @@ class GateSpec:
 
 
 class SpecError(RuntimeError):
-    """Sozlesme yuklenemedi: dongu baslatilmamali."""
+    """The contract could not be loaded: the loop must not start."""
 
 
 @dataclass
@@ -171,10 +172,10 @@ class Spec:
 
     @classmethod
     def load(cls, directory: str | Path, require_goal: bool = True) -> "Spec":
-        """goal.yaml + gates.yaml dosyalarindan yukler.
+        """Loads from the goal.yaml + gates.yaml files.
 
-        `require_goal=True` iken hedef sozlesmesi yoksa yukleme basarisiz olur:
-        hedefi olmayan bir dongu, olcemedigi bir isi yapar (PRD FR-01).
+        With `require_goal=True`, a missing goal contract makes loading fail:
+        a loop without a goal performs work it cannot measure (PRD FR-01).
         """
         directory = Path(directory)
         spec = cls.defaults()
@@ -231,7 +232,7 @@ class Spec:
 def _read_yaml(path: Path) -> dict[str, Any]:
     try:
         import yaml  # type: ignore
-    except ModuleNotFoundError:  # pragma: no cover - ortam garantisi degil
+    except ModuleNotFoundError:  # pragma: no cover - not an environment guarantee
         raise RuntimeError(
             f"{path.name} okumak icin PyYAML gerekli: python -m pip install pyyaml"
         )
@@ -240,16 +241,16 @@ def _read_yaml(path: Path) -> dict[str, Any]:
 
 
 # --------------------------------------------------------------------------
-# Defter: hash zinciri
+# Ledger: hash chain
 # --------------------------------------------------------------------------
 
 
 class Ledger:
-    """Her karari onceki kaydin hash'ine baglar.
+    """Links every decision to the previous record's hash.
 
-    Ayni desen Airlock'ta arac cagrilari icin kullaniliyor; burada dongunun
-    kendi kararlari icin kullaniliyor. Amac ayni: sonradan "aslinda boyle
-    olmamisti" denilemesin.
+    Airlock uses the same pattern for tool calls; here it is used for the
+    loop's own decisions. The goal is the same: nobody can later claim "it
+    actually did not happen that way".
     """
 
     GENESIS = "0" * 64
@@ -286,7 +287,7 @@ class Ledger:
         return out
 
     def verify(self) -> tuple[bool, int, str]:
-        """(gecti, kayit_sayisi, ilk_kirilma_nedeni)"""
+        """(passed, record_count, first_break_reason)"""
         prev = self.GENESIS
         records = self.records()
         for record in records:
@@ -313,7 +314,7 @@ def _hash_record(record: dict[str, Any]) -> str:
 
 
 # --------------------------------------------------------------------------
-# Adapter: modelin takildigi yer
+# Adapter: where the model plugs in
 # --------------------------------------------------------------------------
 
 
@@ -322,7 +323,7 @@ class Adapter(Protocol):
 
 
 class ScriptedAdapter:
-    """Testler ve kuru kosular icin: her goreve sirayla cevap verir."""
+    """For tests and dry runs: answers each task in scripted order."""
 
     def __init__(self, script: dict[str, Sequence[Candidate]]):
         self._script = {k: list(v) for k, v in script.items()}
@@ -338,7 +339,7 @@ class ScriptedAdapter:
 
 
 # --------------------------------------------------------------------------
-# Dongu
+# Loop
 # --------------------------------------------------------------------------
 
 
@@ -382,8 +383,9 @@ class Loop:
             if task is None:
                 self.report.stopped = "is_kalmadi"
                 break
-            # Goreve baslamak icin tahmini maliyet kadar butce sart. Butceyi
-            # asarak baslamak, tavani "yaklasik" yapar; tavan yaklasik olamaz.
+            # Starting a task requires budget at least equal to its estimate.
+            # Starting over budget makes the ceiling "approximate"; a ceiling
+            # cannot be approximate.
             if self.budget_left < task.estimate_tokens:
                 self.report.stopped = "butce_bitti"
                 break
@@ -394,7 +396,7 @@ class Loop:
         self._persist()
         return self.report
 
-    # -- adimlar --------------------------------------------------------
+    # -- steps ----------------------------------------------------------
     def _check_stop(self) -> str:
         if (self.workdir / "STOP").exists():
             return "insan_durdurdu"
@@ -416,8 +418,9 @@ class Loop:
             self._spend(candidate.tokens)
 
             if self.budget_left < 0:
-                # Harcama gerceklesti; dogrulama icin butce kalmadi. Isi kabul
-                # etmek tavani "yaklasik" yapar; tavan yaklasik olamaz.
+                # The spending already happened; no budget is left for
+                # verification. Accepting the task would make the ceiling
+                # "approximate"; a ceiling cannot be approximate.
                 self._decide(
                     Decision("blocked", task.id, "bütçe aşıldı: doğrulama yapılamaz", [])
                 )
@@ -429,7 +432,7 @@ class Loop:
             gates = self.evaluate(candidate)
             blocking_failures = [g for g in gates if not g.ok and g.blocking]
 
-            # C3 ve politika ihlali: insan kapisi, tekrar denemek anlamsiz.
+            # C3 and policy violations: a human gate; retrying is pointless.
             human_gate = self._human_gate(task, gates)
             if human_gate is not None:
                 self._decide(Decision("blocked", task.id, human_gate, gates))
@@ -459,14 +462,14 @@ class Loop:
             self._note_outcome(progress=False, failure=True)
             return
 
-    # -- kapilar --------------------------------------------------------
+    # -- gates ----------------------------------------------------------
     def evaluate(self, candidate: Candidate) -> list[GateResult]:
         results: list[GateResult] = []
         for gate in self.spec.gates:
             result = self._run_gate(gate, candidate)
             results.append(result)
             if not result.ok and result.blocking:
-                break  # fail-fast: ilk bloklayici kapida dur
+                break  # fail-fast: stop at the first blocking gate
         return results
 
     def _run_gate(self, gate: GateSpec, candidate: Candidate) -> GateResult:
@@ -483,7 +486,7 @@ class Loop:
         if gate.signal is None:
             value = candidate.signals.get(gate.name)
             if value is None:
-                # Sinyal yoksa kapi gecmez: olculmemis bir sey "gecti" sayilamaz.
+                # No signal, no pass: something unmeasured cannot count as "passed".
                 return GateResult(gate.name, False, gate.blocking, "sinyal yok")
             ok = bool(value)
             return GateResult(
@@ -492,10 +495,10 @@ class Loop:
 
         value = candidate.signals.get(gate.signal)
         if value is None:
-            # Sinyal yoksa kapi gecmez: "olculmedi" != "gecti".
+            # No signal, no pass: "unmeasured" != "passed".
             return GateResult(gate.name, False, gate.blocking, "sinyal yok")
         if isinstance(value, bool):
-            # Boolean sinyal asla sayiya cevrilmez: False = 0.0 tuzagi.
+            # A boolean signal is never coerced to a number: the False = 0.0 trap.
             ok = value
             return GateResult(
                 gate.name, ok, gate.blocking, "geçti" if ok else "başarısız"
@@ -524,7 +527,7 @@ class Loop:
             return f"politika ihlali: {policy.detail}"
         return None
 
-    # -- kayit ----------------------------------------------------------
+    # -- record ---------------------------------------------------------
     def _decide(self, decision: Decision) -> None:
         self.report.decisions.append(decision)
         self.ledger.append(
@@ -541,11 +544,11 @@ class Loop:
         )
 
     def _learn(self, task: Task, failure: GateResult) -> None:
-        """Tekrar eden hata -> beceri adayi.
+        """Recurring failure -> skill candidate.
 
-        Kural: ayni kapi + ayni neden iki kez gorulurse, bu artik bir gorev
-        problemi degil bir *sistem* problemidir; beceri adayi olarak kaydedilir
-        (ADR-F04). Kaydedilir, otomatik uygulanmaz.
+        Rule: the same gate + same reason seen twice is no longer a task
+        problem but a *system* problem; it is recorded as a skill candidate
+        (ADR-F04). It is recorded, never applied automatically.
         """
         fingerprint = hashlib.sha1(
             f"{failure.gate}|{failure.detail}".encode("utf-8")
@@ -581,7 +584,7 @@ class Loop:
         self.budget_left -= max(0, int(tokens))
         self.report.tokens_spent += max(0, int(tokens))
 
-    # -- durum ----------------------------------------------------------
+    # -- state ----------------------------------------------------------
     def _persist(self) -> None:
         state = {
             "goal": self.spec.goal_id,
