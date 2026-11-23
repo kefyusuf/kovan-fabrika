@@ -341,7 +341,7 @@ decision (ask_user) and the approval was recorded.
   record landed in `kullanim.jsonl` (ÖVD is now measurable).
 - **The life cycle:** proposed → active → stale (90 days) → archived;
   activation criteria: the skill's test passes + evidence ≥ 2 tasks + human
-  approval. The decay report: `skill.py rapor`.
+  approval. The decay report: `skill.py report`.
 
 **The learning loop closed end-to-end for the first time:** error → lesson →
 skill candidate → human approval → active skill → enforcement in the
