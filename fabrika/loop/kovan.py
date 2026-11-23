@@ -42,7 +42,7 @@ from verify import sinyaller  # noqa: E402
 from eval_run import kos as eval_kos  # noqa: E402
 from reviewer import Incelemeci, IncelemeciError  # noqa: E402
 from compliance import sinyal as uyum_sinyali  # noqa: E402
-from capacity import Gorev, inceleme_saati, kabul_et  # noqa: E402
+from capacity import WorkItem, review_hours, accept  # noqa: E402
 from runner import (  # noqa: E402
     Candidate,
     ChangeClass,
@@ -169,8 +169,8 @@ class BacklogIsi:
     bagimlilik: tuple[str, ...]
     dokunur: tuple[str, ...]
 
-    def gorev(self) -> Gorev:
-        return Gorev(self.id, self.loc, self.oncelik, self.bagimlilik)
+    def work_item(self) -> WorkItem:
+        return WorkItem(self.id, self.loc, self.oncelik, self.bagimlilik)
 
     def task(self) -> Task:
         return Task(
@@ -240,20 +240,20 @@ def kuru_senaryo(isler: list[BacklogIsi], seed: int = 0) -> dict[str, list[Candi
     return senaryo
 
 
-def _kapasite_ozeti(isler: list[BacklogIsi], saat: float):
-    return kabul_et([i.gorev() for i in isler], kapasite=saat)
+def _capacity_summary(items: list[BacklogIsi], hours: float):
+    return accept([i.work_item() for i in items], capacity=hours)
 
 
 def cmd_plan(args: argparse.Namespace) -> int:
     isler = backlog_oku(args.backlog)
     c3 = [i for i in isler if i.sinif is ChangeClass.C3]
     adaylar = [i for i in isler if i.sinif is not ChangeClass.C3]
-    karar = _kapasite_ozeti(adaylar, args.hours)
+    karar = _capacity_summary(adaylar, args.hours)
     print(f"Kapasite: {args.hours:.1f} saat")
-    print(f"Kabul   : {', '.join(g.id for g in karar.kabul) or '-'}")
-    print(f"Ertelenen: {', '.join(g.id for g in karar.ertelenen) or '-'}")
+    print(f"Kabul   : {', '.join(g.id for g in karar.accepted) or '-'}")
+    print(f"Ertelenen: {', '.join(g.id for g in karar.deferred) or '-'}")
     print(f"İnsan kuyruğu (C3): {', '.join(i.id for i in c3) or '-'}")
-    print(f"Doluluk : {karar.doluluk:.0%}")
+    print(f"Doluluk : {karar.occupancy:.0%}")
     return 0
 
 
@@ -274,15 +274,15 @@ def cmd_run(args: argparse.Namespace) -> int:
         adaylar = [i for i in adaylar if i.id not in tamamlanan_id]
         atlanan_tamamlanan = onceki - len(adaylar)
 
-    karar = _kapasite_ozeti(adaylar, args.hours)
-    kabul_id = {g.id for g in karar.kabul}
+    karar = _capacity_summary(adaylar, args.hours)
+    kabul_id = {g.id for g in karar.accepted}
     kabul_edilen = [i for i in adaylar if i.id in kabul_id]
     if args.canary and len(kabul_edilen) > args.canary:
         # Kanarya: yalnızca ilk N iş; kalan kapasite harcanmış sayılır
         # (dürüst muhasebe) ama koşulmaz.
-        karar.ertelenen.extend(g for g in karar.kabul[args.canary:])
-        karar.kabul = karar.kabul[: args.canary]
-        kabul_id = {g.id for g in karar.kabul}
+        karar.deferred.extend(g for g in karar.accepted[args.canary:])
+        karar.accepted = karar.accepted[: args.canary]
+        kabul_id = {g.id for g in karar.accepted}
         kabul_edilen = [i for i in kabul_edilen if i.id in kabul_id]
 
     run_id = args.run_id or datetime.now().strftime("%Y%m%d-%H%M%S")
@@ -344,10 +344,10 @@ def cmd_run(args: argparse.Namespace) -> int:
             "kanarya": args.canary or None,
             "tamamlanan_atlandi": atlanan_tamamlanan,
             "kapasite_saat": args.hours,
-            "kabul": [g.id for g in karar.kabul],
-            "ertelenen": [g.id for g in karar.ertelenen],
+            "kabul": [g.id for g in karar.accepted],
+            "ertelenen": [g.id for g in karar.deferred],
             "insan_kuyrugu": [i.id for i in c3],
-            "doluluk": karar.doluluk,
+            "doluluk": karar.occupancy,
             "defter": {"ok": ok, "kayit": kayit, "neden": neden},
         }
     )
@@ -388,7 +388,7 @@ def cmd_run(args: argparse.Namespace) -> int:
                 )
 
     print(f"Koşu     : {run_dir}")
-    print(f"Kabul    : {len(karar.kabul)} iş / {len(isler)}")
+    print(f"Kabul    : {len(karar.accepted)} iş / {len(isler)}")
     print(f"Sonuç    : {len(rapor.accepted)} kabul, {len(rapor.blocked)} insan kapısı")
     print(f"Defter   : {'OK' if ok else 'KIRIK'} ({kayit} kayıt)")
     print(f"Rapor    : {run_dir / 'rapor.md'}")
@@ -489,21 +489,21 @@ def _rapor_yaz(isler, karar, rapor, ok, kayit, run_id, saat, run_dir: Path, c3=N
     satir = [
         f"# KOVAN Koşu Raporu — {run_id}" + (f" · KANARYA ({kanarya})" if kanarya else ""),
         "",
-        f"Kapasite: **{saat:.1f} saat** · Kabul: **{len(karar.kabul)}** · "
-        f"Ertelenen: **{len(karar.ertelenen)}** · Doluluk: **{karar.doluluk:.0%}**",
+        f"Kapasite: **{saat:.1f} saat** · Kabul: **{len(karar.accepted)}** · "
+        f"Ertelenen: **{len(karar.deferred)}** · Doluluk: **{karar.occupancy:.0%}**",
         "",
         "## 1. Kapasite kararı",
         "",
         "| İş | LOC | Efor (saat) | Durum |",
         "|---|---|---|---|",
     ]
-    kabul_id = {g.id for g in karar.kabul}
+    kabul_id = {g.id for g in karar.accepted}
     for isi in sorted(isler, key=lambda i: (i.oncelik, i.loc, i.id)):
         if isi.id in c3_id:
             durum = "insan kuyruğu (C3)"
         else:
             durum = "kabul" if isi.id in kabul_id else "ertelendi"
-        satir.append(f"| {isi.id} | {isi.loc} | {inceleme_saati(isi.loc):.2f} | {durum} |")
+        satir.append(f"| {isi.id} | {isi.loc} | {review_hours(isi.loc):.2f} | {durum} |")
 
     satir += ["", "## 2. Kararlar", "", "| Görev | Sınıf | Karar | Gerekçe |", "|---|---|---|---|"]
     siniflar = {i.id: i.sinif.value for i in isler}

@@ -1,24 +1,24 @@
-"""KOVAN — Kapasite valfi.
+"""KOVAN — Capacity valve.
 
-Arastirmanin ana bulgusu: darboğaz kod üretimi değil, kabul (inceleme)
-kapasitesi. Bu modül, "kaç iş alabiliriz" sorusunu hisle değil, ölçüyle
-cevaplar.
+The research's main finding: the bottleneck is not code production but
+acceptance (review) capacity. This module answers the question "how many
+tasks can we take" with measurement, not gut feeling.
 
-Üç hesap:
-1. İnceleme eforu  : LOC / 500 + PR başına 0,25 saat bağlam payı
-2. Kuyruk gecikmesi: M/M/1  ->  (rho / (1-rho)) / mu
-3. WIP limiti      : Little yasası  ->  hedef cycle time x günlük geliş
+Three calculations:
+1. Review effort   : LOC / 500 + 0.25 hours of context per PR
+2. Queue delay     : M/M/1  ->  (rho / (1-rho)) / mu
+3. WIP limit       : Little's law  ->  target cycle time x daily arrivals
 
-Kalibrasyon (arastirma):
-- 400 LOC ~ 0,8-1,0 inceleme saati (Cisco/SmartBear)
-- mu = 10 PR/gün tabanında: rho = 0,625 -> ~4 saat (Google <4 saat medyan)
-- rho = 0,80 -> 9,6 saat; rho = 0,89 -> ~19 saat (Faros +%441)
-- rho = 0,95 -> ~46 saat: sistem doygun, kuyruk iki güne çıkıyor
+Calibration (research):
+- 400 LOC ~ 0.8-1.0 review hours (Cisco/SmartBear)
+- at mu = 10 PR/day: rho = 0.625 -> ~4 h (Google <4 h median)
+- rho = 0.80 -> 9.6 h; rho = 0.89 -> ~19 h (Faros +441%)
+- rho = 0.95 -> ~46 h: the system is saturated, the queue stretches to two days
 
-Not: M/M/1'de kuyruk *uzunluğu* (rho/(1-rho)) ile kuyruk *süresi*
-(rho/(mu-lam)) karıştırılmamalı. Bu modül süreyi saat olarak verir.
+Note: in M/M/1 the queue *length* (rho/(1-rho)) must not be confused with
+the queue *time* (rho/(mu-lam)). This module reports time in hours.
 
-Kullanim:
+Usage:
     python capacity.py --reviewers 2 --hours 3
     python capacity.py --lam 9 --mu 10
 """
@@ -32,57 +32,57 @@ from dataclasses import asdict, dataclass, field
 
 LOC_PER_HOUR = 500.0
 CONTEXT_HOURS_PER_PR = 0.25
-DEFAULT_CONFLICT_RATE = 0.198  # ayni ajan, eszamanli PR ciftleri (arXiv 2607.04697)
+DEFAULT_CONFLICT_RATE = 0.198  # same agent, concurrent PR pairs (arXiv 2607.04697)
 
 
 @dataclass(frozen=True)
-class Gorev:
+class WorkItem:
     id: str
     loc: int
-    oncelik: int = 2  # 1 = en yüksek
-    bagimlilik: tuple[str, ...] = ()
+    priority: int = 2  # 1 = highest
+    dependencies: tuple[str, ...] = ()
 
     def sort_key(self) -> tuple[int, int, str]:
-        return (self.oncelik, self.loc, self.id)
+        return (self.priority, self.loc, self.id)
 
 
 @dataclass
-class Karar:
-    kabul: list[Gorev] = field(default_factory=list)
-    ertelenen: list[Gorev] = field(default_factory=list)
-    kullanilan_saat: float = 0.0
-    kapasite_saat: float = 0.0
+class CapacityDecision:
+    accepted: list[WorkItem] = field(default_factory=list)
+    deferred: list[WorkItem] = field(default_factory=list)
+    used_hours: float = 0.0
+    capacity_hours: float = 0.0
 
     @property
-    def doluluk(self) -> float:
-        return round(self.kullanilan_saat / self.kapasite_saat, 4) if self.kapasite_saat else 0.0
+    def occupancy(self) -> float:
+        return round(self.used_hours / self.capacity_hours, 4) if self.capacity_hours else 0.0
 
-    def ozet(self) -> dict:
+    def summary(self) -> dict:
         return {
-            "kabul": [g.id for g in self.kabul],
-            "ertelenen": [g.id for g in self.ertelenen],
-            "kullanilan_saat": round(self.kullanilan_saat, 2),
-            "kapasite_saat": round(self.kapasite_saat, 2),
-            "doluluk": self.doluluk,
+            "kabul": [g.id for g in self.accepted],
+            "ertelenen": [g.id for g in self.deferred],
+            "kullanilan_saat": round(self.used_hours, 2),
+            "kapasite_saat": round(self.capacity_hours, 2),
+            "doluluk": self.occupancy,
         }
 
 
-def inceleme_saati(loc: int, baglam: float = CONTEXT_HOURS_PER_PR) -> float:
-    """Bir PR'ı incelemek için gereken saat."""
+def review_hours(loc: int, context: float = CONTEXT_HOURS_PER_PR) -> float:
+    """Hours needed to review one PR."""
     if loc < 0:
         raise ValueError("loc negatif olamaz")
-    return loc / LOC_PER_HOUR + baglam
+    return loc / LOC_PER_HOUR + context
 
 
-def kapasite_saat(inceleyici: int, odakli_saat: float) -> float:
-    """Günlük/haftalık odaklı inceleme kapasitesi."""
-    if inceleyici < 0 or odakli_saat < 0:
+def review_capacity_hours(reviewers: int, focused_hours: float) -> float:
+    """Daily/weekly focused review capacity."""
+    if reviewers < 0 or focused_hours < 0:
         raise ValueError("negatif girdi")
-    return inceleyici * odakli_saat
+    return reviewers * focused_hours
 
 
-def mm1_gecikme(lam: float, mu: float) -> float:
-    """M/M/1 ortalama kuyruk beklemesi (saat). rho >= 1 ise sonsuz."""
+def mm1_delay(lam: float, mu: float) -> float:
+    """M/M/1 average queue wait (hours). Infinite when rho >= 1."""
     if mu <= 0:
         raise ValueError("mu pozitif olmalı")
     rho = lam / mu
@@ -91,72 +91,74 @@ def mm1_gecikme(lam: float, mu: float) -> float:
     return (rho / (1 - rho)) * (1 / mu) * 24
 
 
-def wip_limiti(hedef_gun: float, gunluk_gelis: float) -> int:
-    """Little yasası: L = lambda * W."""
-    if hedef_gun < 0 or gunluk_gelis < 0:
+def wip_limit(target_days: float, daily_arrivals: float) -> int:
+    """Little's law: L = lambda * W."""
+    if target_days < 0 or daily_arrivals < 0:
         raise ValueError("negatif girdi")
-    return max(0, math.floor(hedef_gun * gunluk_gelis))
+    return max(0, math.floor(target_days * daily_arrivals))
 
 
-def cakisan_cift(n: int, p: float = DEFAULT_CONFLICT_RATE) -> float:
-    """n eşzamanlı PR için beklenen çakışan çift sayısı."""
+def conflicting_pairs(n: int, p: float = DEFAULT_CONFLICT_RATE) -> float:
+    """Expected number of conflicting pairs for n concurrent PRs."""
     if n < 2:
         return 0.0
     return n * (n - 1) / 2 * p
 
 
-def kabul_et(gorevler: list[Gorev], kapasite: float, wip: int | None = None) -> Karar:
-    """Öncelik sırasıyla, kapasiteyi aşmadan iş kabul et."""
-    if kapasite < 0:
+def accept(
+    work_items: list[WorkItem], capacity: float, wip: int | None = None
+) -> CapacityDecision:
+    """Accept work in priority order without exceeding capacity."""
+    if capacity < 0:
         raise ValueError("kapasite negatif olamaz")
 
-    kalan = kapasite
-    karar = Karar(kapasite_saat=kapasite)
-    adaylar = sorted(gorevler, key=lambda g: g.sort_key())
-    kabul_edilen: set[str] = set()
+    remaining = capacity
+    decision = CapacityDecision(capacity_hours=capacity)
+    candidates = sorted(work_items, key=lambda g: g.sort_key())
+    accepted_ids: set[str] = set()
 
-    for gorev in adaylar:
-        if wip is not None and len(karar.kabul) >= wip:
-            karar.ertelenen.append(gorev)
+    for item in candidates:
+        if wip is not None and len(decision.accepted) >= wip:
+            decision.deferred.append(item)
             continue
-        if any(dep not in kabul_edilen for dep in gorev.bagimlilik):
-            karar.ertelenen.append(gorev)
+        if any(dep not in accepted_ids for dep in item.dependencies):
+            decision.deferred.append(item)
             continue
-        gerekli = inceleme_saati(gorev.loc)
-        if gerekli <= kalan + 1e-9:
-            karar.kabul.append(gorev)
-            kabul_edilen.add(gorev.id)
-            kalan -= gerekli
-            karar.kullanilan_saat += gerekli
+        needed = review_hours(item.loc)
+        if needed <= remaining + 1e-9:
+            decision.accepted.append(item)
+            accepted_ids.add(item.id)
+            remaining -= needed
+            decision.used_hours += needed
         else:
-            karar.ertelenen.append(gorev)
+            decision.deferred.append(item)
 
-    return karar
+    return decision
 
 
-def kapasite_raporu(
+def capacity_report(
     *,
-    inceleyici: int,
-    odakli_saat: float,
+    reviewers: int,
+    focused_hours: float,
     lam: float,
     mu: float,
-    hedef_gun: float = 1.0,
+    target_days: float = 1.0,
 ) -> dict:
-    kapasite = kapasite_saat(inceleyici, odakli_saat)
+    capacity = review_capacity_hours(reviewers, focused_hours)
     rho = lam / mu if mu else math.inf
     return {
-        "kapasite_saat": kapasite,
-        "gunluk_kapasite_pr": round(kapasite / (400 / LOC_PER_HOUR + CONTEXT_HOURS_PER_PR), 1),
+        "kapasite_saat": capacity,
+        "gunluk_kapasite_pr": round(capacity / (400 / LOC_PER_HOUR + CONTEXT_HOURS_PER_PR), 1),
         "rho": round(rho, 3) if math.isfinite(rho) else "sinirsiz",
         "kuyruk_gecikmesi_saat": (
-            round(mm1_gecikme(lam, mu), 2) if math.isfinite(mm1_gecikme(lam, mu)) else "sinirsiz"
+            round(mm1_delay(lam, mu), 2) if math.isfinite(mm1_delay(lam, mu)) else "sinirsiz"
         ),
-        "wip_limiti": wip_limiti(hedef_gun, lam),
-        "tavsiye": _tavsiye(rho),
+        "wip_limiti": wip_limit(target_days, lam),
+        "tavsiye": _recommendation(rho),
     }
 
 
-def _tavsiye(rho: float) -> str:
+def _recommendation(rho: float) -> str:
     if rho >= 1:
         return "DUR: kapasite talebi karşılamıyor; yeni iş alma."
     if rho >= 0.85:
@@ -166,14 +168,14 @@ def _tavsiye(rho: float) -> str:
     return "BOŞLUK: kapasite var; iş alımını artırabilirsin."
 
 
-def _ornek_backlog() -> list[Gorev]:
+def _sample_backlog() -> list[WorkItem]:
     return [
-        Gorev("K-101", 40, 1),
-        Gorev("K-102", 320, 1),
-        Gorev("K-103", 120, 2),
-        Gorev("K-104", 600, 2),
-        Gorev("K-105", 200, 3),
-        Gorev("K-106", 90, 3),
+        WorkItem("K-101", 40, 1),
+        WorkItem("K-102", 320, 1),
+        WorkItem("K-103", 120, 2),
+        WorkItem("K-104", 600, 2),
+        WorkItem("K-105", 200, 3),
+        WorkItem("K-106", 90, 3),
     ]
 
 
@@ -187,26 +189,26 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--json", action="store_true")
     args = parser.parse_args(argv)
 
-    rapor = kapasite_raporu(
-        inceleyici=args.reviewers,
-        odakli_saat=args.hours,
+    report = capacity_report(
+        reviewers=args.reviewers,
+        focused_hours=args.hours,
         lam=args.lam,
         mu=args.mu,
-        hedef_gun=args.target_days,
+        target_days=args.target_days,
     )
-    karar = kabul_et(_ornek_backlog(), kapasite_saat(args.reviewers, args.hours))
-    rapor["ornek_kabul"] = karar.ozet()
+    decision = accept(_sample_backlog(), review_capacity_hours(args.reviewers, args.hours))
+    report["ornek_kabul"] = decision.summary()
 
     if args.json:
-        print(json.dumps(rapor, ensure_ascii=False, indent=2))
+        print(json.dumps(report, ensure_ascii=False, indent=2))
     else:
-        print(f"Kapasite        : {rapor['kapasite_saat']:.1f} saat/gün")
-        print(f"Günlük PR tavanı: {rapor['gunluk_kapasite_pr']}")
-        print(f"Doluluk (rho)   : {rapor['rho']}")
-        print(f"Kuyruk bekleme  : {rapor['kuyruk_gecikmesi_saat']} saat")
-        print(f"WIP limiti      : {rapor['wip_limiti']}")
-        print(f"Tavsiye         : {rapor['tavsiye']}")
-        print(f"Örnek kabul     : {rapor['ornek_kabul']}")
+        print(f"Kapasite        : {report['kapasite_saat']:.1f} saat/gün")
+        print(f"Günlük PR tavanı: {report['gunluk_kapasite_pr']}")
+        print(f"Doluluk (rho)   : {report['rho']}")
+        print(f"Kuyruk bekleme  : {report['kuyruk_gecikmesi_saat']} saat")
+        print(f"WIP limiti      : {report['wip_limiti']}")
+        print(f"Tavsiye         : {report['tavsiye']}")
+        print(f"Örnek kabul     : {report['ornek_kabul']}")
     return 0
 
 
